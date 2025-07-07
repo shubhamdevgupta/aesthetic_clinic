@@ -30,38 +30,19 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _navigateToNextScreen() async {
     await Future.delayed(const Duration(seconds: 1)); // Optional splash delay
 
-    final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-    final roleId = session.roleId;
-    await authProvider.checkLoginStatus();
+      Navigator.pushReplacementNamed(context, AppConstants.navigateToOnBoardingScreen);
 
-    if (authProvider.isLoggedIn) {
-      if (roleId == 4) {
-        Navigator.pushReplacementNamed(
-            context, AppConstants.navigateToDashboardScreen);
-      } else if (roleId == 8) {
-        Navigator.pushReplacementNamed(
-            context, AppConstants.navigateToDwsmDashboard);
-      } else if (roleId == 7) {
-        Navigator.pushReplacementNamed(
-            context, AppConstants.navigateToFtkDashboard);
-      }
-    } else {
-      Navigator.pushReplacementNamed(
-          context, AppConstants.navigateToLoginScreen);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/icons/wqmis_splash.jpg'),
-            fit: BoxFit.cover,
-          ),
+      body: Center(
+        child: Column(
+          children: [
+            Text('Amara',style: TextStyle(fontSize: 24,fontWeight: FontWeight.w400),),
+            Text('Aesthetic Clinic',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w100),),
+          ],
         ),
       ),
     );

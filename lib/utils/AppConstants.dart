@@ -26,43 +26,11 @@ class AppConstants {
 
   /////////////////////   Routes literals  //////////////////////////////////
 
-  //DWSM
-  //dwsm List
-  static const String navigateToDemonstrationScreen = '/demonstrationScreen';
-  static const String navigateToSchoolAwsScreen = '/schoolAwsScreen';
-  //tabschoolanganwadi
-  static const String navigateToAnganwadiScreen = '/AnganwadiScreen';
-  static const String navigateToSchoolScreen = '/schoolScreen';
-  static const String navigateToTabSchoolAganwadi = '/tabSchoolAnganwadi';
-
-  static const String navigateToDwsmLocaitonScreen = '/dwsmLocation';
-  static const String navigateToDwsmDashboard = '/dwsm_dashboard';
-
-
-  //lab
-  static const String navigateLabView = '/lavView';
-  static const String navigateToParameterView = '/paramView';
-  static const String navigateToLabParam = '/TabLabParam';
-  static const String navigateToWTPLab = '/WtpLab';
-
-  //webView
-  static const String navigateToTestReport = '/testReport';
-
   //auth
   static const String navigateToDashboardScreen = '/dashboardScreen';
   static const String navigateToLoginScreen = '/loginScreen ';
   static const String navigateToSplashScreen = '/ ';
-
-
-  static const String navigateToExceptionScreen = '/exceptionScreen';
-  static const String navigateToLocationScreen = '/locationScreen';
-  static const String navigateToSampleInformationScreen = '/sampleInfo';
-  static const String navigateToSampleListScreen = '/sampleList';
-  static const String navigateToSubmitSampleScreen = '/sampleSubmit';
-
-  //ftk
-  static const String navigateToFtkSampleScreen = '/ftksampleScreen';
-  static const String navigateToFtkDashboard = '/ftkDashboard';
+  static const String navigateToOnBoardingScreen = '/onboardingScreen';
 
 
 

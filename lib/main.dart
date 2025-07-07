@@ -1,5 +1,6 @@
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
+import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/utils/AppRoutes.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: '/',
+      initialRoute: AppConstants.navigateToSplashScreen,
       routes: AppRoutes.getRoutes(),
     );
   }
