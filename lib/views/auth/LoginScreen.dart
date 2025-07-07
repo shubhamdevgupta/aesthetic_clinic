@@ -267,7 +267,7 @@ class _LoginpageState extends State<Loginscreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                '(JJM-WQMIS)',
+                '(Aesthetic Clinic)',
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600, fontFamily: 'OpenSans',

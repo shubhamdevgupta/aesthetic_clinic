@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appTitle = 'JJM-WQMIS';
+  static const String appTitle = 'Aesthetic Clinic';
 
   /////////////////////   Preference Data  //////////////////////////////////
 
