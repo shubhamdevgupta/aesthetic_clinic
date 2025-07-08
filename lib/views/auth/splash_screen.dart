@@ -1,3 +1,4 @@
+import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,14 +14,12 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final session = UserSessionManager();
+  final LocalStorageService storage = LocalStorageService();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await session.sanitizePrefs();  // await clear
-      await session.init();       // await init after clearing
       _navigateToNextScreen();
     });
   }
@@ -29,9 +28,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _navigateToNextScreen() async {
     await Future.delayed(const Duration(seconds: 1)); // Optional splash delay
-
-      Navigator.pushReplacementNamed(context, AppConstants.navigateToOnBoardingScreen);
-
+    print("seen on boarding ${storage.getBool(AppConstants.prefSeenOnboarding)}");
+      if(storage.getBool(AppConstants.prefSeenOnboarding)??false){
+        Navigator.pushReplacementNamed(context, AppConstants.navigateToLoginScreen);
+      }else {
+        Navigator.pushReplacementNamed(
+            context, AppConstants.navigateToOnBoardingScreen);
+      }
   }
 
   @override

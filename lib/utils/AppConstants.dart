@@ -24,6 +24,10 @@ class AppConstants {
 
   static const String prefRegId = 'reg_id';
 
+
+  static const String prefSeenOnboarding = 'seen_onboarding';
+
+
   /////////////////////   Routes literals  //////////////////////////////////
 
   //auth

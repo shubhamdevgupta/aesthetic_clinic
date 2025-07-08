@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import '../models/LoginResponse.dart';
+import 'package:aesthetic_clinic/models/auth_response.dart';
+
+import '../models/otp_response.dart';
 import '../services/BaseApiService.dart';
 import '../utils/GlobalExceptionHandler.dart';
 
@@ -8,20 +10,36 @@ import '../utils/GlobalExceptionHandler.dart';
 class AuthenticaitonRepository {
   final BaseApiService _apiService = BaseApiService();
 
-  Future<LoginResponse> loginUser(
-      String phoneNumber, String password, String txtSalt, int appId) async {
+  Future<OtpResponse> sendOtp(
+      String phoneNumber ) async {
     try {
       // Call the POST method from BaseApiService
-      final response = await _apiService.post('APIMobile/Login',
+      final response = await _apiService.post('/auth/mobile-login',
         body: jsonEncode({
-          'loginid': phoneNumber,
-          'password': password,
-          'txtSaltedHash': txtSalt,
-           'App_id':appId
+          'phone': phoneNumber
         }),
       );
 
-      return LoginResponse.fromJson(response);
+      return OtpResponse.fromJson(response);
+    } catch (e) {
+      GlobalExceptionHandler.handleException(e as Exception);
+      rethrow;
+    }
+  }
+
+  Future<AuthResponse> verifyOtp(
+      String phoneNumber, String otp) async {
+    try {
+      // Call the POST method from BaseApiService
+      final response = await _apiService.post('/auth/mobile-login',
+        body: jsonEncode({
+          'phone': phoneNumber,
+          'otp': otp,
+          'deviceInfo': "Mobile App",
+        }),
+      );
+
+      return AuthResponse.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;

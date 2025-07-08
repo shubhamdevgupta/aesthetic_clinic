@@ -1,3 +1,5 @@
+import 'package:aesthetic_clinic/services/LocalStorageService.dart';
+import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/views/auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +15,7 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
-
+final LocalStorageService storage=LocalStorageService();
   final List<Widget> _pages = [
     const OnboardPage(
       title: "Welcome aboard",
@@ -38,11 +40,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
       setState(() => _currentPage++);
     } else {
+      storage.saveBool(AppConstants.prefSeenOnboarding, true);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
   }
 
   @override

@@ -9,10 +9,7 @@ import '../utils/CustomException.dart';
 
 
 class BaseApiService {
-  final String _baseUrl = 'https://ejalshakti.gov.in/wqmis/api/';
-  static const String ejalShakti = "https://ejalshakti.gov.in/wqmis/api/";
-  static const String reverseGeocoding = "https://reversegeocoding.nic.in/";
-  static const String github = "https://api.github.com/repos/";
+  final String _baseUrl = 'https://api.amaraclinics.ae/api';
 
   Future<dynamic> post(
     String endpoint, {
@@ -54,10 +51,8 @@ class BaseApiService {
   }
 
   Future<dynamic> get(String endpoint,
-      {ApiType apiType = ApiType.ejalShakti,
-      Map<String, String>? headers}) async {
-    final String baseUrl = getBaseUrl(apiType);
-    final Uri url = Uri.parse('$baseUrl$endpoint');
+      {Map<String, String>? headers}) async {
+    final Uri url = Uri.parse('$_baseUrl$endpoint');
 
     headers ??= {};
     headers.putIfAbsent('Content-Type', () => 'application/json');
@@ -121,28 +116,11 @@ class BaseApiService {
     }
   }
 
-  String getBaseUrl(ApiType apiType) {
-    switch (apiType) {
-      case ApiType.ejalShakti:
-        return ejalShakti;
-      case ApiType.reverseGeocoding:
-        return reverseGeocoding;
-      case ApiType.github:
-        return github;
-    }
-  }
 
   String handleErrorResp(String responseBody, String defMessage) {
     final Map<String, dynamic> jsonData = jsonDecode(responseBody);
-    //   final String errType = jsonData['ExceptionType'] ?? '';
     final String message = jsonData['ExceptionMessage'] ?? defMessage;
     String res = " $message";
     return res;
   }
-}
-
-enum ApiType {
-  ejalShakti,
-  reverseGeocoding,
-  github,
 }
