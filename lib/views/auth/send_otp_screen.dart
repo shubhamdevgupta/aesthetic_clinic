@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'country_selection_screen.dart'; // ⬅️ You'll create this file
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SendOtpScreen extends StatefulWidget {
+  const SendOtpScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SendOtpScreen> createState() => _SendOtpScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SendOtpScreenState extends State<SendOtpScreen> {
   Country _selectedCountry = Country(
     phoneCode: '1',
     countryCode: 'US',
@@ -57,12 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
               Text(
-                "Enter your mobile number, we will send you an OTP",
+                "Enter your mobile number, we will send you an OTP on Whatsapp",
                 style: TextStyle(fontSize: 16, color: Colors.grey[700]),
               ),
               const SizedBox(height: 20),
 
-              /// Country Code + Phone Number Field
               Row(
                 children: [
                   GestureDetector(

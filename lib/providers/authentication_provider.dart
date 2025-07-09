@@ -15,15 +15,8 @@ class AuthenticationProvider extends ChangeNotifier {
   final AuthenticaitonRepository _authRepository = AuthenticaitonRepository();
   final LocalStorageService _localStorage = LocalStorageService();
 
-
-
   bool _isLoggedIn = false;
-
   bool get isLoggedIn => _isLoggedIn;
-
-
-  bool _isLoading = false;
-  // Getters
 
   OtpResponse? _otpResponse;
   OtpResponse? get loginResponse => _otpResponse;
@@ -31,6 +24,7 @@ class AuthenticationProvider extends ChangeNotifier {
   AuthResponse? _authResponse;
   AuthResponse? get authResponse => _authResponse;
 
+  bool _isLoading = false;
   bool get isLoading => _isLoading;
 
   String errorMsg = '';

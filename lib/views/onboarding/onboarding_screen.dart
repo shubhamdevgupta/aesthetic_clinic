@@ -1,6 +1,6 @@
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
-import 'package:aesthetic_clinic/views/auth/login_screen.dart';
+import 'package:aesthetic_clinic/views/auth/send_otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -43,7 +43,7 @@ final LocalStorageService storage=LocalStorageService();
       storage.saveBool(AppConstants.prefSeenOnboarding, true);
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        MaterialPageRoute(builder: (_) => const SendOtpScreen()),
       );
     }
   }

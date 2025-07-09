@@ -10,18 +10,6 @@ class AppConstants {
   static const String prefName = 'name';
   static const String prefMobile = 'mobile';
 
-  static const String prefStateId = 'prefStateId';
-  static const String prefDistrictId = 'prefDistrictId';
-  static const String prefBlockId = 'prefBlockId';
-  static const String prefPanchayatId= 'prefPanchayatId';
-  static const String prefVillageId = 'prefVillageId';
-
-  static const String prefStateName = 'stateName';
-  static const String prefDistName = 'prefDistName';
-  static const String prefBlockName = 'prefBlockName';
-  static const String prefGramPanchayatName = 'prefGramPanchayatName';
-  static const String prefVillageName = 'prefVillageName';
-
   static const String prefRegId = 'reg_id';
 
 
@@ -32,9 +20,10 @@ class AppConstants {
 
   //auth
   static const String navigateToDashboardScreen = '/dashboardScreen';
-  static const String navigateToLoginScreen = '/loginScreen ';
+  static const String navigateToSendOtpScreen = '/sendotp ';
   static const String navigateToSplashScreen = '/ ';
   static const String navigateToOnBoardingScreen = '/onboardingScreen';
+  static const String navigateToVerifyOtpScreen = '/verifyotp';
 
 
 
