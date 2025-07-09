@@ -19,7 +19,7 @@ class AuthenticationProvider extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
 
   OtpResponse? _otpResponse;
-  OtpResponse? get loginResponse => _otpResponse;
+OtpResponse? get otpResponse => _otpResponse;
 
   AuthResponse? _authResponse;
   AuthResponse? get authResponse => _authResponse;
@@ -28,6 +28,8 @@ class AuthenticationProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   String errorMsg = '';
+
+  final TextEditingController phoneController = TextEditingController();
 
   Future<void> checkLoginStatus() async {
     _isLoggedIn = _localStorage.getBool(AppConstants.prefIsLoggedIn) ?? false;
