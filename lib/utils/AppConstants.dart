@@ -24,6 +24,7 @@ class AppConstants {
   static const String navigateToSplashScreen = '/ ';
   static const String navigateToOnBoardingScreen = '/onboardingScreen';
   static const String navigateToVerifyOtpScreen = '/verifyotp';
+  static const String navigateToSelectLanguageScreen = '/selectLanguage';
 
 
 

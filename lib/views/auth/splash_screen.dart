@@ -1,10 +1,7 @@
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../../providers/authentication_provider.dart';
 import '../../utils/AppConstants.dart';
-import '../../utils/UserSessionManager.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -24,29 +21,52 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-
-
   Future<void> _navigateToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 1)); // Optional splash delay
+      await Future.delayed(const Duration(seconds: 3)); // Optional splash delay
     print("seen on boarding ${storage.getBool(AppConstants.prefSeenOnboarding)}");
       if(storage.getBool(AppConstants.prefSeenOnboarding)??false){
         Navigator.pushReplacementNamed(context, AppConstants.navigateToSendOtpScreen);
       }else {
         Navigator.pushReplacementNamed(
-            context, AppConstants.navigateToOnBoardingScreen);
+            context, AppConstants.navigateToSelectLanguageScreen);
       }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            Text('Amara',style: TextStyle(fontSize: 24,fontWeight: FontWeight.w400),),
-            Text('Aesthetic Clinic',style: TextStyle(fontSize: 18,fontWeight: FontWeight.w100),),
-          ],
-        ),
+      backgroundColor: Colors.white, // Top part remains white
+      body: Stack(
+        children: [
+          // Bottom U-shape container
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              width: screenWidth,
+              height: screenHeight / 1.1,
+              decoration: BoxDecoration(
+                color: Color(0xFF660033),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(screenWidth),
+                  topRight: Radius.circular(screenWidth),
+                ),
+              ),
+            ),
+          ),
+
+          // Centered icon on full screen
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [Image.asset('assets/icons/ic_logo.png', width: 220)],
+            ),
+          ),
+        ],
       ),
     );
   }

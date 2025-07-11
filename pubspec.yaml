@@ -77,10 +77,9 @@ flutter:
     - assets/icons/
 
   fonts:
-    - family: OpenSans
+    - family: Helvetica
       fonts:
-        - asset: assets/fonts/OpenSans-Medium.ttf
-          weight: 700
+        - asset: assets/fonts/Helvetica.ttf
 
 
   # To add assets to your application, add an assets section, like this:

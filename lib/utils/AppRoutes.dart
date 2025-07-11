@@ -1,4 +1,5 @@
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
+import 'package:aesthetic_clinic/views/onboarding/language_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/cupertino.dart';
 import '../views/auth/send_otp_screen.dart';
@@ -12,7 +13,8 @@ class AppRoutes {
       AppConstants.navigateToSendOtpScreen: (context) => const SendOtpScreen(),
       AppConstants.navigateToSplashScreen: (context) => const SplashScreen(),
       AppConstants.navigateToOnBoardingScreen:(context)=> const OnboardingScreen(),
-      AppConstants.navigateToVerifyOtpScreen:(context)=> const OtpVerificationScreen()
+      AppConstants.navigateToVerifyOtpScreen:(context)=> const OtpVerificationScreen(),
+      AppConstants.navigateToSelectLanguageScreen:(context)=>  LanguageSelectionScreen()
     };
   }
 }
