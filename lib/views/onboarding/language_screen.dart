@@ -1,3 +1,4 @@
+import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -50,9 +51,10 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle selection confirmation
-                  print('Selected language: $selectedLanguage');
-                },
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                  );                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF660033),
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -97,7 +99,7 @@ class LanguageTile extends StatelessWidget {
           ),
           title: Text(title, style: TextStyle(fontSize: 18)),
           trailing: isSelected
-              ? Icon(Icons.check_circle, color: Colors.green)
+              ? Icon(Icons.check_circle, color: Color(0xFF660033))
               : Icon(Icons.radio_button_off),
           onTap: onTap,
         ),

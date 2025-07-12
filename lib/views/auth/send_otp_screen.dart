@@ -5,6 +5,7 @@ import 'package:aesthetic_clinic/views/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:provider/provider.dart';
+import '../onboarding/onboarding_screen.dart';
 import 'country_selection_screen.dart'; // ⬅️ You'll create this file
 
 class SendOtpScreen extends StatefulWidget {
@@ -16,18 +17,17 @@ class SendOtpScreen extends StatefulWidget {
 
 class _SendOtpScreenState extends State<SendOtpScreen> {
   Country _selectedCountry = Country(
-    phoneCode: '1',
-    countryCode: 'US',
+    phoneCode: '971',
+    countryCode: 'AED',
     e164Sc: 0,
     geographic: true,
     level: 1,
-    name: 'United States',
+    name: 'United Arab Emirates',
     example: '2015550123',
-    displayName: 'United States',
-    displayNameNoCountryCode: 'United States',
+    displayName: 'United Arab Emirates',
+    displayNameNoCountryCode: 'United Arab Emirates',
     e164Key: '',
   );
-
 
   Future<void> _navigateToCountryPicker() async {
     final selected = await Navigator.push<Country>(
@@ -45,6 +45,13 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: Icon(Icons.arrow_back_ios),
+        title: Text(
+          "Login or Sign Up",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
       body: Consumer<AuthenticationProvider>(
         builder: (context, provider, child) {
           return SafeArea(
@@ -53,80 +60,114 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Login or Sign Up",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Divider(color: Colors.grey.shade400, thickness: 1),
                   ),
-                  const SizedBox(height: 40),
-                  Text(
-                    "Enter your mobile number, we will send you an OTP on Whatsapp",
-                    style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                  ),
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: _navigateToCountryPicker,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(
-                                _selectedCountry.flagEmoji,
-                                style: const TextStyle(fontSize: 20),
+                  SizedBox(height: 30),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      children: [
+                        Flexible(
+                          flex: 3, // Around 30%
+                          child: GestureDetector(
+                            onTap: _navigateToCountryPicker,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _selectedCountry.flagEmoji,
+                                    style: const TextStyle(fontSize: 18),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      "+${_selectedCountry.phoneCode}",
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const Icon(Icons.arrow_drop_down, size: 20),
+                                ],
                               ),
-                              const SizedBox(width: 8),
-                              Text("+${_selectedCountry.phoneCode}"),
-                              const Icon(Icons.arrow_drop_down),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          controller: provider.phoneController,
-                          keyboardType: TextInputType.phone,
-                          decoration: const InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: 'Mobile Number',
+                        Container(
+                          height: 48,
+                          width: 1,
+                          color: Colors.grey,
+                        ),
+                        Flexible(
+                          flex: 7, // Around 70%
+                          child: TextField(
+                            controller: provider.phoneController,
+                            keyboardType: TextInputType.phone,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                              labelText: 'Mobile Number',
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
 
                   const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: ()async {
-                      final phoneNumber =
-                          '+${_selectedCountry.phoneCode}${provider.phoneController.text}';
-                      print('Send OTP to $phoneNumber');
-                      if(phoneNumber.isNotEmpty) {
-                        provider.phoneController.text=phoneNumber;
-                       await provider.sendOtp(phoneNumber);
-                      }
-                      provider.otpResponse!.message=="OTP sent to your phone via WhatsApp"?
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const OtpVerificationScreen(),
-                        ),
-                      ):ToastHelper.showErrorSnackBar(context,"Error in api : ${provider.otpResponse!.message}");
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
+
+                  Spacer(),
+
+                  Center(child: Text('We will whatsapp you to confirm your number',style: TextStyle(fontSize: 12,color: Colors.grey.shade600)),),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16,
                     ),
-                    child: const Text("Continue"),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final phoneNumber =
+                              '+${_selectedCountry.phoneCode}${provider.phoneController.text}';
+                          print('Send OTP to $phoneNumber');
+                          if (provider.phoneController.text.isNotEmpty) {
+                            provider.phoneController.text = phoneNumber;
+                            await provider.sendOtp(phoneNumber);
+                          }else{
+                            ToastHelper.showErrorSnackBar(context, 'Please enter valid mobile number');
+                          }
+                          provider.otpResponse!.message ==
+                                  "OTP sent to your phone via WhatsApp"
+                              ? Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const OtpVerificationScreen(),
+                                  ),
+                                )
+                              : ToastHelper.showErrorSnackBar(
+                                  context,
+                                  "Error in api : ${provider.otpResponse!.message}",
+                                );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF660033),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(
+                          'Send OTP',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

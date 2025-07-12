@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: AppConstants.navigateToSelectLanguageScreen,
+      initialRoute: AppConstants.navigateToVerifyOtpScreen,
       routes: AppRoutes.getRoutes(),
     );
   }

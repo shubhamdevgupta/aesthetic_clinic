@@ -64,17 +64,21 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         return  Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Divider(color: Colors.grey.shade400, thickness: 1),
+              ),
               const SizedBox(height: 16),
               Text(
-                "Enter the code that was sent to",
-                style: Theme.of(context).textTheme.bodyMedium,
+                "Enter Verification code that was send to",
+                style: TextStyle(color: Colors.grey.shade700,fontSize: 12),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               Text(
-                provider.phoneController.text,
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                '+91 8650922082',
+                style: const TextStyle(fontSize: 18, color :Color(0xFF660033),fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
 
@@ -87,9 +91,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   otpValue=value;
                 },
                 pinTheme: PinTheme(
-                  activeColor: Colors.black,
-                  inactiveColor: Colors.grey,
-                  selectedColor: Colors.amber,
+                  activeColor: Color(0xFF660033),
+                  inactiveColor: Colors.grey.shade700,
+                  selectedColor: Color(0xFF660033),
                   shape: PinCodeFieldShape.box,
                   borderRadius: BorderRadius.circular(8),
                   fieldHeight: 50,
@@ -106,58 +110,70 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
               const SizedBox(height: 16),
 
-              // Resend Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: _canResend ? _onResend : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.lightBlue[100],
-                      foregroundColor: Colors.black,
-                    ),
-                    child: const Text("Whatsapp"),
+              ElevatedButton(
+                onPressed: _canResend ? _onResend : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF25D366), // WhatsApp green
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: _canResend ? _onResend : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[50],
-                      foregroundColor: Colors.grey,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      'assets/icons/ic_whatsapp.png',
+                      width: 24,
+                      height: 24,
                     ),
-                    child: const Text("Sms"),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Text(
+                      'WhatsApp',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               const Spacer(),
 
               // Verify Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async{
-                    if(otpValue!.isNotEmpty){
-                    await  provider.verifyOtp(provider.phoneController.text, otpValue!);
-                    }
-                    provider.authResponse!.data!.accessToken.isNotEmpty?
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const DashboardScreen(),
+              Center(child: Text('Please enter the one-time code sent to your WhatsApp',style: TextStyle(fontSize: 12,color: Colors.grey.shade600),)),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24.0,
+                  vertical: 16,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+        onPressed: () async{
+        if(otpValue!.isNotEmpty){
+        await  provider.verifyOtp(provider.phoneController.text, otpValue!);
+        }
+        provider.authResponse!.data!.accessToken.isNotEmpty?
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+        builder: (_) => const DashboardScreen(),
+        ),
+        ):ToastHelper.showErrorSnackBar(context,"Error in api : ${provider.authResponse!.error}");
+        },                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF660033),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ):ToastHelper.showErrorSnackBar(context,"Error in api : ${provider.authResponse!.error}");
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: const Text(
-                    "Verify Phone Number",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
+                    child: Text(
+                      'Verify',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
                   ),
                 ),
               ),
