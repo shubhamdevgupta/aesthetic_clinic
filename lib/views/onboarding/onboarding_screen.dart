@@ -38,7 +38,8 @@ final LocalStorageService storage=LocalStorageService();
       );
       setState(() => _currentPage++);
     } else {
-      storage.saveBool(AppConstants.prefSeenOnboarding, true);
+      //todo make it true for one time see onboarding screen
+      storage.saveBool(AppConstants.prefSeenOnboarding, false);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const SendOtpScreen()),

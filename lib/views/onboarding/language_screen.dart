@@ -1,5 +1,9 @@
+import 'package:aesthetic_clinic/views/auth/send_otp_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/locale_provider.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   @override
@@ -25,21 +29,25 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             title: 'English',
             isSelected: selectedLanguage == 'en',
             onTap: () {
-              setState(() {
-                selectedLanguage = 'en';
-              });
+              Provider.of<LocaleProvider>(context, listen: false).setLocale(const Locale('en'));
+            },
+          ),
+          LanguageTile(
+            flagAsset: 'assets/icons/en.png',
+            title: 'हिंदी',
+            isSelected: selectedLanguage == 'hi',
+            onTap: () {
+              Provider.of<LocaleProvider>(context, listen: false).setLocale(const Locale('hi'));
             },
           ),
 
           // Arabic Option
           LanguageTile(
             flagAsset: 'assets/icons/ar.png',
-            title: 'Arabic',
+            title: 'العربية',
             isSelected: selectedLanguage == 'ar',
             onTap: () {
-              setState(() {
-                selectedLanguage = 'ar';
-              });
+              Provider.of<LocaleProvider>(context, listen: false).setLocale(const Locale('ar'));
             },
           ),
 
@@ -53,7 +61,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+                    MaterialPageRoute(builder: (_) => const SendOtpScreen()),
                   );                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF660033),

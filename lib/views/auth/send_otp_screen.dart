@@ -5,11 +5,13 @@ import 'package:aesthetic_clinic/views/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_localizations.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'country_selection_screen.dart'; // ⬅️ You'll create this file
 
 class SendOtpScreen extends StatefulWidget {
   const SendOtpScreen({super.key});
+
 
   @override
   State<SendOtpScreen> createState() => _SendOtpScreenState();
@@ -44,11 +46,12 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localization = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         leading: Icon(Icons.arrow_back_ios),
         title: Text(
-          "Login or Sign Up",
+            localization.loginSignup,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
@@ -107,10 +110,10 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           child: TextField(
                             controller: provider.phoneController,
                             keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                              labelText: 'Mobile Number',
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                              labelText: localization.mobileNumber,
                             ),
                           ),
                         ),
@@ -122,7 +125,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
 
                   Spacer(),
 
-                  Center(child: Text('We will whatsapp you to confirm your number',style: TextStyle(fontSize: 12,color: Colors.grey.shade600)),),
+                  Center(child: Text(localization.sendOtpMsg,style: TextStyle(fontSize: 12,color: Colors.grey.shade600)),),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24.0,
@@ -163,7 +166,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           ),
                         ),
                         child: Text(
-                          'Send OTP',
+                          localization.sendOtp,
                           style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),

@@ -1,0 +1,9 @@
+{
+"@@locale": "en",
+"hello": "Hello",
+"welcomeMessage": "Welcome to our app!",
+"loginSignup": "Login or Signup",
+"mobileNumber": "Mobile Number",
+"sendOtp": "Send OTP",
+"sendOtpMsg": "We'll whatsapp you to confirm your number"
+}
