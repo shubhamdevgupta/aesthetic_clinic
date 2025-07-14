@@ -1,9 +1,18 @@
 {
-"@@locale": "en",
-"hello": "Hello",
-"welcomeMessage": "Welcome to our app!",
-"loginSignup": "Login or Signup",
-"mobileNumber": "Mobile Number",
-"sendOtp": "Send OTP",
-"sendOtpMsg": "We'll whatsapp you to confirm your number"
+  "@@locale": "en",
+  "hello": "Hello",
+  "select": "Select",
+  "language": "Language",
+  "welcomeMessage": "Welcome to our app!",
+  "loginSignup": "Login or Signup",
+  "mobileNumber": "Mobile Number",
+  "sendOtp": "Send OTP",
+  "sendOtpMsg": "We'll whatsapp you to confirm your number",
+  "verifyMsg": "Verify phone number",
+  "verifyCodeMsg": "Enter Verification code that was send to",
+  "resendNow": "You can resend now",
+  "resendInTime": "Resend code in 00",
+  "whatsapp": "WhatsApp",
+  "otpMsg": "Please enter the one-time code sent to your WhatsApp",
+  "verify": "Verify"
 }

@@ -49,10 +49,11 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
     AppLocalizations localization = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.arrow_back_ios),
-        title: Text(
-            localization.loginSignup,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Center(
+          child: Text(
+              localization.loginSignup,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
       body: Consumer<AuthenticationProvider>(
@@ -110,6 +111,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           child: TextField(
                             controller: provider.phoneController,
                             keyboardType: TextInputType.phone,
+                            maxLength: 10,
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -136,8 +138,9 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           final phoneNumber =
-                              '+${_selectedCountry.phoneCode}${provider.phoneController.text}';
+                              '${_selectedCountry.phoneCode}${provider.phoneController.text}';
                           print('Send OTP to $phoneNumber');
+                          print('Send country code $phoneNumber');
                           if (provider.phoneController.text.isNotEmpty) {
                             provider.phoneController.text = phoneNumber;
                             await provider.sendOtp(phoneNumber);

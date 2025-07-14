@@ -3,6 +3,7 @@ import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers/locale_provider.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -15,12 +16,15 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppLocalizations localization = AppLocalizations.of(context)!;
+    LocaleProvider localeProvider = Provider.of<LocaleProvider>(context);
+    String selectedLanguage = localeProvider.locale.languageCode;
     return Scaffold(
       body: Column(
         children: [
           const SizedBox(height: 120),
 
-          Text('Language',style: TextStyle(fontFamily: 'Helvetica',fontSize: 24),),
+          Text(localization.language,style: TextStyle(fontFamily: 'Helvetica',fontSize: 24),),
           // English Option
           const SizedBox(height: 20),
 
@@ -28,17 +32,15 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             flagAsset: 'assets/icons/en.png',
             title: 'English',
             isSelected: selectedLanguage == 'en',
-            onTap: () {
-              Provider.of<LocaleProvider>(context, listen: false).setLocale(const Locale('en'));
-            },
+            onTap: () => localeProvider.setLocale(const Locale('en')),
+
           ),
           LanguageTile(
             flagAsset: 'assets/icons/en.png',
             title: 'हिंदी',
             isSelected: selectedLanguage == 'hi',
-            onTap: () {
-              Provider.of<LocaleProvider>(context, listen: false).setLocale(const Locale('hi'));
-            },
+            onTap: () => localeProvider.setLocale(const Locale('hi')),
+
           ),
 
           // Arabic Option
@@ -46,9 +48,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             flagAsset: 'assets/icons/ar.png',
             title: 'العربية',
             isSelected: selectedLanguage == 'ar',
-            onTap: () {
-              Provider.of<LocaleProvider>(context, listen: false).setLocale(const Locale('ar'));
-            },
+            onTap: () => localeProvider.setLocale(const Locale('ar')),
           ),
 
           Spacer(),
@@ -71,7 +71,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   ),
                 ),
                 child: Text(
-                  'Select',
+                  localization.language,
                   style: TextStyle(fontSize: 18,color: Colors.white),
                 ),
               ),
