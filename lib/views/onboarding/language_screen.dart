@@ -71,7 +71,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   ),
                 ),
                 child: Text(
-                  localization.language,
+                  localization.select,
                   style: TextStyle(fontSize: 18,color: Colors.white),
                 ),
               ),
