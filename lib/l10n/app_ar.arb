@@ -14,5 +14,7 @@
   "resendInTime": "إعادة إرسال الرمز خلال 00 ثانية",
   "whatsapp": "واتساب",
   "otpMsg": "يرجى إدخال الرمز المرسل إلى واتساب الخاص بك",
-  "verify": "تحقق"
+  "verify": "تحقق",
+  "onboardMessage": "Amara Welcome you to the personalised...",
+  "letStart": "Let's Get Started"
 }

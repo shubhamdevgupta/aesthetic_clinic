@@ -25,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
       await Future.delayed(const Duration(seconds: 3)); // Optional splash delay
     print("seen on boarding ${storage.getBool(AppConstants.prefSeenOnboarding)}");
       if(storage.getBool(AppConstants.prefSeenOnboarding)??false){
-        Navigator.pushReplacementNamed(context, AppConstants.navigateToSendOtpScreen);
+        Navigator.pushReplacementNamed(context, AppConstants.navigateToDashboardScreen);
       }else {
         Navigator.pushReplacementNamed(
             context, AppConstants.navigateToSelectLanguageScreen);

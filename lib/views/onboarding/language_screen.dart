@@ -61,7 +61,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 onPressed: () {
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const SendOtpScreen()),
+                    MaterialPageRoute(builder: (_) => const OnboardingScreen()),
                   );                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF660033),

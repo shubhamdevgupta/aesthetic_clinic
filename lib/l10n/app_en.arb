@@ -14,5 +14,7 @@
   "resendInTime": "Resend code in 00",
   "whatsapp": "WhatsApp",
   "otpMsg": "Please enter the one-time code sent to your WhatsApp",
-  "verify": "Verify"
+  "verify": "Verify",
+  "onboardMessage": "Amara Welcome you to the personalised...",
+  "letStart": "Let's Get Started"
 }
