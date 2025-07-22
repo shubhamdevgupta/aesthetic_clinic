@@ -52,21 +52,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _currentIndex = index;
               });
             },
-            items: const [
+            items:  [
               BottomNavigationBarItem(
-                icon: Icon(Icons.home),
+                icon: Icon(Icons.home,color: Color(0xFF660033),),
                 label: 'Home',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_today),
+                icon: Image.asset('assets/icons/ic_service.png',color: Color(0xFF660033),),
+                label: 'Services',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_month,color: Color(0xFF660033),),
                 label: 'Bookings',
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.credit_card),
-                label: 'Credits',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
+                icon: Icon(Icons.person,color: Color(0xFF660033),),
                 label: 'Profile',
               ),
             ],
