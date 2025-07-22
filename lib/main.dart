@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'l10n/app_localizations.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
+//flutter gen-l10n for generate language
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorageService.init();
