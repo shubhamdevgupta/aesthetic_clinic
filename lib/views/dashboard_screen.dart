@@ -33,7 +33,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_titles[_currentIndex])),
       body: _screens[_currentIndex],
       bottomNavigationBar: Stack(
         children: [
