@@ -1,5 +1,6 @@
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/providers/locale_provider.dart';
+import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/utils/AppRoutes.dart';
@@ -20,6 +21,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthenticationProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => ServiceProvider()),
       ],
       child: const MyApp(),
     ),

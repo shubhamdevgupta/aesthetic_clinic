@@ -1,16 +1,26 @@
 import 'dart:async';
+import 'package:aesthetic_clinic/providers/service_provider.dart';
+import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    return 'Good Evening';
-  }
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ServiceProvider>(context, listen: false);
+      provider.getAllServices();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +40,7 @@ class HomeScreen extends StatelessWidget {
                     const Text("Samiya Fatima",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Colors.purple,
+                          color: Color(0xFF660033),
                           fontSize: 16,
                         )),
                   ],
@@ -74,7 +84,7 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.purple),
+                  color: Color(0xFF660033)),
             ),
             const SizedBox(height: 12),
             SizedBox(
@@ -83,7 +93,7 @@ class HomeScreen extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 children: const [
                   ServiceItem(icon: Icons.lightbulb, label: "Laser Hair Removal"),
-                  ServiceItem(icon: Icons.face, label: "Dermatology"),
+                  ServiceItem(icon: Icons.face, label: "Dermatology and aesthetics"),
                   ServiceItem(icon: Icons.medical_services, label: "Dental Services"),
                   ServiceItem(icon: Icons.healing, label: "Hijama Therapy"),
                 ],
@@ -97,7 +107,7 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.purple),
+                  color: Color(0xFF660033)),
             ),
             const SizedBox(height: 12),
             SizedBox(
@@ -118,6 +128,12 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Good Morning';
+    if (hour < 17) return 'Good Afternoon';
+    return 'Good Evening';
   }
 
   static Widget topChoiceItem(String title, String imageUrl) {
@@ -144,7 +160,12 @@ class HomeScreen extends StatelessWidget {
 class ServiceItem extends StatelessWidget {
   final IconData icon;
   final String label;
-  const ServiceItem({super.key, required this.icon, required this.label});
+
+  const ServiceItem({
+    super.key,
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -152,16 +173,30 @@ class ServiceItem extends StatelessWidget {
       width: 90,
       margin: const EdgeInsets.only(right: 12),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: Colors.pink.shade50,
-            child: Icon(icon, color: Colors.pink),
+          SizedBox(
+            height: 30,
+            child: Center(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ),
-          const SizedBox(height: 6),
-          Text(label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 12)),
+          const SizedBox(height: 12),
+           SizedBox(height: 48, // total height of icon area
+            child: Center(
+              child: CircleAvatar(
+                radius: 24,
+                backgroundColor: Color(0xFFFFEBEE), // pink.shade50
+                child: Icon(icon, color: Color(0xFF660033)), // Example icon
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -257,7 +292,7 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: Colors.pink,
+                    foregroundColor: Color(0xFF660033),
                   ),
                   child: const Text("Book Now"),
                 ),

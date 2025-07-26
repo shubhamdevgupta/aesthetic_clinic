@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:aesthetic_clinic/views/dashboard_screen.dart';
+import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
@@ -175,17 +176,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             provider.phoneController.text,
                             otpValue!,
                           );
+                        }else{
+                          ToastHelper.showErrorSnackBar(context, "please enter valid otp");
                         }
-                        provider.authResponse!.data!.accessToken.isNotEmpty
-                            ? Navigator.pushReplacement(
+                        provider.authResponse!.statuscode==200&&provider.authResponse!.status ? Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const DashboardScreen(),
+                                  builder: (_) => const OnboardingScreen(),
                                 ),
                               )
                             : ToastHelper.showErrorSnackBar(
                                 context,
-                                "Error in api : ${provider.authResponse!.error}",
+                                "Error in api : ${provider.authResponse!.message}",
                               );
                       },
                       style: ElevatedButton.styleFrom(

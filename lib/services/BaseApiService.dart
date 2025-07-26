@@ -2,15 +2,17 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/CustomException.dart';
+import 'LocalStorageService.dart';
 
 
 class BaseApiService {
   final String _baseUrl = 'https://api.amaraclinics.ae/api';
-
+  LocalStorageService storageService = LocalStorageService();
   Future<dynamic> post(
     String endpoint, {
     Map<String, String>? headers,
@@ -51,12 +53,17 @@ class BaseApiService {
   }
 
   Future<dynamic> get(String endpoint,
-      {Map<String, String>? headers}) async {
+      {Map<String, String>? headers,  bool withAuth = false,
+      }
+      ) async {
     final Uri url = Uri.parse('$_baseUrl$endpoint');
 
     headers ??= {};
     headers.putIfAbsent('Content-Type', () => 'application/json');
 
+    if (withAuth) {
+      headers['Authorization'] = 'Bearer ${storageService.getString(AppConstants.prefAccessToken)}';
+    }
     log('GET Request: URL: $url \n Headers: ${headers.toString()}');
 
     try {

@@ -1,40 +1,51 @@
-class AuthResponse {
-  final AuthData? data;
-  final dynamic error;
+class LoginResponseModel {
+  final bool status;
+  final int statuscode;
+  final String message;
+  final LoginData data;
 
-  AuthResponse({required this.data, required this.error});
+  LoginResponseModel({
+    required this.status,
+    required this.statuscode,
+    required this.message,
+    required this.data,
+  });
 
-  factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    return AuthResponse(
-      data: json['data'] != null ? AuthData.fromJson(json['data']) : null,
-      error: json['error'],
+  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    return LoginResponseModel(
+      status: json['status'] ?? false,
+      statuscode: json['statuscode'] ?? 0,
+      message: json['message'] ?? '',
+      data: LoginData.fromJson(json['data'] ?? {}),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'data': data?.toJson(),
-      'error': error,
+      'status': status,
+      'statuscode': statuscode,
+      'message': message,
+      'data': data.toJson(),
     };
   }
 }
 
-class AuthData {
+class LoginData {
   final String accessToken;
   final String refreshToken;
   final User user;
 
-  AuthData({
+  LoginData({
     required this.accessToken,
     required this.refreshToken,
     required this.user,
   });
 
-  factory AuthData.fromJson(Map<String, dynamic> json) {
-    return AuthData(
-      accessToken: json['accessToken'],
-      refreshToken: json['refreshToken'],
-      user: User.fromJson(json['user']),
+  factory LoginData.fromJson(Map<String, dynamic> json) {
+    return LoginData(
+      accessToken: json['accessToken'] ?? '',
+      refreshToken: json['refreshToken'] ?? '',
+      user: User.fromJson(json['user'] ?? {}),
     );
   }
 
@@ -53,6 +64,7 @@ class User {
   final String lastName;
   final String? email;
   final String phone;
+  final String? emiratesId;
   final String roleId;
   final String? doctorId;
 
@@ -62,18 +74,20 @@ class User {
     required this.lastName,
     this.email,
     required this.phone,
+    this.emiratesId,
     required this.roleId,
     this.doctorId,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      firstName: json['firstName'],
-      lastName: json['lastName'],
+      id: json['id'] ?? '',
+      firstName: json['firstName'] ?? '',
+      lastName: json['lastName'] ?? '',
       email: json['email'],
-      phone: json['phone'],
-      roleId: json['roleId'],
+      phone: json['phone'] ?? '',
+      emiratesId: json['emiratesId'],
+      roleId: json['roleId'] ?? '',
       doctorId: json['doctorId'],
     );
   }
@@ -85,6 +99,7 @@ class User {
       'lastName': lastName,
       'email': email,
       'phone': phone,
+      'emiratesId': emiratesId,
       'roleId': roleId,
       'doctorId': doctorId,
     };

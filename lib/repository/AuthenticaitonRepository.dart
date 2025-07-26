@@ -10,7 +10,7 @@ import '../utils/GlobalExceptionHandler.dart';
 class AuthenticaitonRepository {
   final BaseApiService _apiService = BaseApiService();
 
-  Future<OtpResponse> sendOtp(
+  Future<OtpResponseModel> sendOtp(
       String phoneNumber ) async {
     try {
       // Call the POST method from BaseApiService
@@ -20,14 +20,14 @@ class AuthenticaitonRepository {
         }),
       );
 
-      return OtpResponse.fromJson(response);
+      return OtpResponseModel.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;
     }
   }
 
-  Future<AuthResponse> verifyOtp(
+  Future<LoginResponseModel> verifyOtp(
       String phoneNumber, String otp) async {
     try {
       // Call the POST method from BaseApiService
@@ -39,7 +39,7 @@ class AuthenticaitonRepository {
         }),
       );
 
-      return AuthResponse.fromJson(response);
+      return LoginResponseModel.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;

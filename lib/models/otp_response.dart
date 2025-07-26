@@ -1,27 +1,31 @@
-class OtpResponse {
-  final dynamic data;
-  final String? message;
-  final dynamic error;
+class OtpResponseModel {
+  final bool status;
+  final int statuscode;
+  final String message;
+  final Map<String, dynamic> data;
 
-  OtpResponse({
-    required this.data,
+  OtpResponseModel({
+    required this.status,
+    required this.statuscode,
     required this.message,
-    required this.error,
+    required this.data,
   });
 
-  factory OtpResponse.fromJson(Map<String, dynamic> json) {
-    return OtpResponse(
-      data: json['data'],
-      message: json['message'],
-      error: json['error'],
+  factory OtpResponseModel.fromJson(Map<String, dynamic> json) {
+    return OtpResponseModel(
+      status: json['status'] ?? false,
+      statuscode: json['statuscode'] ?? 0,
+      message: json['message'] ?? '',
+      data: json['data'] ?? {},
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'data': data,
+      'status': status,
+      'statuscode': statuscode,
       'message': message,
-      'error': error,
+      'data': data,
     };
   }
 }

@@ -17,13 +17,13 @@ class UserSessionManager {
   String mobile = '';
 
 
-  Future<void> init() async {
+/*  Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     token = _prefs?.getString(AppConstants.prefToken) ?? '';
     userName = _prefs?.getString(AppConstants.prefName) ?? '';
     mobile = _prefs?.getString(AppConstants.prefMobile) ?? '';
 
-  }
+  }*/
 
   bool get isInitialized => _prefs != null;
 

@@ -22,8 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-      await Future.delayed(const Duration(seconds: 3)); // Optional splash delay
-    print("seen on boarding ${storage.getBool(AppConstants.prefSeenOnboarding)}");
+      await Future.delayed(const Duration(seconds: 3));
       if(storage.getBool(AppConstants.prefSeenOnboarding)??false){
         Navigator.pushReplacementNamed(context, AppConstants.navigateToDashboardScreen);
       }else {

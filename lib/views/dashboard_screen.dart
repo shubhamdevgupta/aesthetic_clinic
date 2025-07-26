@@ -44,7 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           BottomNavigationBar(
             currentIndex: _currentIndex,
-            selectedItemColor: Colors.blue,
+            selectedItemColor: Color(0xFF660033),
             unselectedItemColor: Colors.grey,
             onTap: (index) {
               setState(() {
