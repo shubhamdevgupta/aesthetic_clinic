@@ -46,4 +46,19 @@ class AuthenticaitonRepository {
     }
   }
 
+  Future <OtpResponseModel> refreshToken(String authToken)async{
+    try {
+      // Call the POST method from BaseApiService
+      final response = await _apiService.post('/auth/refresh',
+        body: authToken
+      );
+
+      return OtpResponseModel.fromJson(response);
+    } catch (e) {
+      GlobalExceptionHandler.handleException(e as Exception);
+      rethrow;
+    }
+  }
+
+
 }
