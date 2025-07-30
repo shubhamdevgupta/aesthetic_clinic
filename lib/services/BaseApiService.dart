@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:aesthetic_clinic/repository/AuthenticaitonRepository.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +11,7 @@ import 'LocalStorageService.dart';
 
 class BaseApiService {
   final String _baseUrl = 'https://api.amaraclinics.ae/api';
-  LocalStorageService storageService = LocalStorageService();
+  final LocalStorageService storageService = LocalStorageService();
 
   Future<dynamic> post(
       String endpoint, {
@@ -21,7 +20,6 @@ class BaseApiService {
         bool withAuth = false,
       }) async {
     final Uri url = Uri.parse('$_baseUrl$endpoint');
-
     headers ??= {};
     headers.putIfAbsent('Content-Type', () => 'application/json');
 
@@ -31,21 +29,32 @@ class BaseApiService {
       headers['Authorization'] = 'Bearer $accessToken';
     }
 
-    log('POST Request: $url');
-    log('POST Body: $body');
-    log('POST Headers: $headers');
+    log('🔹 POST Request to: $url');
+    log('🔸 Headers: ${jsonEncode(headers)}');
+    log('🔸 Body: $body');
 
     try {
       await _checkConnectivity();
+
       var response = await http.post(url, headers: headers, body: body);
 
+      log('📩 Response Status: ${response.statusCode}');
+      log('📩 Response Body: ${response.body}');
+
       if (response.statusCode == 401 && withAuth) {
+        log('🔄 Access token expired. Trying to refresh...');
         bool refreshed = await _refreshAccessToken();
+
         if (refreshed) {
           final newAccessToken =
           await storageService.getString(AppConstants.prefAccessToken);
           headers['Authorization'] = 'Bearer $newAccessToken';
+
+          log('🔁 Retrying POST with refreshed token...');
           response = await http.post(url, headers: headers, body: body);
+
+          log('📩 Retried Response Status: ${response.statusCode}');
+          log('📩 Retried Response Body: ${response.body}');
         }
       }
 
@@ -53,7 +62,7 @@ class BaseApiService {
     } on SocketException {
       throw NetworkException('No internet connection');
     } catch (e) {
-      log('POST Exception: $e');
+      log('❌ POST Exception: $e');
       throw ApiException('Unexpected error during POST');
     }
   }
@@ -64,7 +73,6 @@ class BaseApiService {
         bool withAuth = false,
       }) async {
     final Uri url = Uri.parse('$_baseUrl$endpoint');
-
     headers ??= {};
     headers.putIfAbsent('Content-Type', () => 'application/json');
 
@@ -74,19 +82,31 @@ class BaseApiService {
       headers['Authorization'] = 'Bearer $accessToken';
     }
 
-    log('GET Request: $url\nHeaders: $headers');
+    log('🔹 GET Request to: $url');
+    log('🔸 Headers: ${jsonEncode(headers)}');
 
     try {
       await _checkConnectivity();
+
       var response = await http.get(url, headers: headers);
 
+      log('📩 Response Status: ${response.statusCode}');
+      log('📩 Response Body: ${response.body}');
+
       if (response.statusCode == 401 && withAuth) {
+        log('🔄 Access token expired. Trying to refresh...');
         bool refreshed = await _refreshAccessToken();
+
         if (refreshed) {
           final newAccessToken =
           await storageService.getString(AppConstants.prefAccessToken);
           headers['Authorization'] = 'Bearer $newAccessToken';
+
+          log('🔁 Retrying GET with refreshed token...');
           response = await http.get(url, headers: headers);
+
+          log('📩 Retried Response Status: ${response.statusCode}');
+          log('📩 Retried Response Body: ${response.body}');
         }
       }
 
@@ -94,7 +114,7 @@ class BaseApiService {
     } on SocketException {
       throw NetworkException('No internet connection');
     } catch (e) {
-      log('GET Exception: $e');
+      log('❌ GET Exception: $e');
       throw ApiException('Unexpected error during GET');
     }
   }
@@ -112,24 +132,19 @@ class BaseApiService {
       case 200:
         return jsonDecode(response.body);
       case 400:
-        throw ApiException(
-            'Bad Request ${handleErrorResp(response.body, '')}');
+        throw ApiException('Bad Request ${handleErrorResp(response.body, '')}');
       case 404:
         throw ApiException('Page not found (404). Please contact admin');
       case 401:
-        throw ApiException(
-            'Unauthorized ${handleErrorResp(response.body, '')}');
+        throw ApiException('Unauthorized ${handleErrorResp(response.body, '')}');
       case 500:
-        throw ApiException(
-            handleErrorResp(response.body, 'Internal Server Error'));
+        throw ApiException(handleErrorResp(response.body, 'Internal Server Error'));
       case 502:
-        throw ApiException(
-            'Bad Gateway ${handleErrorResp(response.body, '')}');
+        throw ApiException('Bad Gateway ${handleErrorResp(response.body, '')}');
       case 408:
         throw ApiException('Request Timeout: Please try again later');
       default:
-        throw ApiException(
-            'Unexpected error ${response.statusCode} \n ${handleErrorResp(response.body, '')}');
+        throw ApiException('Unexpected error ${response.statusCode} \n ${handleErrorResp(response.body, '')}');
     }
   }
 
@@ -146,40 +161,43 @@ class BaseApiService {
   }
 
   Future<bool> _refreshAccessToken() async {
-    final refreshToken =
-    await storageService.getString(AppConstants.prefRefresToken);
-    final expiredAccessToken =
-    await storageService.getString(AppConstants.prefAccessToken);
+    final refreshToken = await storageService.getString(AppConstants.prefRefreshToken);
+    if (refreshToken == null) {
+      log('⚠️ No refresh token found.');
+      return false;
+    }
 
-    if (refreshToken == null || expiredAccessToken == null) return false;
-
-    final Uri url = Uri.parse('$_baseUrl/auth/refresh');
+    final Uri url = Uri.parse('$_baseUrl/auth/refresh-token');
 
     try {
+      log('🔄 Refreshing token...');
+      log('🔸 Refresh Token: $refreshToken');
+
       final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-        body: expiredAccessToken, // raw body
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'refreshToken': refreshToken}),
       );
+
+      log('📩 Refresh Response Status: ${response.statusCode}');
+      log('📩 Refresh Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         final newAccessToken = json['data']['accessToken'];
         final newRefreshToken = json['data']['refreshToken'];
 
-        await storageService.saveString(
-            AppConstants.prefRefresToken, newRefreshToken);
-        await storageService.saveString(
-            AppConstants.prefAccessToken, newAccessToken);
+        await storageService.saveString(AppConstants.prefAccessToken, newAccessToken);
+        await storageService.saveString(AppConstants.prefRefreshToken, newRefreshToken);
+
+        log('✅ Token refreshed successfully');
         return true;
       } else {
-        log('Refresh token failed: ${response.body}');
+        log('❌ Failed to refresh token: ${response.body}');
         return false;
       }
     } catch (e) {
-      log('Refresh token exception: $e');
+      log('❌ Refresh token exception: $e');
       return false;
     }
   }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:aesthetic_clinic/models/auth_response.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -19,7 +20,7 @@ class AuthenticationProvider extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
 
   OtpResponseModel? _otpResponse;
-OtpResponseModel? get otpResponse => _otpResponse;
+  OtpResponseModel? get otpResponse => _otpResponse;
 
   LoginResponseModel? _authResponse;
   LoginResponseModel? get authResponse => _authResponse;
@@ -28,7 +29,7 @@ OtpResponseModel? get otpResponse => _otpResponse;
   bool get isLoading => _isLoading;
 
   String errorMsg = '';
-
+  String countryCode='';
   final TextEditingController phoneController = TextEditingController();
 
 
@@ -54,7 +55,7 @@ OtpResponseModel? get otpResponse => _otpResponse;
       _authResponse = await _authRepository.verifyOtp(phoneNumber,otp);
       if(_authResponse!.status&& _authResponse!.statuscode==200){
         _localStorage.saveString(AppConstants.prefAccessToken, _authResponse!.data.accessToken);
-        _localStorage.saveString(AppConstants.prefRefresToken, _authResponse!.data.refreshToken);
+        _localStorage.saveString(AppConstants.prefRefreshToken, _authResponse!.data.refreshToken);
       }
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
@@ -65,5 +66,24 @@ OtpResponseModel? get otpResponse => _otpResponse;
     }
   }
 
+  Country _selectedCountry = Country(
+    phoneCode: '971',
+    countryCode: 'AED',
+    e164Sc: 0,
+    geographic: true,
+    level: 1,
+    name: 'United Arab Emirates',
+    example: '2015550123',
+    displayName: 'United Arab Emirates',
+    displayNameNoCountryCode: 'United Arab Emirates',
+    e164Key: '',
+  );
+
+  Country get selectedCountry => _selectedCountry;
+
+  void setSelectedCountry(Country country) {
+    _selectedCountry = country;
+    notifyListeners();
+  }
 
 }

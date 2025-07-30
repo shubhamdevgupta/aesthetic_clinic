@@ -19,6 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<ServiceProvider>(context, listen: false);
       provider.getAllServices();
+      provider.getBannerList();
     });
   }
   @override
@@ -28,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // Top App Bar with Logo and Name
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

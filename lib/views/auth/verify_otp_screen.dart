@@ -84,7 +84,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  provider.phoneController.text,
+                  "${provider.selectedCountry.phoneCode}${provider.phoneController.text}",
                   style: const TextStyle(
                     fontSize: 18,
                     color: Color(0xFF660033),
@@ -173,7 +173,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       onPressed: () async {
                         if (otpValue!.isNotEmpty) {
                           await provider.verifyOtp(
-                            provider.phoneController.text,
+                            "${provider.selectedCountry.phoneCode}${provider.phoneController.text}",
                             otpValue!,
                           );
                         }else{

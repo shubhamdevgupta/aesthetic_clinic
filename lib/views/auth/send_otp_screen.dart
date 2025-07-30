@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
+import '../../utils/LoaderUtils.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'country_selection_screen.dart'; // ⬅️ You'll create this file
 
@@ -18,31 +21,18 @@ class SendOtpScreen extends StatefulWidget {
 }
 
 class _SendOtpScreenState extends State<SendOtpScreen> {
-  Country _selectedCountry = Country(
-    phoneCode: '971',
-    countryCode: 'AED',
-    e164Sc: 0,
-    geographic: true,
-    level: 1,
-    name: 'United Arab Emirates',
-    example: '2015550123',
-    displayName: 'United Arab Emirates',
-    displayNameNoCountryCode: 'United Arab Emirates',
-    e164Key: '',
-  );
 
-  Future<void> _navigateToCountryPicker() async {
+  Future<void> _navigateToCountryPicker(BuildContext context, AuthenticationProvider provider) async {
     final selected = await Navigator.push<Country>(
       context,
       MaterialPageRoute(builder: (_) => const CountrySelectionScreen()),
     );
 
     if (selected != null) {
-      setState(() {
-        _selectedCountry = selected;
-      });
+      provider.setSelectedCountry(selected);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,19 +69,19 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                         Flexible(
                           flex: 3, // Around 30%
                           child: GestureDetector(
-                            onTap: _navigateToCountryPicker,
+                            onTap: () => _navigateToCountryPicker(context, provider),
                             child: Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                               child: Row(
                                 children: [
                                   Text(
-                                    _selectedCountry.flagEmoji,
+                                    provider.selectedCountry.flagEmoji,
                                     style: const TextStyle(fontSize: 18),
                                   ),
                                   const SizedBox(width: 4),
                                   Flexible(
                                     child: Text(
-                                      "+${_selectedCountry.phoneCode}",
+                                      "+${provider.selectedCountry.phoneCode}",
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
@@ -129,40 +119,37 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
 
                   Center(child: Text(localization.sendOtpMsg,style: TextStyle(fontSize: 12,color: Colors.grey.shade600)),),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
-                          final phoneNumber =
-                              '${_selectedCountry.phoneCode}${provider.phoneController.text}';
-                          print('Send OTP to $phoneNumber');
-                          print('Send country code $phoneNumber');
-                          if (provider.phoneController.text.isNotEmpty) {
-                            provider.phoneController.text = phoneNumber;
-                            await provider.sendOtp(phoneNumber);
-                          }else{
-                            ToastHelper.showErrorSnackBar(context, 'Please enter valid mobile number');
+                          final rawPhone = provider.phoneController.text.trim();
+                          final phoneNumber = '${provider.selectedCountry.phoneCode}$rawPhone';
+
+                          if (rawPhone.isEmpty) {
+                            ToastHelper.showErrorSnackBar(context, 'Please enter a valid mobile number');
+                            return;
                           }
-                          provider.otpResponse!.message ==
-                                  "OTP sent to your phone via WhatsApp"
-                              ? Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        const OtpVerificationScreen(),
-                                  ),
-                                )
-                              : ToastHelper.showErrorSnackBar(
-                                  context,
-                                  "Error in api : ${provider.otpResponse!.message}",
-                                );
+
+                          await provider.sendOtp(phoneNumber);
+
+                          LoaderUtils.conditionalLoader(isLoading: provider.isLoading);
+
+                          if (provider.otpResponse?.statuscode == 200 && provider.otpResponse!.status) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => const OtpVerificationScreen()),
+                            );
+                          } else {
+                            ToastHelper.showErrorSnackBar(
+                              context,
+                              "Error in API: ${provider.otpResponse?.message ?? 'Unknown error'}",
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF660033),
+                          backgroundColor: const Color(0xFF660033),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -170,7 +157,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                         ),
                         child: Text(
                           localization.sendOtp,
-                          style: TextStyle(fontSize: 18, color: Colors.white),
+                          style: const TextStyle(fontSize: 18, color: Colors.white),
                         ),
                       ),
                     ),
