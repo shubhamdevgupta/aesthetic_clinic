@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:aesthetic_clinic/models/auth_response.dart';
+import 'package:aesthetic_clinic/models/verify_otp_response.dart';
 
-import '../models/otp_response.dart';
+import '../models/send_otp_response.dart';
 import '../services/BaseApiService.dart';
 import '../utils/GlobalExceptionHandler.dart';
 
@@ -10,7 +10,7 @@ import '../utils/GlobalExceptionHandler.dart';
 class AuthenticaitonRepository {
   final BaseApiService _apiService = BaseApiService();
 
-  Future<OtpResponseModel> sendOtp(
+  Future<SendOtpResponseModel> sendOtp(
       String phoneNumber ) async {
     try {
       // Call the POST method from BaseApiService
@@ -20,14 +20,14 @@ class AuthenticaitonRepository {
         }),
       );
 
-      return OtpResponseModel.fromJson(response);
+      return SendOtpResponseModel.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;
     }
   }
 
-  Future<LoginResponseModel> verifyOtp(
+  Future<VerifyOtpResponseModel> verifyOtp(
       String phoneNumber, String otp) async {
     try {
       // Call the POST method from BaseApiService
@@ -39,21 +39,21 @@ class AuthenticaitonRepository {
         }),
       );
 
-      return LoginResponseModel.fromJson(response);
+      return VerifyOtpResponseModel.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;
     }
   }
 
-  Future <OtpResponseModel> refreshToken(String authToken)async{
+  Future <SendOtpResponseModel> refreshToken(String authToken)async{
     try {
       // Call the POST method from BaseApiService
       final response = await _apiService.post('/auth/refresh',
         body: authToken
       );
 
-      return OtpResponseModel.fromJson(response);
+      return SendOtpResponseModel.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;

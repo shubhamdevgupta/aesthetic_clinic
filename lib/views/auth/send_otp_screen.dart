@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
-import 'package:aesthetic_clinic/views/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:provider/provider.dart';
@@ -135,7 +134,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
 
                           await provider.sendOtp(phoneNumber);
 
-                          if (provider.otpResponse?.statuscode == 200 && provider.otpResponse!.status) {
+                          if (provider.sendOtpResponse?.statuscode == 200 && provider.sendOtpResponse!.status) {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (_) => const OtpVerificationScreen()),
@@ -143,7 +142,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           } else {
                             ToastHelper.showErrorSnackBar(
                               context,
-                              "Error in API: ${provider.otpResponse?.message ?? 'Unknown error'}",
+                              "Error in API: ${provider.sendOtpResponse?.message ?? 'Unknown error'}",
                             );
                           }
                         },

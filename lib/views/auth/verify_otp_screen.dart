@@ -183,8 +183,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           otpValue,
                         );
 
-                        if (provider.authResponse!.statuscode == 200 &&
-                            provider.authResponse!.status) {
+                        if (provider.verifyOtpResponse?.statuscode == 200 &&
+                            provider.verifyOtpResponse!.status) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -194,7 +194,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         } else {
                           ToastHelper.showErrorSnackBar(
                             context,
-                            "Error in api : ${provider.authResponse!.message}",
+                            "Error in api : ${provider.verifyOtpResponse!.message}",
                           );
                         }
                       },

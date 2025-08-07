@@ -1,18 +1,18 @@
-class LoginResponseModel {
+class VerifyOtpResponseModel {
   final bool status;
   final int statuscode;
   final String message;
   final LoginData data;
 
-  LoginResponseModel({
+  VerifyOtpResponseModel({
     required this.status,
     required this.statuscode,
     required this.message,
     required this.data,
   });
 
-  factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
-    return LoginResponseModel(
+  factory VerifyOtpResponseModel.fromJson(Map<String, dynamic> json) {
+    return VerifyOtpResponseModel(
       status: json['status'] ?? false,
       statuscode: json['statuscode'] ?? 0,
       message: json['message'] ?? '',

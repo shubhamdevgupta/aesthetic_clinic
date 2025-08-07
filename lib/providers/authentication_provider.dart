@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'dart:math';
 
-import 'package:aesthetic_clinic/models/auth_response.dart';
+import 'package:aesthetic_clinic/models/verify_otp_response.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../models/otp_response.dart';
+import '../models/send_otp_response.dart';
 import '../repository/AuthenticaitonRepository.dart';
 import '../services/LocalStorageService.dart';
 import '../utils/AppConstants.dart';
@@ -19,11 +19,11 @@ class AuthenticationProvider extends ChangeNotifier {
   bool _isLoggedIn = false;
   bool get isLoggedIn => _isLoggedIn;
 
-  OtpResponseModel? _otpResponse;
-  OtpResponseModel? get otpResponse => _otpResponse;
+  SendOtpResponseModel? _sendotpResponse;
+  SendOtpResponseModel? get sendOtpResponse => _sendotpResponse;
 
-  LoginResponseModel? _authResponse;
-  LoginResponseModel? get authResponse => _authResponse;
+  VerifyOtpResponseModel? _verifyOtpResponse;
+  VerifyOtpResponseModel? get verifyOtpResponse => _verifyOtpResponse;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -38,10 +38,10 @@ class AuthenticationProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _otpResponse = await _authRepository.sendOtp(phoneNumber);
+      _sendotpResponse = await _authRepository.sendOtp(phoneNumber);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
-      _otpResponse = null;
+      _sendotpResponse = null;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -52,14 +52,14 @@ class AuthenticationProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _authResponse = await _authRepository.verifyOtp(phoneNumber,otp);
-      if(_authResponse!.status&& _authResponse!.statuscode==200){
-        _localStorage.saveString(AppConstants.prefAccessToken, _authResponse!.data.accessToken);
-        _localStorage.saveString(AppConstants.prefRefreshToken, _authResponse!.data.refreshToken);
+      _verifyOtpResponse = await _authRepository.verifyOtp(phoneNumber,otp);
+      if(_verifyOtpResponse!.status&& _verifyOtpResponse!.statuscode==200){
+        _localStorage.saveString(AppConstants.prefAccessToken, _verifyOtpResponse!.data.accessToken);
+        _localStorage.saveString(AppConstants.prefRefreshToken, _verifyOtpResponse!.data.refreshToken);
       }
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
-      _authResponse = null;
+      _verifyOtpResponse = null;
     } finally {
       _isLoading = false;
       notifyListeners();
