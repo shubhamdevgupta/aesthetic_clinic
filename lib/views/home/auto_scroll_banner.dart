@@ -1,11 +1,13 @@
-/*
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/service_provider.dart'; // Update path as per your structure
 import 'package:url_launcher/url_launcher.dart';
 
 class AutoScrollingBanner extends StatefulWidget {
-  const AutoScrollingBanner({super.key});
+  final List<dynamic> bannerList; // Pass the flattened list directly
+
+  const AutoScrollingBanner({
+    super.key,
+    required this.bannerList,
+  });
 
   @override
   State<AutoScrollingBanner> createState() => _AutoScrollingBannerState();
@@ -22,13 +24,9 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
   }
 
   void autoScroll() {
-    if (!mounted) return;
+    if (!mounted || widget.bannerList.isEmpty) return;
 
-    final banners = Provider.of<ServiceProvider>(context, listen: false).banners;
-    if (banners.isEmpty) return;
-
-    currentPage++;
-    if (currentPage >= banners.length) currentPage = 0;
+    currentPage = (currentPage + 1) % widget.bannerList.length;
 
     _pageController.animateToPage(
       currentPage,
@@ -47,12 +45,12 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
 
   @override
   Widget build(BuildContext context) {
-    final banners = Provider.of<ServiceProvider>(context).banners;
+    final bannerList = widget.bannerList;
 
-    if (banners.isEmpty) {
+    if (bannerList.isEmpty) {
       return const SizedBox(
         height: 180,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: Text("No banners available")),
       );
     }
 
@@ -60,9 +58,9 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
       height: 180,
       child: PageView.builder(
         controller: _pageController,
-        itemCount: banners.length,
+        itemCount: bannerList.length,
         itemBuilder: (context, index) {
-          final banner = banners[index].configData;
+          final banner = bannerList[index].configData;
           return Stack(
             fit: StackFit.expand,
             children: [
@@ -71,9 +69,12 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                 child: Image.network(
                   banner.imageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Center(child: Icon(Icons.broken_image)),
+                  errorBuilder: (context, error, stackTrace) =>
+                  const Center(child: Icon(Icons.broken_image)),
                   loadingBuilder: (context, child, loadingProgress) =>
-                  loadingProgress == null ? child : const Center(child: CircularProgressIndicator()),
+                  loadingProgress == null
+                      ? child
+                      : const Center(child: CircularProgressIndicator()),
                 ),
               ),
               Positioned(
@@ -93,7 +94,10 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                     ),
                     Text(
                       banner.subtitle,
-                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
                     ),
                   ],
                 ),
@@ -122,4 +126,3 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
     );
   }
 }
-*/

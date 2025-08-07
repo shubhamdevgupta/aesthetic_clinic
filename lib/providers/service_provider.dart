@@ -40,9 +40,9 @@ class ServiceProvider extends ChangeNotifier{
       notifyListeners();
     }
   }
+
   Future<void> getBannerList() async {
     _isLoading = true;
-    notifyListeners();
     try {
       final response = await serviceRepository.getBannerList();
 
@@ -50,10 +50,10 @@ class ServiceProvider extends ChangeNotifier{
         _appConfigurationResponse=response;
       }
 
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      _appConfigurationResponse = null;
-    } finally {
+    } catch (e,stack) {
+      debugPrint("Error: $e");
+      debugPrint("StackTrace: $stack");
+    }finally {
       _isLoading = false;
       notifyListeners();
     }
