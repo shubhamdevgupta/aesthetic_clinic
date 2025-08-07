@@ -2,6 +2,7 @@ import 'package:aesthetic_clinic/models/all_services.dart';
 import 'package:aesthetic_clinic/repository/ServiceRepository.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../models/banner_list.dart';
 import '../services/LocalStorageService.dart';
 import '../utils/GlobalExceptionHandler.dart';
 
@@ -15,6 +16,10 @@ class ServiceProvider extends ChangeNotifier{
 
   ServiceResponse? _serviceResponse;
   ServiceResponse? get serviceResponse => _serviceResponse;
+
+
+  AppConfigurationResponse? _appConfigurationResponse;
+  AppConfigurationResponse? get appConfigResponse => _appConfigurationResponse;
 
 
   Future<void> getAllServices() async {
@@ -31,6 +36,24 @@ class ServiceProvider extends ChangeNotifier{
       GlobalExceptionHandler.handleException(e as Exception);
       _serviceResponse = null;
     } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> getBannerList() async {
+    _isLoading = true;
+    try {
+      final response = await serviceRepository.getBannerList();
+
+      if(response.status && response.statuscode==200){
+        _appConfigurationResponse=response;
+      }
+
+    } catch (e,stack) {
+      debugPrint("Error: $e");
+      debugPrint("StackTrace: $stack");
+    }finally {
       _isLoading = false;
       notifyListeners();
     }

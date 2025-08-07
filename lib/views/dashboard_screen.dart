@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'booking_screen.dart';
 import 'credit_screen.dart';
-import 'home_screen.dart';
+import 'home/home_screen.dart';
 
 
 class DashboardScreen extends StatefulWidget {

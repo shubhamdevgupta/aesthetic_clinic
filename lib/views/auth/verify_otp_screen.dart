@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
-import 'package:aesthetic_clinic/views/dashboard_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../utils/LoaderUtils.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen({super.key});
@@ -21,7 +21,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   late Timer _timer;
   int _start = 30; // countdown duration
   bool _canResend = false;
-  String? otpValue;
+  String otpValue = '';
 
   @override
   void initState() {
@@ -64,10 +64,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title:  Text(localization.verifyMsg),
+        title: Text(localization.verifyMsg),
       ),
       body: Consumer<AuthenticationProvider>(
         builder: (context, provider, child) {
+          if(provider.isLoading)return LoaderUtils.conditionalLoader(isLoading: provider.isLoading);
           return Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -79,12 +80,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                 localization.verifyCodeMsg,
+                  localization.verifyCodeMsg,
                   style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  provider.phoneController.text,
+                  "${provider.selectedCountry.phoneCode}${provider.phoneController.text}",
                   style: const TextStyle(
                     fontSize: 18,
                     color: Color(0xFF660033),
@@ -144,7 +145,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         height: 24,
                       ),
                       const SizedBox(width: 8),
-                       Text(
+                      Text(
                         localization.whatsapp,
                         style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
@@ -171,24 +172,31 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (otpValue!.isNotEmpty) {
-                          await provider.verifyOtp(
-                            provider.phoneController.text,
-                            otpValue!,
+                        if (otpValue.isEmpty) {
+                          ToastHelper.showErrorSnackBar(
+                            context,
+                            "please enter valid otp",
                           );
-                        }else{
-                          ToastHelper.showErrorSnackBar(context, "please enter valid otp");
                         }
-                        provider.authResponse!.statuscode==200&&provider.authResponse!.status ? Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const OnboardingScreen(),
-                                ),
-                              )
-                            : ToastHelper.showErrorSnackBar(
-                                context,
-                                "Error in api : ${provider.authResponse!.message}",
-                              );
+                        await provider.verifyOtp(
+                          "${provider.selectedCountry.phoneCode}${provider.phoneController.text}",
+                          otpValue,
+                        );
+
+                        if (provider.authResponse!.statuscode == 200 &&
+                            provider.authResponse!.status) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OnboardingScreen(),
+                            ),
+                          );
+                        } else {
+                          ToastHelper.showErrorSnackBar(
+                            context,
+                            "Error in api : ${provider.authResponse!.message}",
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF660033),

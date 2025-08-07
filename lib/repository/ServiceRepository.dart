@@ -1,6 +1,8 @@
 
 import 'package:aesthetic_clinic/models/all_services.dart';
+import 'package:flutter/foundation.dart';
 
+import '../models/banner_list.dart';
 import '../services/BaseApiService.dart';
 import '../utils/GlobalExceptionHandler.dart';
 
@@ -14,6 +16,17 @@ Future<ServiceResponse> getAllServices( ) async {
     final response = await _apiService.get('/services/list',withAuth: true);
 
     return ServiceResponse.fromJson(response);
+  } catch (e) {
+    GlobalExceptionHandler.handleException(e as Exception);
+    rethrow;
+  }
+}
+Future<AppConfigurationResponse> getBannerList( ) async {
+  try {
+    final response = await _apiService.get(
+        '/app-configs/list?type=banner&include=appConfigs,topServices,recommendedServices',withAuth: true);
+
+    return AppConfigurationResponse.fromJson(response);
   } catch (e) {
     GlobalExceptionHandler.handleException(e as Exception);
     rethrow;
