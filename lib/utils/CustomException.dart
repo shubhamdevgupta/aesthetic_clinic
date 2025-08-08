@@ -1,21 +1,23 @@
-class AppException implements Exception {
+class ApiException implements Exception {
   final String message;
-  final String prefix;
-
-  AppException(this.message, this.prefix);
+  ApiException(this.message);
 
   @override
-  String toString() {
-    return "$prefix$message";
-  }
+  String toString() => message;
 }
 
-class NetworkException extends AppException {
-  NetworkException([String message = "No Internet Connection"])
-      : super(message, "");
+class NetworkException implements Exception {
+  final String message;
+  NetworkException(this.message);
+
+  @override
+  String toString() => message;
 }
 
-class ApiException extends AppException {
-  ApiException([String message = "Something went wrong with the API"])
-      : super(message, "");
+class AuthenticationException implements Exception {
+  final String message;
+  AuthenticationException(this.message);
+
+  @override
+  String toString() => message;
 }

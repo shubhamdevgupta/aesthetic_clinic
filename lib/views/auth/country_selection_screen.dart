@@ -22,22 +22,43 @@ class _CountrySelectionScreenState extends State<CountrySelectionScreen> {
   }
 
   Future<void> _loadCountries() async {
-    final countries = await CountryService().getAll();
-    setState(() {
-      _allCountries = countries;
-      _filteredCountries = countries;
-      _isLoading = false;
-    });
+    try {
+      final countries = await CountryService().getAll();
+      if (mounted) {
+        setState(() {
+          _allCountries = countries;
+          _filteredCountries = countries;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to load countries. Please try again.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    }
   }
 
   void _filterCountries() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredCountries = _allCountries.where((c) {
-        return c.name.toLowerCase().contains(query) ||
-            c.phoneCode.contains(query) ||
-            c.countryCode.toLowerCase().contains(query);
-      }).toList();
+      if (query.isEmpty) {
+        _filteredCountries = _allCountries;
+      } else {
+        _filteredCountries = _allCountries.where((c) {
+          return c.name.toLowerCase().contains(query) ||
+              c.phoneCode.contains(query) ||
+              c.countryCode.toLowerCase().contains(query);
+        }).toList();
+      }
     });
   }
 
@@ -54,38 +75,64 @@ class _CountrySelectionScreenState extends State<CountrySelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Select Country")),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search),
-                hintText: 'Search country name or code',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _filteredCountries.length,
-              itemBuilder: (context, index) {
-                final country = _filteredCountries[index];
-                return ListTile(
-                  onTap: () => _selectCountry(country),
-                  leading: Text(country.flagEmoji, style: const TextStyle(fontSize: 24)),
-                  title: Text(country.name),
-                  trailing: Text('+${country.phoneCode}'),
-                );
-              },
-            ),
-          ),
-        ],
+      appBar: AppBar(
+        title: const Text("Select Country"),
+        backgroundColor: const Color(0xFF660033),
+        foregroundColor: Colors.white,
       ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF660033)),
+              ),
+            )
+          : Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: 'Search country name or code',
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xFF660033)),
+                      ),
+                    ),
+                    autofocus: true,
+                  ),
+                ),
+                Expanded(
+                  child: _filteredCountries.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'No countries found',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: _filteredCountries.length,
+                          itemBuilder: (context, index) {
+                            final country = _filteredCountries[index];
+                            return ListTile(
+                              onTap: () => _selectCountry(country),
+                              leading: Text(
+                                country.flagEmoji, 
+                                style: const TextStyle(fontSize: 24)
+                              ),
+                              title: Text(
+                                country.name,
+                                style: const TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                              subtitle: Text('+${country.phoneCode}'),
+                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
     );
   }
 }

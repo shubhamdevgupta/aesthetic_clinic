@@ -1,5 +1,7 @@
+import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../utils/AppConstants.dart';
 
@@ -22,13 +24,28 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-      await Future.delayed(const Duration(seconds: 3));
-      if(storage.getBool(AppConstants.prefSeenOnboarding)??false){
-        Navigator.pushReplacementNamed(context, AppConstants.navigateToDashboardScreen);
-      }else {
-        Navigator.pushReplacementNamed(
-            context, AppConstants.navigateToSelectLanguageScreen);
-      }
+    await Future.delayed(const Duration(seconds: 3));
+    
+    // Check if user has seen onboarding
+    final hasSeenOnboarding = storage.getBool(AppConstants.prefSeenOnboarding) ?? false;
+    
+    if (!hasSeenOnboarding) {
+      // First time user - go to language selection
+      Navigator.pushReplacementNamed(context, AppConstants.navigateToSelectLanguageScreen);
+      return;
+    }
+    
+    // Check authentication state using the provider
+    final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+    await authProvider.checkAuthenticationState();
+    
+    if (authProvider.isLoggedIn) {
+      // User is logged in - go to dashboard
+      Navigator.pushReplacementNamed(context, AppConstants.navigateToDashboardScreen);
+    } else {
+      // User is not logged in - go to login
+      Navigator.pushReplacementNamed(context, AppConstants.navigateToSendOtpScreen);
+    }
   }
 
   @override

@@ -34,8 +34,7 @@ class AuthenticaitonRepository {
       final response = await _apiService.post('/auth/mobile-login',
         body: jsonEncode({
           'phone': phoneNumber,
-          'otp': otp,
-          'deviceInfo': "Mobile App",
+          'otp': otp
         }),
       );
 
@@ -46,11 +45,11 @@ class AuthenticaitonRepository {
     }
   }
 
-  Future <SendOtpResponseModel> refreshToken(String authToken)async{
+  Future <SendOtpResponseModel> refreshToken(String refreshToken)async{
     try {
       // Call the POST method from BaseApiService
-      final response = await _apiService.post('/auth/refresh',
-        body: authToken
+      final response = await _apiService.post('/auth/refresh-token',
+        body: jsonEncode({'refreshToken': refreshToken})
       );
 
       return SendOtpResponseModel.fromJson(response);

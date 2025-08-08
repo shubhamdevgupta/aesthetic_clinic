@@ -33,38 +33,73 @@ class BaseApiService {
     log('🔸 Headers: ${jsonEncode(headers)}');
     log('🔸 Body: $body');
 
-    try {
-      await _checkConnectivity();
+    int retryCount = 0;
+    const maxRetries = 2;
 
-      var response = await http.post(url, headers: headers, body: body);
+    while (retryCount <= maxRetries) {
+      try {
+        await _checkConnectivity();
 
-      log('📩 Response Status: ${response.statusCode}');
-      log('📩 Response Body: ${response.body}');
+        var response = await http.post(url, headers: headers, body: body);
 
-      if (response.statusCode == 401 && withAuth) {
-        log('🔄 Access token expired. Trying to refresh...');
-        bool refreshed = await _refreshAccessToken();
+        log('📩 Response Status: ${response.statusCode}');
+        log('📩 Response Body: ${response.body}');
 
-        if (refreshed) {
-          final newAccessToken =
-          await storageService.getString(AppConstants.prefAccessToken);
-          headers['Authorization'] = 'Bearer $newAccessToken';
+        if (response.statusCode == 401 && withAuth) {
+          log('🔄 Access token expired. Trying to refresh...');
+          bool refreshed = await _refreshAccessToken();
 
-          log('🔁 Retrying POST with refreshed token...');
-          response = await http.post(url, headers: headers, body: body);
+          if (refreshed) {
+            final newAccessToken =
+            await storageService.getString(AppConstants.prefAccessToken);
+            if (newAccessToken != null && newAccessToken.isNotEmpty) {
+              headers['Authorization'] = 'Bearer $newAccessToken';
 
-          log('📩 Retried Response Status: ${response.statusCode}');
-          log('📩 Retried Response Body: ${response.body}');
+              log('🔁 Retrying POST with refreshed token...');
+              response = await http.post(url, headers: headers, body: body);
+
+              log('📩 Retried Response Status: ${response.statusCode}');
+              log('📩 Retried Response Body: ${response.body}');
+            } else {
+              log('❌ Failed to get new access token after refresh');
+              throw AuthenticationException('Authentication failed. Please login again.');
+            }
+          } else {
+            log('❌ Token refresh failed. User needs to login again.');
+            throw AuthenticationException('Session expired. Please login again.');
+          }
         }
-      }
 
-      return _processResponse(response);
-    } on SocketException {
-      throw NetworkException('No internet connection');
-    } catch (e) {
-      log('❌ POST Exception: $e');
-      throw ApiException('Unexpected error during POST');
+        // Check if it's a server error that we should retry
+        if ((response.statusCode >= 500 && response.statusCode < 600) && retryCount < maxRetries) {
+          log('⚠️ Server error (${response.statusCode}), retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+          await Future.delayed(const Duration(seconds: 1));
+          retryCount++;
+          continue;
+        }
+
+        return _processResponse(response);
+      } on SocketException {
+        throw NetworkException('No internet connection');
+      } catch (e) {
+        if (e is ApiException) {
+          // If it's already an ApiException, check if it's a server error we should retry
+          if (e.toString().contains('Server error') && retryCount < maxRetries) {
+            log('⚠️ Server error exception, retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+            await Future.delayed(const Duration(seconds: 1));
+            retryCount++;
+            continue;
+          }
+          throw e; // Re-throw ApiException as is
+        }
+        
+        log('❌ POST Exception: $e');
+        throw ApiException('Unexpected error during POST');
+      }
     }
+    
+    // This should never be reached, but just in case
+    throw ApiException('Failed after all retry attempts');
   }
 
   Future<dynamic> get(
@@ -85,38 +120,73 @@ class BaseApiService {
     log('🔹 GET Request to: $url');
     log('🔸 Headers: ${jsonEncode(headers)}');
 
-    try {
-      await _checkConnectivity();
+    int retryCount = 0;
+    const maxRetries = 2;
 
-      var response = await http.get(url, headers: headers);
+    while (retryCount <= maxRetries) {
+      try {
+        await _checkConnectivity();
 
-      log('📩 Response Status: ${response.statusCode}');
-      log('📩 Response Body: ${response.body}');
+        var response = await http.get(url, headers: headers);
 
-      if (response.statusCode == 401 && withAuth) {
-        log('🔄 Access token expired. Trying to refresh...');
-        bool refreshed = await _refreshAccessToken();
+        log('📩 Response Status: ${response.statusCode}');
+        log('📩 Response Body: ${response.body}');
 
-        if (refreshed) {
-          final newAccessToken =
-          await storageService.getString(AppConstants.prefAccessToken);
-          headers['Authorization'] = 'Bearer $newAccessToken';
+        if (response.statusCode == 401 && withAuth) {
+          log('🔄 Access token expired. Trying to refresh...');
+          bool refreshed = await _refreshAccessToken();
 
-          log('🔁 Retrying GET with refreshed token...');
-          response = await http.get(url, headers: headers);
+          if (refreshed) {
+            final newAccessToken =
+            await storageService.getString(AppConstants.prefAccessToken);
+            if (newAccessToken != null && newAccessToken.isNotEmpty) {
+              headers['Authorization'] = 'Bearer $newAccessToken';
 
-          log('📩 Retried Response Status: ${response.statusCode}');
-          log('📩 Retried Response Body: ${response.body}');
+              log('🔁 Retrying GET with refreshed token...');
+              response = await http.get(url, headers: headers);
+
+              log('📩 Retried Response Status: ${response.statusCode}');
+              log('📩 Retried Response Body: ${response.body}');
+            } else {
+              log('❌ Failed to get new access token after refresh');
+              throw AuthenticationException('Authentication failed. Please login again.');
+            }
+          } else {
+            log('❌ Token refresh failed. User needs to login again.');
+            throw AuthenticationException('Session expired. Please login again.');
+          }
         }
-      }
 
-      return _processResponse(response);
-    } on SocketException {
-      throw NetworkException('No internet connection');
-    } catch (e) {
-      log('❌ GET Exception: $e');
-      throw ApiException('Unexpected error during GET');
+        // Check if it's a server error that we should retry
+        if ((response.statusCode >= 500 && response.statusCode < 600) && retryCount < maxRetries) {
+          log('⚠️ Server error (${response.statusCode}), retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+          await Future.delayed(const Duration(seconds: 1));
+          retryCount++;
+          continue;
+        }
+
+        return _processResponse(response);
+      } on SocketException {
+        throw NetworkException('No internet connection');
+      } catch (e) {
+        if (e is ApiException) {
+          // If it's already an ApiException, check if it's a server error we should retry
+          if (e.toString().contains('Server error') && retryCount < maxRetries) {
+            log('⚠️ Server error exception, retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+            await Future.delayed(const Duration(seconds: 1));
+            retryCount++;
+            continue;
+          }
+          throw e; // Re-throw ApiException as is
+        }
+        
+        log('❌ GET Exception: $e');
+        throw ApiException('Unexpected error during GET');
+      }
     }
+    
+    // This should never be reached, but just in case
+    throw ApiException('Failed after all retry attempts');
   }
 
   Future<void> _checkConnectivity() async {
@@ -138,13 +208,29 @@ class BaseApiService {
       case 401:
         throw ApiException('Unauthorized ${handleErrorResp(response.body, '')}');
       case 500:
-        throw ApiException(handleErrorResp(response.body, 'Internal Server Error'));
+        // Handle specific server errors
+        final errorMessage = handleErrorResp(response.body, 'Internal Server Error');
+        if (errorMessage.contains('Transaction cannot be rolled back') || 
+            errorMessage.contains('database') ||
+            errorMessage.contains('transaction')) {
+          throw ApiException('Server is temporarily unavailable. Please try again in a few moments.');
+        } else {
+          throw ApiException('Server error: $errorMessage');
+        }
       case 502:
         throw ApiException('Bad Gateway ${handleErrorResp(response.body, '')}');
+      case 503:
+        throw ApiException('Service temporarily unavailable. Please try again later.');
+      case 504:
+        throw ApiException('Gateway timeout. Please try again.');
       case 408:
         throw ApiException('Request Timeout: Please try again later');
       default:
-        throw ApiException('Unexpected error ${response.statusCode} \n ${handleErrorResp(response.body, '')}');
+        if (response.statusCode >= 500) {
+          throw ApiException('Server error (${response.statusCode}). Please try again later.');
+        } else {
+          throw ApiException('Unexpected error ${response.statusCode} \n ${handleErrorResp(response.body, '')}');
+        }
     }
   }
 
@@ -162,43 +248,114 @@ class BaseApiService {
 
   Future<bool> _refreshAccessToken() async {
     final refreshToken = await storageService.getString(AppConstants.prefRefreshToken);
-    if (refreshToken == null) {
+    if (refreshToken == null || refreshToken.isEmpty) {
       log('⚠️ No refresh token found.');
+      // Clear stored tokens and redirect to login
+      await _clearStoredTokens();
       return false;
     }
 
     final Uri url = Uri.parse('$_baseUrl/auth/refresh-token');
+    int retryCount = 0;
+    const maxRetries = 2;
 
-    try {
-      log('🔄 Refreshing token...');
-      log('🔸 Refresh Token: $refreshToken');
+    while (retryCount <= maxRetries) {
+      try {
+        log('🔄 Refreshing token... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+        log('🔸 Refresh Token: ${refreshToken.substring(0, 10)}...'); // Log only first 10 chars for security
 
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'refreshToken': refreshToken}),
-      );
+        final response = await http.post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'refreshToken': refreshToken}),
+        );
+        log('🔸 Post Request to: $url');
 
-      log('📩 Refresh Response Status: ${response.statusCode}');
-      log('📩 Refresh Response Body: ${response.body}');
+        log('📩 Refresh Response Status: ${response.statusCode}');
+        log('📩 Refresh Response Body: ${response.body}');
 
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final newAccessToken = json['data']['accessToken'];
-        final newRefreshToken = json['data']['refreshToken'];
-
-        await storageService.saveString(AppConstants.prefAccessToken, newAccessToken);
-        await storageService.saveString(AppConstants.prefRefreshToken, newRefreshToken);
-
-        log('✅ Token refreshed successfully');
-        return true;
-      } else {
-        log('❌ Failed to refresh token: ${response.body}');
-        return false;
+        if (response.statusCode == 200) {
+          final json = jsonDecode(response.body);
+          
+          // Handle different possible response structures
+          String? newAccessToken;
+          String? newRefreshToken;
+          
+          if (json['data'] != null) {
+            newAccessToken = json['data']['accessToken'];
+            newRefreshToken = json['data']['refreshToken'];
+          } else if (json['accessToken'] != null) {
+            newAccessToken = json['accessToken'];
+            newRefreshToken = json['refreshToken'];
+          }
+          
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            await storageService.saveString(AppConstants.prefAccessToken, newAccessToken);
+            if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+              await storageService.saveString(AppConstants.prefRefreshToken, newRefreshToken);
+            }
+            log('✅ Token refreshed successfully');
+            return true;
+          } else {
+            log('❌ Invalid response structure for token refresh');
+            await _clearStoredTokens();
+            return false;
+          }
+        } else if (response.statusCode == 401) {
+          log('❌ Refresh token is invalid or expired');
+          await _clearStoredTokens();
+          return false;
+        } else if (response.statusCode >= 500 && retryCount < maxRetries) {
+          // Server error, retry after delay
+          log('⚠️ Server error (${response.statusCode}), retrying in 1 second...');
+          await Future.delayed(const Duration(seconds: 1));
+          retryCount++;
+          continue;
+        } else {
+          log('❌ Failed to refresh token: ${response.body}');
+          return false;
+        }
+      } catch (e) {
+        if (retryCount < maxRetries) {
+          log('⚠️ Refresh token exception (attempt ${retryCount + 1}), retrying in 1 second...: $e');
+          await Future.delayed(const Duration(seconds: 1));
+          retryCount++;
+          continue;
+        } else {
+          log('❌ Refresh token exception after all retries: $e');
+          return false;
+        }
       }
-    } catch (e) {
-      log('❌ Refresh token exception: $e');
-      return false;
     }
+    
+    return false;
+  }
+
+  Future<void> _clearStoredTokens() async {
+    await storageService.remove(AppConstants.prefAccessToken);
+    await storageService.remove(AppConstants.prefRefreshToken);
+    await storageService.remove(AppConstants.prefIsLoggedIn);
+    log('🗑️ Cleared stored tokens due to refresh failure');
+  }
+
+  Future<bool> isUserLoggedIn() async {
+    final accessToken = await storageService.getString(AppConstants.prefAccessToken);
+    final isLoggedIn = await storageService.getBool(AppConstants.prefIsLoggedIn);
+    final refreshToken = await storageService.getString(AppConstants.prefRefreshToken);
+    
+    log('🔍 Checking login state:');
+    log('   - Access Token: ${accessToken != null ? 'Present (${accessToken.length} chars)' : 'Missing'}');
+    log('   - Refresh Token: ${refreshToken != null ? 'Present (${refreshToken.length} chars)' : 'Missing'}');
+    log('   - Is Logged In Flag: $isLoggedIn');
+    
+    final result = accessToken != null && accessToken.isNotEmpty && (isLoggedIn ?? false);
+    log('   - Final Result: $result');
+    
+    return result;
+  }
+
+  Future<void> logout() async {
+    await _clearStoredTokens();
+    log('👋 User logged out successfully');
   }
 }

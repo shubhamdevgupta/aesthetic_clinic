@@ -101,6 +101,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   keyboardType: TextInputType.number,
                   onChanged: (value) {
                     otpValue = value;
+                    // Clear error when user starts typing
+                    if (provider.errorMsg.isNotEmpty) {
+                      provider.clearError();
+                    }
                   },
                   pinTheme: PinTheme(
                     activeColor: Color(0xFF660033),
@@ -172,19 +176,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if (otpValue.isEmpty) {
-                          ToastHelper.showErrorSnackBar(
-                            context,
-                            "please enter valid otp",
-                          );
-                        }
-                        await provider.verifyOtp(
-                          "${provider.selectedCountry.phoneCode}${provider.phoneController.text}",
-                          otpValue,
+                        final phoneNumber = provider.formatPhoneNumber(
+                          provider.selectedCountry.phoneCode,
+                          provider.phoneController.text
                         );
-
-                        if (provider.verifyOtpResponse?.statuscode == 200 &&
-                            provider.verifyOtpResponse!.status) {
+                        
+                        final success = await provider.verifyOtpWithValidation(phoneNumber, otpValue);
+                        
+                        if (success) {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -194,7 +193,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         } else {
                           ToastHelper.showErrorSnackBar(
                             context,
-                            "Error in api : ${provider.verifyOtpResponse!.message}",
+                            provider.errorMsg,
                           );
                         }
                       },

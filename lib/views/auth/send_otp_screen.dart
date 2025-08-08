@@ -9,29 +9,41 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/LoaderUtils.dart';
 import '../onboarding/onboarding_screen.dart';
-import 'country_selection_screen.dart'; // ⬅️ You'll create this file
+import 'country_selection_screen.dart';
 
 class SendOtpScreen extends StatefulWidget {
   const SendOtpScreen({super.key});
-
 
   @override
   State<SendOtpScreen> createState() => _SendOtpScreenState();
 }
 
 class _SendOtpScreenState extends State<SendOtpScreen> {
+  bool _isNavigating = false;
 
   Future<void> _navigateToCountryPicker(BuildContext context, AuthenticationProvider provider) async {
-    final selected = await Navigator.push<Country>(
-      context,
-      MaterialPageRoute(builder: (_) => const CountrySelectionScreen()),
-    );
+    // Prevent multiple taps
+    if (_isNavigating) return;
+    
+    setState(() {
+      _isNavigating = true;
+    });
 
-    if (selected != null) {
-      provider.setSelectedCountry(selected);
+    try {
+      final selected = await Navigator.push<Country>(
+        context,
+        MaterialPageRoute(builder: (_) => const CountrySelectionScreen()),
+      );
+
+      if (selected != null) {
+        provider.setSelectedCountry(selected);
+      }
+    } finally {
+      setState(() {
+        _isNavigating = false;
+      });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -68,25 +80,33 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                       children: [
                         Flexible(
                           flex: 3, // Around 30%
-                          child: GestureDetector(
-                            onTap: () => _navigateToCountryPicker(context, provider),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    provider.selectedCountry.flagEmoji,
-                                    style: const TextStyle(fontSize: 18),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
-                                    child: Text(
-                                      "+${provider.selectedCountry.phoneCode}",
-                                      overflow: TextOverflow.ellipsis,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _isNavigating ? null : () => _navigateToCountryPicker(context, provider),
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      provider.selectedCountry.flagEmoji,
+                                      style: const TextStyle(fontSize: 18),
                                     ),
-                                  ),
-                                  const Icon(Icons.arrow_drop_down, size: 20),
-                                ],
+                                    const SizedBox(width: 4),
+                                    Flexible(
+                                      child: Text(
+                                        "+${provider.selectedCountry.phoneCode}",
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      size: 20,
+                                      color: _isNavigating ? Colors.grey : null,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -102,6 +122,12 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                             controller: provider.phoneController,
                             keyboardType: TextInputType.phone,
                             maxLength: 10,
+                            onChanged: (value) {
+                              // Clear error when user starts typing
+                              if (provider.errorMsg.isNotEmpty) {
+                                provider.clearError();
+                              }
+                            },
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
@@ -125,16 +151,14 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           final rawPhone = provider.phoneController.text.trim();
-                          final phoneNumber = '${provider.selectedCountry.phoneCode}$rawPhone';
+                          final phoneNumber = provider.formatPhoneNumber(
+                            provider.selectedCountry.phoneCode, 
+                            rawPhone
+                          );
 
-                          if (rawPhone.isEmpty) {
-                            ToastHelper.showErrorSnackBar(context, 'Please enter a valid mobile number');
-                            return;
-                          }
-
-                          await provider.sendOtp(phoneNumber);
-
-                          if (provider.sendOtpResponse?.statuscode == 200 && provider.sendOtpResponse!.status) {
+                          final success = await provider.sendOtpWithValidation(phoneNumber);
+                          
+                          if (success) {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (_) => const OtpVerificationScreen()),
@@ -142,7 +166,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           } else {
                             ToastHelper.showErrorSnackBar(
                               context,
-                              "Error in API: ${provider.sendOtpResponse?.message ?? 'Unknown error'}",
+                              provider.errorMsg,
                             );
                           }
                         },

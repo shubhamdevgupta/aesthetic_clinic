@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../models/banner_list.dart';
 import '../services/LocalStorageService.dart';
+import '../utils/CustomException.dart';
 import '../utils/GlobalExceptionHandler.dart';
 
 class ServiceProvider extends ChangeNotifier{
@@ -33,7 +34,10 @@ class ServiceProvider extends ChangeNotifier{
       }
 
     } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
+      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
+      if (e is! AuthenticationException) {
+        GlobalExceptionHandler.handleException(e as Exception);
+      }
       _serviceResponse = null;
     } finally {
       _isLoading = false;
@@ -50,10 +54,15 @@ class ServiceProvider extends ChangeNotifier{
         _appConfigurationResponse=response;
       }
 
-    } catch (e,stack) {
+    } catch (e, stack) {
       debugPrint("Error: $e");
       debugPrint("StackTrace: $stack");
-    }finally {
+      
+      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
+      if (e is! AuthenticationException) {
+        GlobalExceptionHandler.handleException(e as Exception);
+      }
+    } finally {
       _isLoading = false;
       notifyListeners();
     }
