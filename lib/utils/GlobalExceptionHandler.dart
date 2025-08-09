@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 import '../providers/authentication_provider.dart';
 import '../utils/AppConstants.dart';
-import '../views/ExceptionScreen.dart';
+import '../views/auth/ExceptionScreen.dart';
 import 'CustomException.dart';
 
 class GlobalExceptionHandler {
@@ -65,17 +65,17 @@ class GlobalExceptionHandler {
     debugPrint("Authentication failure handled: $errorMessage");
     
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Get the authentication provider and logout
+      // Clear all persisted data via provider (central place)
       final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
       await authProvider.logout();
       
       // Show error message
       ToastHelper.showSnackBar(context, errorMessage);
       
-      // Navigate to login screen
+      // Navigate to splash to re-bootstrap and route to correct screen
       if (navigatorKey.currentState != null) {
         navigatorKey.currentState!.pushNamedAndRemoveUntil(
-          AppConstants.navigateToSendOtpScreen,
+          AppConstants.navigateToSplashScreen,
           (route) => false, // Remove all previous routes
         );
       }

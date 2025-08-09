@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class LoaderUtils {
@@ -37,12 +39,63 @@ class LoaderUtils {
 
   /// Returns a conditional overlay loader
   static Widget conditionalLoader({required bool isLoading, Widget? child}) {
-    return isLoading
-        ? Container(
-      color: Colors.black.withOpacity(0.2),
-      child: const Center(child: CircularProgressIndicator(color: Colors.white)),
-    )
-        : (child ?? const SizedBox.shrink());
+    if (!isLoading) {
+      return child ?? const SizedBox.shrink();
+    }
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Dim + blur the background
+        Container(color: Colors.black.withOpacity(0.25)),
+        BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+          child: const SizedBox.expand(),
+        ),
+
+        // Centered glass card with brand spinner
+        Center(
+          child: Container(
+            width: 180,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.92),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    color: Color(0xFF660033),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Just a moment...',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   /// Returns a reusable styled progress loader widget (for embedding in dialogs)

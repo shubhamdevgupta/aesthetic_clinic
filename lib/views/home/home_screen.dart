@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/views/booking_screen/booking_screen.dart';
+import 'package:aesthetic_clinic/views/service_screen.dart';
+import 'package:aesthetic_clinic/views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/LocalStorageService.dart';
 import 'auto_scroll_banner.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final LocalStorageService storage = LocalStorageService();
   @override
   void initState() {
     super.initState();
@@ -63,19 +68,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (shouldLogout == true) {
-      // Perform logout
-      final authProvider = Provider.of<AuthenticationProvider>(
-        context,
-        listen: false,
-      );
+      // Perform global logout: clear all storage and restart at splash
+      final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
       await authProvider.logout();
-
-      // Navigate to login screen
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppConstants.navigateToSendOtpScreen,
-        (route) => false,
-      );
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppConstants.navigateToSplashScreen,
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -107,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 12),
                     Text(
-                      'Samiya Fatima',
+                      '${storage.getString(AppConstants.prefUserName)}',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -138,8 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.person,
                 title: 'Profile',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to profile
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileScreen(),
+                    ),
+                  );
                 },
               ),
 
@@ -147,17 +153,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.calendar_month,
                 title: 'Bookings',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to bookings
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BookingScreen(),
+                    ),
+                  );
                 },
               ),
 
               _buildDrawerItem(
                 icon: Icons.credit_card,
-                title: 'Credits',
+                title: 'Service',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to credits
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>  ServiceScreen(),
+                    ),
+                  );
                 },
               ),
 
@@ -206,8 +220,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _getGreeting(),
                           style: const TextStyle(fontSize: 14),
                         ),
-                        const Text(
-                          "Samiya Fatima",
+                         Text(
+                          '${storage.getString(AppConstants.prefUserName)}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF660033),
@@ -296,7 +310,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: recommendedServices.length,
                     itemBuilder: (context, length) {
-                      print("*******    $recommendedServices");
                       final recommended = recommendedServices[length];
                       return topChoiceItem(recommended.name, recommended.image);
                     },
@@ -349,6 +362,20 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 120,
               width: 140,
               fit: BoxFit.cover,
+              // Downscale a bit to reduce decode cost
+              cacheWidth: 560,
+              cacheHeight: 480,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return _ShimmerPlaceholder(width: 140, height: 120, borderRadius: 12);
+              },
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 120,
+                width: 140,
+                color: const Color(0xFFFFEBEE),
+                alignment: Alignment.center,
+                child: const Icon(Icons.broken_image, color: Colors.red),
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -399,23 +426,17 @@ class ServiceItem extends StatelessWidget {
               width: 40,
               height: 40,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, color: Colors.red, size: 24),
+              cacheWidth: 120,
+              cacheHeight: 120,
               loadingBuilder: (context, child, loadingProgress) {
                 if (loadingProgress == null) return child;
-                return Container(
-                  width: 40,
-                  height: 40,
-                  color: const Color(0xFFFFEBEE),
-                  child: const Center(
-                    child: Icon(
-                      Icons.image,
-                      color: Color(0xFF660033),
-                      size: 20,
-                    ),
-                  ),
-                );
+                return _CircleShimmer(size: 40);
               },
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.broken_image,
+                color: Colors.red,
+                size: 24,
+              ),
             ),
           ),
 
@@ -427,6 +448,72 @@ class ServiceItem extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ShimmerPlaceholder extends StatefulWidget {
+  final double width;
+  final double height;
+  final double borderRadius;
+  const _ShimmerPlaceholder({required this.width, required this.height, this.borderRadius = 8});
+
+  @override
+  State<_ShimmerPlaceholder> createState() => _ShimmerPlaceholderState();
+}
+
+class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            gradient: LinearGradient(
+              begin: Alignment(-1 + _controller.value * 2, 0),
+              end: Alignment(1 + _controller.value * 2, 0),
+              colors: const [
+                Color(0xFFF1F1F1),
+                Color(0xFFE7E7E7),
+                Color(0xFFF1F1F1),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CircleShimmer extends StatelessWidget {
+  final double size;
+  const _CircleShimmer({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: const CircularProgressIndicator(
+        strokeWidth: 2,
+        color: Color(0xFF660033),
       ),
     );
   }
