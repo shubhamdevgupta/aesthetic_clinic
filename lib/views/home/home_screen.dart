@@ -3,9 +3,13 @@ import 'dart:async';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/views/booking_screen/booking_screen.dart';
+import 'package:aesthetic_clinic/views/service_screen.dart';
+import 'package:aesthetic_clinic/views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/LocalStorageService.dart';
 import 'auto_scroll_banner.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final LocalStorageService storage = LocalStorageService();
   @override
   void initState() {
     super.initState();
@@ -63,19 +68,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (shouldLogout == true) {
-      // Perform logout
-      final authProvider = Provider.of<AuthenticationProvider>(
-        context,
-        listen: false,
-      );
+      // Perform global logout: clear all storage and restart at splash
+      final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
       await authProvider.logout();
-
-      // Navigate to login screen
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppConstants.navigateToSendOtpScreen,
-        (route) => false,
-      );
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppConstants.navigateToSplashScreen,
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -107,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 12),
                     Text(
-                      'Samiya Fatima',
+                      '${storage.getString(AppConstants.prefUserName)}',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -138,8 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.person,
                 title: 'Profile',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to profile
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileScreen(),
+                    ),
+                  );
                 },
               ),
 
@@ -147,17 +153,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.calendar_month,
                 title: 'Bookings',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to bookings
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const BookingScreen(),
+                    ),
+                  );
                 },
               ),
 
               _buildDrawerItem(
                 icon: Icons.credit_card,
-                title: 'Credits',
+                title: 'Service',
                 onTap: () {
-                  Navigator.pop(context);
-                  // Navigate to credits
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>  ServiceScreen(),
+                    ),
+                  );
                 },
               ),
 
@@ -206,8 +220,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           _getGreeting(),
                           style: const TextStyle(fontSize: 14),
                         ),
-                        const Text(
-                          "Samiya Fatima",
+                         Text(
+                          '${storage.getString(AppConstants.prefUserName)}',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF660033),
@@ -296,7 +310,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: recommendedServices.length,
                     itemBuilder: (context, length) {
-                      print("*******    $recommendedServices");
                       final recommended = recommendedServices[length];
                       return topChoiceItem(recommended.name, recommended.image);
                     },

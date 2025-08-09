@@ -2,7 +2,7 @@ import 'package:aesthetic_clinic/views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'booking_screen/booking_screen.dart';
-import 'credit_screen.dart';
+import 'service_screen.dart';
 import 'home/home_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
