@@ -349,6 +349,20 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 120,
               width: 140,
               fit: BoxFit.cover,
+              // Downscale a bit to reduce decode cost
+              cacheWidth: 560,
+              cacheHeight: 480,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return _ShimmerPlaceholder(width: 140, height: 120, borderRadius: 12);
+              },
+              errorBuilder: (context, error, stackTrace) => Container(
+                height: 120,
+                width: 140,
+                color: const Color(0xFFFFEBEE),
+                alignment: Alignment.center,
+                child: const Icon(Icons.broken_image, color: Colors.red),
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -399,23 +413,17 @@ class ServiceItem extends StatelessWidget {
               width: 40,
               height: 40,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.broken_image, color: Colors.red, size: 24),
+              cacheWidth: 120,
+              cacheHeight: 120,
               loadingBuilder: (context, child, loadingProgress) {
                 if (loadingProgress == null) return child;
-                return Container(
-                  width: 40,
-                  height: 40,
-                  color: const Color(0xFFFFEBEE),
-                  child: const Center(
-                    child: Icon(
-                      Icons.image,
-                      color: Color(0xFF660033),
-                      size: 20,
-                    ),
-                  ),
-                );
+                return _CircleShimmer(size: 40);
               },
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.broken_image,
+                color: Colors.red,
+                size: 24,
+              ),
             ),
           ),
 
@@ -427,6 +435,72 @@ class ServiceItem extends StatelessWidget {
             fit: BoxFit.contain,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ShimmerPlaceholder extends StatefulWidget {
+  final double width;
+  final double height;
+  final double borderRadius;
+  const _ShimmerPlaceholder({required this.width, required this.height, this.borderRadius = 8});
+
+  @override
+  State<_ShimmerPlaceholder> createState() => _ShimmerPlaceholderState();
+}
+
+class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1200),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            gradient: LinearGradient(
+              begin: Alignment(-1 + _controller.value * 2, 0),
+              end: Alignment(1 + _controller.value * 2, 0),
+              colors: const [
+                Color(0xFFF1F1F1),
+                Color(0xFFE7E7E7),
+                Color(0xFFF1F1F1),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CircleShimmer extends StatelessWidget {
+  final double size;
+  const _CircleShimmer({required this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: const CircularProgressIndicator(
+        strokeWidth: 2,
+        color: Color(0xFF660033),
       ),
     );
   }

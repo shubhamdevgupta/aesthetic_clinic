@@ -1,3 +1,4 @@
+import 'package:aesthetic_clinic/views/profile/get_help_screen.dart';
 import 'package:flutter/material.dart';
 
 const Color kPrimaryColor = Color(0xFF660033);
@@ -45,12 +46,22 @@ class BookingScreen extends StatelessWidget {
                   children: [
                     const Text('Bookings', style: kHeaderTitleStyle),
                     // Optional help text to match visual balance
-                    Text(
-                      'Need Help?',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+                    InkWell(
+                      onTap: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const GetHelpScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Need Help?',
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],

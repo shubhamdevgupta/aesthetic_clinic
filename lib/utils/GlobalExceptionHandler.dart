@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 import '../providers/authentication_provider.dart';
 import '../utils/AppConstants.dart';
-import '../views/ExceptionScreen.dart';
+import '../views/auth/ExceptionScreen.dart';
 import 'CustomException.dart';
 
 class GlobalExceptionHandler {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/AppStyles.dart';
+import '../../utils/AppStyles.dart';
 
 class ExceptionScreen extends StatelessWidget {
   final String errorMessage;
