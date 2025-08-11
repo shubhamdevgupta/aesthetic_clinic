@@ -62,10 +62,12 @@ class BaseApiService {
               log('📩 Retried Response Body: ${response.body}');
             } else {
               log('❌ Failed to get new access token after refresh');
+              await logout();
               throw AuthenticationException('Authentication failed. Please login again.');
             }
           } else {
             log('❌ Token refresh failed. User needs to login again.');
+            await logout();
             throw AuthenticationException('Session expired. Please login again.');
           }
         }
@@ -153,6 +155,7 @@ class BaseApiService {
             }
           } else {
             log('❌ Token refresh failed. User needs to login again.');
+            await logout();
             throw AuthenticationException('Session expired. Please login again.');
           }
         }
@@ -332,10 +335,8 @@ class BaseApiService {
   }
 
   Future<void> _clearStoredTokens() async {
-    await storageService.remove(AppConstants.prefAccessToken);
-    await storageService.remove(AppConstants.prefRefreshToken);
-    await storageService.remove(AppConstants.prefIsLoggedIn);
-    log('🗑️ Cleared stored tokens due to refresh failure');
+    await storageService.clearAll();
+    log('🗑️ Cleared all stored preferences due to auth failure');
   }
 
   Future<bool> isUserLoggedIn() async {

@@ -58,8 +58,11 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       _verifyOtpResponse = await _authRepository.verifyOtp(phoneNumber,otp);
       if(_verifyOtpResponse!.status&& _verifyOtpResponse!.statuscode==200){
+        final firstName=_verifyOtpResponse!.data.user.firstName;
+        final lastName=_verifyOtpResponse!.data.user.lastName;
         _localStorage.saveString(AppConstants.prefAccessToken, _verifyOtpResponse!.data.accessToken);
         _localStorage.saveString(AppConstants.prefRefreshToken, _verifyOtpResponse!.data.refreshToken);
+        _localStorage.saveString(AppConstants.prefUserName, firstName+lastName);
         _localStorage.saveBool(AppConstants.prefIsLoggedIn, true);
         _isLoggedIn = true;
       }
