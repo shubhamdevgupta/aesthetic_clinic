@@ -5,10 +5,10 @@ import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/views/booking_screen/booking_screen.dart';
 import 'package:aesthetic_clinic/views/service_screen.dart';
-import 'package:aesthetic_clinic/views/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../profile/profile_screen.dart';
 import '../../services/LocalStorageService.dart';
 import 'auto_scroll_banner.dart';
 
