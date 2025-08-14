@@ -111,87 +111,8 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Validation methods following MVVM structure
-  String? validatePhoneNumber(String phoneNumber) {
-    if (phoneNumber.isEmpty) {
-      return 'Please enter a mobile number';
-    }
-    
-    // Remove country code for validation
-    final cleanPhone = phoneNumber.replaceAll(RegExp(r'^\+\d+'), '');
-    
-    if (cleanPhone.isEmpty) {
-      return 'Please enter a valid mobile number';
-    }
-    
-    if (!RegExp(r'^\d+$').hasMatch(cleanPhone)) {
-      return 'Mobile number can only contain digits';
-    }
-    
-    // Additional validation for common phone number patterns
-    if (cleanPhone.startsWith('0')) {
-      return 'Please remove the leading zero from your mobile number';
-    }
-    
-    // Check length after removing leading zero
-    final finalPhone = cleanPhone.startsWith('0') ? cleanPhone.substring(1) : cleanPhone;
-    
-    if (finalPhone.length < 8) {
-      return 'Mobile number must be at least 8 digits (excluding country code)';
-    }
-    
-    if (finalPhone.length > 15) {
-      return 'Mobile number cannot exceed 15 digits (excluding country code)';
-    }
-    
-    // Country-specific validation
-    final validationError = validatePhoneNumberForCountry(finalPhone, _selectedCountry);
-    if (validationError != null) {
-      return validationError;
-    }
-    
-    return null; // No error
-  }
 
-  // Country-specific phone number validation
-  String? validatePhoneNumberForCountry(String phoneNumber, Country country) {
-    print("-------- $phoneNumber");
-    switch (country.countryCode) {
-      case 'AE': // UAE
-        if (phoneNumber.length != 9) {
-          return 'UAE mobile number must be 9 digits (excluding country code)';
-        }
-        if (!phoneNumber.startsWith('5')) {
-          return 'UAE mobile number must start with 5';
-        }
-        break;
-      case 'IN': // India
-        if (!RegExp(r'^[6-9]').hasMatch(phoneNumber)) {
-          return 'Indian mobile number must start with 6, 7, 8, or 9';
-        }
-        break;
-      case 'US': // United States
-        if (phoneNumber.length != 10) {
-          return 'US mobile number must be 10 digits (excluding country code)';
-        }
-        break;
-      case 'GB': // United Kingdom
-        if (phoneNumber.length != 10) {
-          return 'UK mobile number must be 10 digits (excluding country code)';
-        }
-        if (!phoneNumber.startsWith('7')) {
-          return 'UK mobile number must start with 7';
-        }
-        break;
-      default:
-        // For other countries, just check basic length
-        if (phoneNumber.length < 8 || phoneNumber.length > 15) {
-          return 'Mobile number length is invalid for this country';
-        }
-    }
-    
-    return null; // No error
-  }
+
 
   String? validateOtp(String otp) {
     if (otp.isEmpty) {
@@ -218,48 +139,52 @@ class AuthenticationProvider extends ChangeNotifier {
     
     return null; // No error
   }
+  Future<String?> validatePhoneNumber(String phoneNumber) async {
+    // Remove spaces and dashes
+    String cleanNumber = phoneNumber.replaceAll(RegExp(r'\s+|-'), '');
+
+    if (cleanNumber.isEmpty) {
+      return 'Please enter a phone number';
+    }
+
+    if (!RegExp(r'^\d+$').hasMatch(cleanNumber)) {
+      return 'Phone number must contain only digits';
+    }
+
+    // Generic worldwide range: min 7, max 15 digits
+    if (cleanNumber.length < 7 || cleanNumber.length > 15) {
+      return 'Please enter a valid phone number';
+    }
+
+    return null; // ✅ Valid
+  }
+
 
   // Method to send OTP with validation
   Future<bool> sendOtpWithValidation(String phoneNumber) async {
-    // Step 1: Validate input first
-    final validationError = validatePhoneNumber(phoneNumber);
+    final validationError = await validatePhoneNumber(phoneNumber);
+
     if (validationError != null) {
       errorMsg = validationError;
       notifyListeners();
-      return false; // Stop here, don't call API
+      return false;
     }
 
-    // Step 2: Clear previous error and call API only if validation passes
     errorMsg = '';
     notifyListeners();
 
     try {
       await sendOtp(phoneNumber);
-      
-      // Step 3: Handle API response
+
       if (_sendotpResponse?.statuscode == 200 && _sendotpResponse!.status) {
         return true;
       } else {
-        // API returned error
-        final apiMessage = _sendotpResponse?.message ?? 'Failed to send OTP. Please try again.';
-        
-        // Check if it's a server error
-        if (_sendotpResponse?.statuscode == 500) {
-          errorMsg = 'Server is temporarily unavailable. Please try again in a few moments.';
-        } else {
-          errorMsg = apiMessage;
-        }
-        
+        errorMsg = _sendotpResponse?.message ?? 'Failed to send OTP. Please try again.';
         notifyListeners();
         return false;
       }
     } catch (e) {
-      // API call failed
-      if (e.toString().contains('Server error') || e.toString().contains('temporarily unavailable')) {
-        errorMsg = 'Server is temporarily unavailable. Please try again in a few moments.';
-      } else {
-        errorMsg = 'An error occurred. Please try again.';
-      }
+      errorMsg = 'An error occurred. Please try again.';
       notifyListeners();
       return false;
     }
@@ -268,11 +193,12 @@ class AuthenticationProvider extends ChangeNotifier {
   // Method to verify OTP with validation
   Future<bool> verifyOtpWithValidation(String phoneNumber, String otp) async {
     // Step 1: Validate inputs first
-    final phoneValidationError = validatePhoneNumber(phoneNumber);
-    if (phoneValidationError != null) {
-      errorMsg = phoneValidationError;
+    final validationError = await validatePhoneNumber(phoneNumber);
+
+    if (validationError != null) {
+      errorMsg = validationError;
       notifyListeners();
-      return false; // Stop here, don't call API
+      return false;
     }
 
     final otpValidationError = validateOtp(otp);
@@ -288,21 +214,21 @@ class AuthenticationProvider extends ChangeNotifier {
 
     try {
       await verifyOtp(phoneNumber, otp);
-      
+
       // Step 3: Handle API response
       if (_verifyOtpResponse?.statuscode == 200 && _verifyOtpResponse!.status) {
         return true;
       } else {
         // API returned error
         final apiMessage = _verifyOtpResponse?.message ?? 'Invalid OTP. Please try again.';
-        
+
         // Check if it's a server error
         if (_verifyOtpResponse?.statuscode == 500) {
           errorMsg = 'Server is temporarily unavailable. Please try again in a few moments.';
         } else {
           errorMsg = apiMessage;
         }
-        
+
         notifyListeners();
         return false;
       }

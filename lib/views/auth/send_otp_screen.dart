@@ -5,6 +5,7 @@ import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../utils/LoaderUtils.dart';
@@ -117,22 +118,24 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           color: Colors.grey,
                         ),
                         Flexible(
-                          flex: 7, // Around 70%
+                          flex: 7,
                           child: TextField(
                             controller: provider.phoneController,
                             keyboardType: TextInputType.phone,
-                            maxLength: 10,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly, // ✅ Only digits allowed
+                            ],
                             onChanged: (value) {
-                              // Clear error when user starts typing
                               if (provider.errorMsg.isNotEmpty) {
                                 provider.clearError();
                               }
                             },
                             decoration: InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                           //   labelText: localization.mobileNumber,
                               labelText: "Phone Number",
+                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                              border: InputBorder.none, // If you want no visible border
                             ),
                           ),
                         ),

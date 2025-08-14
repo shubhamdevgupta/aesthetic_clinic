@@ -76,7 +76,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 ),
               ),
             ),
-          )
+          ),
+          SizedBox(height: 80,)
         ],
       ),
     );
