@@ -73,19 +73,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
                 items: [
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.home, ),
+                    icon: Image.asset('assets/icons/ic_home.png', width: 48,height: 48,),
+                    activeIcon: Image.asset('assets/icons/ic_home_highlight.png', width: 48,height: 48,),
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
                     icon: Image.asset('assets/icons/ic_service.png', width: 48,height: 48,),
+                    activeIcon: Image.asset('assets/icons/ic_service_highlight.png', width: 48,height: 48,),
                     label: 'Services',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month ),
+                    icon: Image.asset('assets/icons/ic_booking.png', width: 48,height: 48,),
+                    activeIcon: Image.asset('assets/icons/ic_booking_highlight.png', width: 48,height: 48,),
                     label: 'Bookings',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.person),
+                    icon: Image.asset('assets/icons/ic_profile.png', width: 48,height: 48,),
+                    activeIcon: Image.asset('assets/icons/ic_profile_highlight.png', width: 48,height: 48,),
                     label: 'Profile',
                   ),
                 ],

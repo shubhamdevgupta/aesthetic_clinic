@@ -107,8 +107,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 // Navigate to notifications
               },
-              hasBadge: true,
-              badgeCount: 2,
             ),
             _buildMenuItem(
               icon: Icons.help_outline,

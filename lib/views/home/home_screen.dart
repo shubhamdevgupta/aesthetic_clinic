@@ -279,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
-                  height: 128,
+                  height: 80,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: topServices.length,
@@ -438,14 +438,6 @@ class ServiceItem extends StatelessWidget {
                 size: 24,
               ),
             ),
-          ),
-
-          // Asset image directly below (no gap)
-          Image.asset(
-            'assets/icons/ic_below_service.png',
-            width: 48,
-            height: 48,
-            fit: BoxFit.contain,
           ),
         ],
       ),

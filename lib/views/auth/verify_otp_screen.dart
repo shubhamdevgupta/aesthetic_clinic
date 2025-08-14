@@ -140,20 +140,26 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'assets/icons/ic_whatsapp.png',
-                        width: 24,
-                        height: 24,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        localization.whatsapp,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    ],
+                  child: InkWell(
+                    onTap: (){
+                      ToastHelper.showToastMessage("Sending otp..");
+                      provider.sendOtp(provider.selectedCountry.phoneCode+provider.phoneController.text);
+                    },
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Image.asset(
+                          'assets/icons/ic_whatsapp.png',
+                          width: 24,
+                          height: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          localization.whatsapp,
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 

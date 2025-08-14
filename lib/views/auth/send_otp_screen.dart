@@ -131,7 +131,8 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                              labelText: localization.mobileNumber,
+                           //   labelText: localization.mobileNumber,
+                              labelText: "Phone Number",
                             ),
                           ),
                         ),
