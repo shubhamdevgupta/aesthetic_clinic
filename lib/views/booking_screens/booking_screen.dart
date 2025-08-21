@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../profile/get_help_screen.dart';
+import '../profile_screens/get_help_screen.dart';
+
 
 const Color kPrimaryColor = Color(0xFF660033);
 const Color kUnselectedTabText = Color(0xFF9E9E9E);

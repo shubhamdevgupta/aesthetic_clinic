@@ -15,8 +15,8 @@ class ServiceProvider extends ChangeNotifier{
   bool get isLoading => _isLoading;
 
 
-  ServiceResponse? _serviceResponse;
-  ServiceResponse? get serviceResponse => _serviceResponse;
+  GetAllService? _serviceResponse;
+  GetAllService? get serviceResponse => _serviceResponse;
 
 
   AppConfigurationResponse? _appConfigurationResponse;
@@ -45,10 +45,10 @@ class ServiceProvider extends ChangeNotifier{
     }
   }
 
-  Future<void> getBannerList() async {
+  Future<void> getDashboardData() async {
     _isLoading = true;
     try {
-      final response = await serviceRepository.getBannerList();
+      final response = await serviceRepository.getDashboardData();
 
       if(response.status && response.statuscode==200){
         _appConfigurationResponse=response;

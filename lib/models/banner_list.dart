@@ -2,7 +2,7 @@ class AppConfigurationResponse {
   final bool status;
   final int statuscode;
   final String message;
-  final List<AppConfigData> data;
+  final List<DataItem> data;
   final Meta meta;
 
   AppConfigurationResponse({
@@ -15,33 +15,67 @@ class AppConfigurationResponse {
 
   factory AppConfigurationResponse.fromJson(Map<String, dynamic> json) {
     return AppConfigurationResponse(
-      status: json['status'],
-      statuscode: json['statuscode'],
-      message: json['message'],
-      data: (json['data'] as List).map((e) => AppConfigData.fromJson(e)).toList(),
-      meta: Meta.fromJson(json['meta']),
+      status: json['status'] ?? false,
+      statuscode: json['statuscode'] ?? 0,
+      message: json['message'] ?? '',
+      data: (json['data'] as List<dynamic>?)
+          ?.map((e) => DataItem.fromJson(e))
+          .toList() ??
+          [],
+      meta: Meta.fromJson(json['meta'] ?? {}),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "statuscode": statuscode,
+    "message": message,
+    "data": data.map((e) => e.toJson()).toList(),
+    "meta": meta.toJson(),
+  };
 }
-class AppConfigData {
+
+class DataItem {
   final AppConfigs appConfigs;
   final List<Service> topServices;
   final List<Service> recommendedServices;
+  final List<Service> personalisedServices;
 
-  AppConfigData({
+  DataItem({
     required this.appConfigs,
     required this.topServices,
     required this.recommendedServices,
+    required this.personalisedServices,
   });
 
-  factory AppConfigData.fromJson(Map<String, dynamic> json) {
-    return AppConfigData(
-      appConfigs: AppConfigs.fromJson(json['appConfigs']),
-      topServices: (json['topServices'] as List).map((e) => Service.fromJson(e)).toList(),
-      recommendedServices: (json['recommendedServices'] as List).map((e) => Service.fromJson(e)).toList(),
+  factory DataItem.fromJson(Map<String, dynamic> json) {
+    return DataItem(
+      appConfigs: AppConfigs.fromJson(json['appConfigs'] ?? {}),
+      topServices: (json['topServices'] as List<dynamic>?)
+          ?.map((e) => Service.fromJson(e))
+          .toList() ??
+          [],
+      recommendedServices: (json['recommendedServices'] as List<dynamic>?)
+          ?.map((e) => Service.fromJson(e))
+          .toList() ??
+          [],
+      personalisedServices: (json['personalisedservices'] as List<dynamic>?)
+          ?.map((e) => Service.fromJson(e))
+          .toList() ??
+          [],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "appConfigs": appConfigs.toJson(),
+    "topServices": topServices.map((e) => e.toJson()).toList(),
+    "recommendedServices":
+    recommendedServices.map((e) => e.toJson()).toList(),
+    "personalisedservices":
+    personalisedServices.map((e) => e.toJson()).toList(),
+  };
 }
+
 class AppConfigs {
   final List<BannerItem> banner;
   final List<dynamic> landingPage;
@@ -57,13 +91,24 @@ class AppConfigs {
 
   factory AppConfigs.fromJson(Map<String, dynamic> json) {
     return AppConfigs(
-      banner: (json['banner'] as List).map((e) => BannerItem.fromJson(e)).toList(),
-      landingPage: json['landing_page'],
-      screen: json['screen'],
-      offer: json['offer'],
+      banner: (json['banner'] as List<dynamic>?)
+          ?.map((e) => BannerItem.fromJson(e))
+          .toList() ??
+          [],
+      landingPage: json['landing_page'] ?? [],
+      screen: json['screen'] ?? [],
+      offer: json['offer'] ?? [],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "banner": banner.map((e) => e.toJson()).toList(),
+    "landing_page": landingPage,
+    "screen": screen,
+    "offer": offer,
+  };
 }
+
 class BannerItem {
   final String id;
   final String type;
@@ -79,13 +124,21 @@ class BannerItem {
 
   factory BannerItem.fromJson(Map<String, dynamic> json) {
     return BannerItem(
-      id: json['id'],
-      type: json['type'],
-      configData: ConfigData.fromJson(json['configData']),
-      isActive: json['isActive'],
+      id: json['id'] ?? '',
+      type: json['type'] ?? '',
+      configData: ConfigData.fromJson(json['configData'] ?? {}),
+      isActive: json['isActive'] ?? false,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "type": type,
+    "configData": configData.toJson(),
+    "isActive": isActive,
+  };
 }
+
 class ConfigData {
   final String text;
   final String title;
@@ -103,14 +156,23 @@ class ConfigData {
 
   factory ConfigData.fromJson(Map<String, dynamic> json) {
     return ConfigData(
-      text: json['text'],
-      title: json['title'],
-      imageUrl: json['imageUrl'],
-      subtitle: json['subtitle'],
-      actionUrl: json['actionUrl'],
+      text: json['text'] ?? '',
+      title: json['title'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      subtitle: json['subtitle'] ?? '',
+      actionUrl: json['actionUrl'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "text": text,
+    "title": title,
+    "imageUrl": imageUrl,
+    "subtitle": subtitle,
+    "actionUrl": actionUrl,
+  };
 }
+
 class Service {
   final String id;
   final String name;
@@ -119,9 +181,11 @@ class Service {
   final String price;
   final String image;
   final bool isTopService;
-  final String topServiceImage;
+  final String? topServiceImage;
   final bool isRecommended;
-  final dynamic extraDetail;
+  final bool personalisedService;
+  final String? personalisedServiceImages;
+  final String? extraDetail;
   final String? parentServiceId;
   final List<Doctor> doctors;
 
@@ -133,30 +197,55 @@ class Service {
     required this.price,
     required this.image,
     required this.isTopService,
-    required this.topServiceImage,
+    this.topServiceImage,
     required this.isRecommended,
-    required this.extraDetail,
-    required this.parentServiceId,
+    required this.personalisedService,
+    this.personalisedServiceImages,
+    this.extraDetail,
+    this.parentServiceId,
     required this.doctors,
   });
 
   factory Service.fromJson(Map<String, dynamic> json) {
     return Service(
-      id: json['id'],
-      name: json['name'],
-      slug: json['slug'],
-      description: json['description'],
-      price: json['price'],
-      image: json['image'],
-      isTopService: json['isTopService'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+      description: json['description'] ?? '',
+      price: json['price'] ?? '0.00',
+      image: json['image'] ?? '',
+      isTopService: json['isTopService'] ?? false,
       topServiceImage: json['topServiceImage'],
-      isRecommended: json['isRecommended'],
+      isRecommended: json['isRecommended'] ?? false,
+      personalisedService: json['personalisedService'] ?? false,
+      personalisedServiceImages: json['personalisedServiceImages'],
       extraDetail: json['extra_detail'],
       parentServiceId: json['parentServiceId'],
-      doctors: (json['doctors'] as List).map((e) => Doctor.fromJson(e)).toList(),
+      doctors: (json['doctors'] as List<dynamic>?)
+          ?.map((e) => Doctor.fromJson(e))
+          .toList() ??
+          [],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "slug": slug,
+    "description": description,
+    "price": price,
+    "image": image,
+    "isTopService": isTopService,
+    "topServiceImage": topServiceImage,
+    "isRecommended": isRecommended,
+    "personalisedService": personalisedService,
+    "personalisedServiceImages": personalisedServiceImages,
+    "extra_detail": extraDetail,
+    "parentServiceId": parentServiceId,
+    "doctors": doctors.map((e) => e.toJson()).toList(),
+  };
 }
+
 class Doctor {
   final String id;
   final String name;
@@ -176,15 +265,25 @@ class Doctor {
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
-      id: json['id'],
-      name: json['name'],
-      slug: json['slug'],
-      title: json['title'],
-      experience: json['experience'],
-      specialization: json['specialization'],
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      slug: json['slug'] ?? '',
+      title: json['title'] ?? '',
+      experience: json['experience'] ?? 0,
+      specialization: json['specialization'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "slug": slug,
+    "title": title,
+    "experience": experience,
+    "specialization": specialization,
+  };
 }
+
 class Meta {
   final int total;
   final int page;
@@ -200,11 +299,17 @@ class Meta {
 
   factory Meta.fromJson(Map<String, dynamic> json) {
     return Meta(
-      total: json['total'],
-      page: json['page'],
-      limit: json['limit'],
-      totalPages: json['totalPages'],
+      total: json['total'] ?? 0,
+      page: json['page'] ?? 1,
+      limit: json['limit'] ?? 0,
+      totalPages: json['totalPages'] ?? 0,
     );
   }
-}
 
+  Map<String, dynamic> toJson() => {
+    "total": total,
+    "page": page,
+    "limit": limit,
+    "totalPages": totalPages,
+  };
+}

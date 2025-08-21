@@ -1,5 +1,5 @@
-import 'package:aesthetic_clinic/profile/settings_screen.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/views/profile_screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/LocalStorageService.dart';

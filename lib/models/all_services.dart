@@ -1,11 +1,11 @@
-class ServiceResponse {
+class GetAllService {
   final bool status;
   final int statuscode;
   final String message;
-  final List<ServiceData> data;
+  final List<Service> data;
   final Meta meta;
 
-  ServiceResponse({
+  GetAllService({
     required this.status,
     required this.statuscode,
     required this.message,
@@ -13,82 +13,102 @@ class ServiceResponse {
     required this.meta,
   });
 
-  factory ServiceResponse.fromJson(Map<String, dynamic> json) {
-    return ServiceResponse(
+  factory GetAllService.fromJson(Map<String, dynamic> json) {
+    return GetAllService(
       status: json['status'] ?? false,
       statuscode: json['statuscode'] ?? 0,
       message: json['message'] ?? '',
-      data: (json['data'] as List)
-          .map((item) => ServiceData.fromJson(item))
-          .toList(),
+      data: (json['data'] as List<dynamic>?)
+          ?.map((e) => Service.fromJson(e))
+          .toList() ??
+          [],
       meta: Meta.fromJson(json['meta'] ?? {}),
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'status': status,
-    'statuscode': statuscode,
-    'message': message,
-    'data': data.map((e) => e.toJson()).toList(),
-    'meta': meta.toJson(),
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "status": status,
+      "statuscode": statuscode,
+      "message": message,
+      "data": data.map((e) => e.toJson()).toList(),
+      "meta": meta.toJson(),
+    };
+  }
 }
 
-class ServiceData {
+class Service {
   final String id;
   final String name;
   final String slug;
   final String description;
   final String price;
   final String image;
+  final bool isTopService;
+  final String? topServiceImage;
+  final bool isRecommended;
   final String? extraDetail;
-  final String parentServiceId;
+  final String? parentServiceId;
   final List<SubService> subServices;
   final List<Doctor> doctors;
 
-  ServiceData({
+  Service({
     required this.id,
     required this.name,
     required this.slug,
     required this.description,
     required this.price,
     required this.image,
-    required this.extraDetail,
-    required this.parentServiceId,
+    required this.isTopService,
+    this.topServiceImage,
+    required this.isRecommended,
+    this.extraDetail,
+    this.parentServiceId,
     required this.subServices,
     required this.doctors,
   });
 
-  factory ServiceData.fromJson(Map<String, dynamic> json) {
-    return ServiceData(
+  factory Service.fromJson(Map<String, dynamic> json) {
+    return Service(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
       description: json['description'] ?? '',
-      price: json['price'] ?? '',
+      price: json['price'] ?? '0.00',
       image: json['image'] ?? '',
+      isTopService: json['isTopService'] ?? false,
+      topServiceImage: json['topServiceImage'],
+      isRecommended: json['isRecommended'] ?? false,
       extraDetail: json['extra_detail'],
-      parentServiceId: json['parentServiceId'] ?? '',
-      subServices: (json['subServices'] as List)
-          .map((e) => SubService.fromJson(e))
-          .toList(),
-      doctors:
-      (json['doctors'] as List).map((e) => Doctor.fromJson(e)).toList(),
+      parentServiceId: json['parentServiceId'],
+      subServices: (json['subServices'] as List<dynamic>?)
+          ?.map((e) => SubService.fromJson(e))
+          .toList() ??
+          [],
+      doctors: (json['doctors'] as List<dynamic>?)
+          ?.map((e) => Doctor.fromJson(e))
+          .toList() ??
+          [],
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'slug': slug,
-    'description': description,
-    'price': price,
-    'image': image,
-    'extra_detail': extraDetail,
-    'parentServiceId': parentServiceId,
-    'subServices': subServices.map((e) => e.toJson()).toList(),
-    'doctors': doctors.map((e) => e.toJson()).toList(),
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "slug": slug,
+      "description": description,
+      "price": price,
+      "image": image,
+      "isTopService": isTopService,
+      "topServiceImage": topServiceImage,
+      "isRecommended": isRecommended,
+      "extra_detail": extraDetail,
+      "parentServiceId": parentServiceId,
+      "subServices": subServices.map((e) => e.toJson()).toList(),
+      "doctors": doctors.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
 class SubService {
@@ -98,8 +118,11 @@ class SubService {
   final String description;
   final String price;
   final String image;
+  final bool isTopService;
+  final String? topServiceImage;
+  final bool isRecommended;
   final String? extraDetail;
-  final String parentServiceId;
+  final String? parentServiceId;
 
   SubService({
     required this.id,
@@ -108,8 +131,11 @@ class SubService {
     required this.description,
     required this.price,
     required this.image,
-    required this.extraDetail,
-    required this.parentServiceId,
+    required this.isTopService,
+    this.topServiceImage,
+    required this.isRecommended,
+    this.extraDetail,
+    this.parentServiceId,
   });
 
   factory SubService.fromJson(Map<String, dynamic> json) {
@@ -118,23 +144,31 @@ class SubService {
       name: json['name'] ?? '',
       slug: json['slug'] ?? '',
       description: json['description'] ?? '',
-      price: json['price'] ?? '',
+      price: json['price'] ?? '0.00',
       image: json['image'] ?? '',
+      isTopService: json['isTopService'] ?? false,
+      topServiceImage: json['topServiceImage'],
+      isRecommended: json['isRecommended'] ?? false,
       extraDetail: json['extra_detail'],
-      parentServiceId: json['parentServiceId'] ?? '',
+      parentServiceId: json['parentServiceId'],
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'slug': slug,
-    'description': description,
-    'price': price,
-    'image': image,
-    'extra_detail': extraDetail,
-    'parentServiceId': parentServiceId,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "slug": slug,
+      "description": description,
+      "price": price,
+      "image": image,
+      "isTopService": isTopService,
+      "topServiceImage": topServiceImage,
+      "isRecommended": isRecommended,
+      "extra_detail": extraDetail,
+      "parentServiceId": parentServiceId,
+    };
+  }
 }
 
 class Doctor {
@@ -156,7 +190,7 @@ class Doctor {
     required this.experience,
     required this.specialization,
     required this.bio,
-    required this.description,
+    this.description,
     required this.slotDuration,
   });
 
@@ -174,17 +208,19 @@ class Doctor {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'name': name,
-    'slug': slug,
-    'title': title,
-    'experience': experience,
-    'specialization': specialization,
-    'bio': bio,
-    'description': description,
-    'slotDuration': slotDuration,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "slug": slug,
+      "title": title,
+      "experience": experience,
+      "specialization": specialization,
+      "bio": bio,
+      "description": description,
+      "slotDuration": slotDuration,
+    };
+  }
 }
 
 class Meta {
@@ -203,16 +239,18 @@ class Meta {
   factory Meta.fromJson(Map<String, dynamic> json) {
     return Meta(
       total: json['total'] ?? 0,
-      page: json['page'] ?? 0,
+      page: json['page'] ?? 1,
       limit: json['limit'] ?? 0,
       totalPages: json['totalPages'] ?? 0,
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'total': total,
-    'page': page,
-    'limit': limit,
-    'totalPages': totalPages,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      "total": total,
+      "page": page,
+      "limit": limit,
+      "totalPages": totalPages,
+    };
+  }
 }

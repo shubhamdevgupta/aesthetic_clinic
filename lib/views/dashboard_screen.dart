@@ -1,9 +1,10 @@
+import 'package:aesthetic_clinic/views/profile_screens/profile_screen.dart';
+import 'package:aesthetic_clinic/views/service_screens/service_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../profile/profile_screen.dart';
-import 'booking_screen/booking_screen.dart';
-import 'service_screen.dart';
-import 'home/home_screen.dart';
+import 'booking_screens/booking_screen.dart';
+import 'home_screens/home_screen.dart';
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

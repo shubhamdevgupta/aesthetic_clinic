@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
-import 'package:aesthetic_clinic/views/booking_screen/booking_screen.dart';
-import 'package:aesthetic_clinic/views/service_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../profile/profile_screen.dart';
 import '../../services/LocalStorageService.dart';
+import '../booking_screens/booking_screen.dart';
+import '../profile_screens/profile_screen.dart';
+import '../service_screens/service_screen.dart';
 import 'auto_scroll_banner.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     Future.microtask(
       () =>
-          Provider.of<ServiceProvider>(context, listen: false).getBannerList(),
+          Provider.of<ServiceProvider>(context, listen: false).getDashboardData(),
     );
   }
 
@@ -201,6 +202,9 @@ class _HomeScreenState extends State<HomeScreen> {
           final recommendedServices = provider.appConfigResponse!.data
               .expand((item) => item.recommendedServices)
               .toList();
+          final personalizeServices = provider.appConfigResponse!.data
+              .expand((item) => item.personalisedServices)
+              .toList();
           final bannerList = provider.appConfigResponse!.data
               .expand((item) => item.appConfigs.banner)
               .toList();
@@ -286,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, length) {
                       final service = topServices[length];
                       return ServiceItem(
-                        imageUrl: service.topServiceImage,
+                        imageUrl: service.topServiceImage!,
                         label: service.name,
                       );
                     },
@@ -312,6 +316,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, length) {
                       final recommended = recommendedServices[length];
                       return topChoiceItem(recommended.name, recommended.image);
+                    },
+                  ),
+                ),
+
+                // Our Personalized service  for You
+                const Text(
+                  "Our Personalise Services for You",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF660033),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 180,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: personalizeServices.length,
+                    itemBuilder: (context, length) {
+                      final personalize = personalizeServices[length];
+                      return topChoiceItem(personalize.name, personalize.image);
                     },
                   ),
                 ),
