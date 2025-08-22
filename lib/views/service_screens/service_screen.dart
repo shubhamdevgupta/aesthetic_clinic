@@ -16,13 +16,12 @@ class ServiceScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<ServiceScreen> {
   final LocalStorageService storage = LocalStorageService();
-  Service? selectedService;
 
   @override
   void initState() {
     super.initState();
     Future.microtask(
-      () =>
+          () =>
           Provider.of<ServiceProvider>(context, listen: false).getAllServices(),
     );
   }
@@ -39,11 +38,6 @@ class _HomeScreenState extends State<ServiceScreen> {
           }
           final topServices = provider.serviceResponse!.data
               .where((item) => item.isTopService) // filter only top services
-              .toList();
-          final subService = provider.serviceResponse!.data
-              .where(
-                (item) => item.parentServiceId != null,
-              ) // filter only top services
               .toList();
 
           return SafeArea(
@@ -63,10 +57,10 @@ class _HomeScreenState extends State<ServiceScreen> {
                         onPressed: () {
                           Scaffold.of(context).openDrawer();
                         },
-                        icon: Icon(Icons.menu),
+                        icon: const Icon(Icons.menu),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(
+                      const SizedBox(width: 10),
+                      const Expanded(
                         child: TextField(
                           decoration: InputDecoration(
                             hintText: "Search",
@@ -74,7 +68,7 @@ class _HomeScreenState extends State<ServiceScreen> {
                           ),
                         ),
                       ),
-                      Icon(Icons.search),
+                      const Icon(Icons.search),
                     ],
                   ),
                 ),
@@ -94,20 +88,64 @@ class _HomeScreenState extends State<ServiceScreen> {
 
                 // Horizontal top services
                 SizedBox(
-                  height: 80,
+                  height: 80, // Increased height slightly to accommodate border/shadow
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: topServices.length,
                     itemBuilder: (context, index) {
                       final service = topServices[index];
-                      return ServiceItem(
-                        imageUrl: service.topServiceImage ?? service.image,
-                        label: service.name,
+                      final isSelected = provider.selectedService != null && service.id == provider.selectedService!.id;
+
+                      return GestureDetector(
                         onTap: () {
-                          setState(() {
-                            selectedService = service;
-                          });
+                          provider.selectService(service);
                         },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Added vertical padding
+                          margin: const EdgeInsets.only(right: 8), // Added margin for spacing
+                          decoration: BoxDecoration(
+                            color: isSelected ? Colors.pink.withOpacity(0.1) : Colors.transparent, // Subtle background for selected
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected ? Colors.pink : Colors.grey[300]!,
+                              width: isSelected ? 2.0 : 1.0,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                              BoxShadow(
+                                color: Colors.pink.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              )
+                            ]
+                                : [],
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center, // Center items
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10), // Slightly smaller radius
+                                child: Image.network(
+                                  service.topServiceImage ?? service.image,
+                                  width: 38, // Adjusted size
+                                  height: 38, // Adjusted size
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                service.name,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected ? Colors.pink : Colors.black87,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -116,9 +154,10 @@ class _HomeScreenState extends State<ServiceScreen> {
                 const SizedBox(height: 20),
 
                 // Show subservices if selected
-                if (selectedService != null) ...[
+                if (provider.selectedService != null) ...[
+                  const SizedBox(height: 20),
                   Text(
-                    "${selectedService!.name} → Sub Services",
+                    "${provider.selectedService!.name} → Sub Services",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -126,20 +165,19 @@ class _HomeScreenState extends State<ServiceScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  if (selectedService!.subServices.isNotEmpty)
+                  if (provider.selectedService!.subServices.isNotEmpty)
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            childAspectRatio: 0.9,
-                          ),
-                      itemCount: selectedService!.subServices.length,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.9,
+                      ),
+                      itemCount: provider.selectedService!.subServices.length,
                       itemBuilder: (context, index) {
-                        final subService = selectedService!.subServices[index];
+                        final subService = provider.selectedService!.subServices[index];
                         return Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -168,17 +206,14 @@ class _HomeScreenState extends State<ServiceScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 6),
-
-                                // Show doctors
-                                if (selectedService!.doctors.isNotEmpty)
+                                if (provider.selectedService!.doctors.isNotEmpty)
                                   Expanded(
                                     child: ListView.builder(
                                       shrinkWrap: true,
-                                      itemCount:
-                                          selectedService!.doctors.length,
+                                      itemCount: provider.selectedService!.doctors.length,
                                       itemBuilder: (context, docIndex) {
                                         final doc =
-                                            selectedService!.doctors[docIndex];
+                                        provider.selectedService!.doctors[docIndex];
                                         return Text(
                                           "👨‍⚕️ ${doc.name}",
                                           style: const TextStyle(fontSize: 11),

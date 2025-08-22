@@ -1,4 +1,5 @@
 import 'package:aesthetic_clinic/views/profile_screens/profile_screen.dart';
+import 'package:aesthetic_clinic/views/service_screens/service_details.dart';
 import 'package:aesthetic_clinic/views/service_screens/service_screen.dart';
 import 'package:flutter/material.dart';
 

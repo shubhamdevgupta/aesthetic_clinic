@@ -1,5 +1,6 @@
 
 import 'package:aesthetic_clinic/models/all_services.dart';
+import 'package:aesthetic_clinic/models/service_detail_response.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/banner_list.dart';
@@ -21,6 +22,19 @@ Future<GetAllService> getAllServices( ) async {
     rethrow;
   }
 }
+
+Future<ServiceDetailResponse> getServicebyID(String serviceId) async {
+  try {
+    // Call the POST method from BaseApiService
+    final response = await _apiService.get('/services/$serviceId',withAuth: true);
+
+    return ServiceDetailResponse.fromJson(response);
+  } catch (e) {
+    GlobalExceptionHandler.handleException(e as Exception);
+    rethrow;
+  }
+}
+
 Future<AppConfigurationResponse> getDashboardData( ) async {
   try {
     final response = await _apiService.get(
