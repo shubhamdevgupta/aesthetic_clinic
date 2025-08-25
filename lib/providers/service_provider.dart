@@ -23,9 +23,6 @@ class ServiceProvider extends ChangeNotifier{
   ServiceDetailResponse? get serviceDetailResponse => _serviceDetailResponse;
 
 
-  AppConfigurationResponse? _appConfigurationResponse;
-  AppConfigurationResponse? get appConfigResponse => _appConfigurationResponse;
-
   Service? _selectedService;
   Service? get selectedService => _selectedService;
 
@@ -80,28 +77,7 @@ class ServiceProvider extends ChangeNotifier{
     }
   }
 
-  Future<void> getDashboardData() async {
-    _isLoading = true;
-    try {
-      final response = await serviceRepository.getDashboardData();
 
-      if(response.status && response.statuscode==200){
-        _appConfigurationResponse=response;
-      }
-
-    } catch (e, stack) {
-      debugPrint("Error: $e");
-      debugPrint("StackTrace: $stack");
-      
-      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
-      if (e is! AuthenticationException) {
-        GlobalExceptionHandler.handleException(e as Exception);
-      }
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
   void selectService(Service service) {
     _selectedService = service;
     notifyListeners();

@@ -3,8 +3,8 @@ import 'package:aesthetic_clinic/views/service_screens/service_details.dart';
 import 'package:aesthetic_clinic/views/service_screens/service_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'booking_screens/booking_screen.dart';
-import 'home_screens/home_screen.dart';
+import '../booking_screens/booking_screen.dart';
+import 'home_clinic_tab_screen.dart';
 
 
 class DashboardScreen extends StatefulWidget {

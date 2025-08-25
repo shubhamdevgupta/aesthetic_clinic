@@ -35,16 +35,4 @@ Future<ServiceDetailResponse> getServicebyID(String serviceId) async {
   }
 }
 
-Future<AppConfigurationResponse> getDashboardData( ) async {
-  try {
-    final response = await _apiService.get(
-        '/app-configs/list',withAuth: true);
-
-    return AppConfigurationResponse.fromJson(response);
-  } catch (e) {
-    GlobalExceptionHandler.handleException(e as Exception);
-    rethrow;
-  }
-}
-
 }

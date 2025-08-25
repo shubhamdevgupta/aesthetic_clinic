@@ -1,7 +1,7 @@
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/views/auth/send_otp_screen.dart';
-import 'package:aesthetic_clinic/views/dashboard_screen.dart';
+import 'package:aesthetic_clinic/views/home_screens/bottom_sheet_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';

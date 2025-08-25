@@ -1,5 +1,5 @@
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
-import 'package:aesthetic_clinic/views/dashboard_screen.dart';
+import 'package:aesthetic_clinic/views/home_screens/bottom_sheet_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/language_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/cupertino.dart';
