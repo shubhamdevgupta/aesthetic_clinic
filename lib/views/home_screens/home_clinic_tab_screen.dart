@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
           () =>
           Provider.of<HomeProvider>(context, listen: false).getDashboardData(),
     );
+    print("userid--  ${storage.getString(AppConstants.prefUserName)}");
   }
 
   void _handleLogout() async {
