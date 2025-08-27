@@ -16,39 +16,17 @@ class UserSessionManager {
   String userName = '';
   String mobile = '';
 
-
-/*  Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
-    token = _prefs?.getString(AppConstants.prefToken) ?? '';
-    userName = _prefs?.getString(AppConstants.prefName) ?? '';
-    mobile = _prefs?.getString(AppConstants.prefMobile) ?? '';
-
-  }*/
-
   bool get isInitialized => _prefs != null;
 
   // Optional: helper getters
   String getToken() => token;
-  int getUserId() => int.tryParse(_prefs?.getString(AppConstants.prefRegId) ?? '0') ?? 0;
   Future<void> clearPref() async {
     _prefs ??= await SharedPreferences.getInstance();
-    await _prefs!.remove(AppConstants.prefRegId);
-    await _prefs!.remove(AppConstants.prefRoleId);
 
-    await _prefs!.clear(); // Optionally clear all
+    await _prefs!.clear();
   }
   Future<void> sanitizePrefs() async {
     _prefs ??= await SharedPreferences.getInstance();
-
-    // Check for corrupt data and remove it
-    if (_prefs!.get(AppConstants.prefRegId) is String) {
-      await _prefs!.remove(AppConstants.prefRegId);
-    }
-
-    if (_prefs!.get(AppConstants.prefRoleId) is String) {
-      await _prefs!.remove(AppConstants.prefRoleId);
-    }
-
 
   }
 

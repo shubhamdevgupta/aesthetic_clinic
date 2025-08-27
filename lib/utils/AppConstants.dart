@@ -7,12 +7,11 @@ class AppConstants {
   static const String prefIsLoggedIn = 'isLoggedIn';
   static const String prefAccessToken = 'accesstoken';
   static const String prefRefreshToken = 'refreshtoken';
+  static const String prefUserId = 'userId';
   static const String prefUserName = 'username';
-  static const String prefRoleId = 'roleId';
   static const String prefName = 'name';
   static const String prefMobile = 'mobile';
 
-  static const String prefRegId = 'reg_id';
 
 
   static const String prefSeenOnboarding = 'seen_onboarding';

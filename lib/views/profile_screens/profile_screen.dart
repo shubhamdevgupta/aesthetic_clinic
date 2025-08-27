@@ -1,4 +1,6 @@
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/utils/widgets/AppDialog.dart';
+import 'package:aesthetic_clinic/views/auth/splash_screen.dart';
 import 'package:aesthetic_clinic/views/profile_screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -130,6 +132,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     builder: (_) => const SettingsScreen(),
                   ),
                 );
+              },
+            ),
+            _buildMenuItem(
+              icon: Icons.logout,
+              title: 'Logout',
+              onTap: () {
+               AppDialogs.showLogoutDialog(context);
               },
             ),
 

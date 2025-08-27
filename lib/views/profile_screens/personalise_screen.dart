@@ -1,3 +1,5 @@
+import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:flutter/material.dart';
 
 class PersonalizeScreen extends StatefulWidget {
@@ -189,7 +191,9 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
                 // Do It Later Button
                 TextButton(
-                  onPressed: _handleDoItLater,
+                  onPressed: (){
+                    Navigator.pushReplacementNamed(context, AppConstants.navigateToOnBoardingScreen);
+                  },
                   child: Text(
                     'Do It Later',
                     style: TextStyle(
@@ -304,23 +308,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
   }
 
   void _handleSubmit() {
-    // Handle submit logic here
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Profile updated successfully!'),
-        backgroundColor: Color(0xFF660033),
-      ),
-    );
+
   }
 
-  void _handleDoItLater() {
-    // Handle do it later logic here
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const PersonalizeScreen(),
-      ),
-    );
-    Navigator.pop(context);
-  }
 }

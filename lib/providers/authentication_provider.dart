@@ -62,6 +62,7 @@ class AuthenticationProvider extends ChangeNotifier {
         final lastName=_verifyOtpResponse!.data.user.lastName;
         _localStorage.saveString(AppConstants.prefAccessToken, _verifyOtpResponse!.data.accessToken);
         _localStorage.saveString(AppConstants.prefRefreshToken, _verifyOtpResponse!.data.refreshToken);
+        _localStorage.saveString(AppConstants.prefUserId, _verifyOtpResponse!.data.user.id);
         _localStorage.saveString(AppConstants.prefUserName, firstName+lastName);
         _localStorage.saveBool(AppConstants.prefIsLoggedIn, true);
         _isLoggedIn = true;
@@ -86,6 +87,7 @@ class AuthenticationProvider extends ChangeNotifier {
       _isLoggedIn = false;
       _sendotpResponse = null;
       _verifyOtpResponse = null;
+      phoneController.text='';
       errorMsg = '';
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);

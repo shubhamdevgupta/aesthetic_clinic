@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/providers/home_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/utils/widgets/AppDialog.dart';
 import 'package:aesthetic_clinic/utils/widgets/CartIconButton.dart';
 import 'package:aesthetic_clinic/views/home_screens/clinic_based_screen.dart';
 import 'package:aesthetic_clinic/views/home_screens/home_based_screen.dart';
@@ -32,62 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
           () =>
           Provider.of<HomeProvider>(context, listen: false).getDashboardData(),
     );
-    print("userid--  ${storage.getString(AppConstants.prefUserName)}");
-  }
-
-  void _handleLogout() async {
-    final shouldLogout = await showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: Row(
-            children: [
-              const Icon(Icons.logout, color: Color(0xFF660033)),
-              const SizedBox(width: 8),
-              const Text('Logout', style: TextStyle(color: Color(0xFF660033))),
-            ],
-          ),
-          content: const Text('Are you sure you want to logout?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF660033),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (shouldLogout == true) {
-      final authProvider = Provider.of<AuthenticationProvider>(
-        context,
-        listen: false,
-      );
-      await authProvider.logout();
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          AppConstants.navigateToSplashScreen,
-              (route) => false,
-        );
-      }
-    }
+    print("userid--  ${storage.getString(AppConstants.prefUserId)}");
   }
 
   @override
@@ -180,7 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
               _buildDrawerItem(
                 icon: Icons.logout,
                 title: 'Logout',
-                onTap: _handleLogout,
+                onTap: (){
+                  AppDialogs.showLogoutDialog(context);
+                },
                 isLogout: true,
               ),
             ],
