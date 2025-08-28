@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/utils/widgets/AppDialog.dart';
 import 'package:aesthetic_clinic/views/auth/splash_screen.dart';
+import 'package:aesthetic_clinic/views/profile_screens/personalise_screen.dart';
 import 'package:aesthetic_clinic/views/profile_screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(width: 16),
                  Text(
-                  '${storage.getString(AppConstants.prefUserName)}',
+                  "${storage.getString(AppConstants.prefFirstName)!} ${storage.getString(AppConstants.prefLastName)!}",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -86,8 +87,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: Icons.person_outline,
               title: 'Personal Information',
               onTap: () {
-                // Navigate to personal information
-              },
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>  PersonalizeScreen(isVerified: false,),
+                  ),
+                );},
             ),
             _buildMenuItem(
               icon: Icons.account_balance_wallet_outlined,

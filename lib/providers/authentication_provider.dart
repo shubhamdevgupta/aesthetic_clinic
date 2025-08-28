@@ -1,9 +1,5 @@
-import 'dart:convert';
-import 'dart:math';
-
 import 'package:aesthetic_clinic/models/verify_otp_response.dart';
 import 'package:country_picker/country_picker.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../models/send_otp_response.dart';
@@ -18,21 +14,24 @@ class AuthenticationProvider extends ChangeNotifier {
   final LocalStorageService _localStorage = LocalStorageService();
 
   bool _isLoggedIn = false;
+
   bool get isLoggedIn => _isLoggedIn;
 
   SendOtpResponseModel? _sendotpResponse;
+
   SendOtpResponseModel? get sendOtpResponse => _sendotpResponse;
 
   VerifyOtpResponseModel? _verifyOtpResponse;
+
   VerifyOtpResponseModel? get verifyOtpResponse => _verifyOtpResponse;
 
   bool _isLoading = false;
+
   bool get isLoading => _isLoading;
 
   String errorMsg = '';
-  String countryCode='';
+  String countryCode = '';
   final TextEditingController phoneController = TextEditingController();
-
 
   // Method to login user
   Future<void> sendOtp(String phoneNumber) async {
@@ -56,14 +55,34 @@ class AuthenticationProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      _verifyOtpResponse = await _authRepository.verifyOtp(phoneNumber,otp);
-      if(_verifyOtpResponse!.status&& _verifyOtpResponse!.statuscode==200){
-        final firstName=_verifyOtpResponse!.data.user.firstName;
-        final lastName=_verifyOtpResponse!.data.user.lastName;
-        _localStorage.saveString(AppConstants.prefAccessToken, _verifyOtpResponse!.data.accessToken);
-        _localStorage.saveString(AppConstants.prefRefreshToken, _verifyOtpResponse!.data.refreshToken);
-        _localStorage.saveString(AppConstants.prefUserId, _verifyOtpResponse!.data.user.id);
-        _localStorage.saveString(AppConstants.prefUserName, firstName+lastName);
+      _verifyOtpResponse = await _authRepository.verifyOtp(phoneNumber, otp);
+      if (_verifyOtpResponse!.status && _verifyOtpResponse!.statuscode == 200) {
+        _localStorage.saveString(
+          AppConstants.prefAccessToken,
+          _verifyOtpResponse!.data.accessToken,
+        );
+        _localStorage.saveString(
+          AppConstants.prefRefreshToken,
+          _verifyOtpResponse!.data.refreshToken,
+        );
+        _localStorage.saveString(
+          AppConstants.prefUserId,
+          _verifyOtpResponse!.data.user.id,
+        );
+        _localStorage.saveString(
+          AppConstants.prefFirstName,
+          _verifyOtpResponse!.data.user.firstName);
+        _localStorage.saveString(
+          AppConstants.prefLastName,
+          _verifyOtpResponse!.data.user.lastName);
+        _localStorage.saveString(
+          AppConstants.prefMobile,
+          _verifyOtpResponse!.data.user.phone,
+        );
+        _localStorage.saveString(
+          AppConstants.prefEmail,
+          _verifyOtpResponse!.data.user.email!,
+        );
         _localStorage.saveBool(AppConstants.prefIsLoggedIn, true);
         _isLoggedIn = true;
       }
@@ -87,7 +106,7 @@ class AuthenticationProvider extends ChangeNotifier {
       _isLoggedIn = false;
       _sendotpResponse = null;
       _verifyOtpResponse = null;
-      phoneController.text='';
+      phoneController.text = '';
       errorMsg = '';
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
@@ -98,9 +117,10 @@ class AuthenticationProvider extends ChangeNotifier {
   }
 
   Future<void> checkAuthenticationState() async {
-    final isLoggedIn = _localStorage.getBool(AppConstants.prefIsLoggedIn) ?? false;
+    final isLoggedIn =
+        _localStorage.getBool(AppConstants.prefIsLoggedIn) ?? false;
     final accessToken = _localStorage.getString(AppConstants.prefAccessToken);
-    
+
     if (isLoggedIn && accessToken != null && accessToken.isNotEmpty) {
       _isLoggedIn = true;
     } else {
@@ -113,34 +133,32 @@ class AuthenticationProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
-
   String? validateOtp(String otp) {
     if (otp.isEmpty) {
       return 'Please enter the OTP';
     }
-    
+
     if (otp.length != 6) {
       return 'OTP must be exactly 6 digits';
     }
-    
+
     if (!RegExp(r'^\d{6}$').hasMatch(otp)) {
       return 'OTP can only contain digits (0-9)';
     }
-    
+
     // Additional validation: Check if OTP contains only same digits (like 111111)
     if (RegExp(r'^(\d)\1{5}$').hasMatch(otp)) {
       return 'Please enter a valid OTP';
     }
-    
+
     // Additional validation: Check if OTP is sequential (like 123456)
     if (otp == '123456') {
       return 'Please enter a valid OTP';
     }
-    
+
     return null; // No error
   }
+
   Future<String?> validatePhoneNumber(String phoneNumber) async {
     // Remove spaces and dashes
     String cleanNumber = phoneNumber.replaceAll(RegExp(r'\s+|-'), '');
@@ -161,7 +179,6 @@ class AuthenticationProvider extends ChangeNotifier {
     return null; // ✅ Valid
   }
 
-
   // Method to send OTP with validation
   Future<bool> sendOtpWithValidation(String phoneNumber) async {
     final validationError = await validatePhoneNumber(phoneNumber);
@@ -181,7 +198,9 @@ class AuthenticationProvider extends ChangeNotifier {
       if (_sendotpResponse?.statuscode == 200 && _sendotpResponse!.status) {
         return true;
       } else {
-        errorMsg = _sendotpResponse?.message ?? 'Failed to send OTP. Please try again.';
+        errorMsg =
+            _sendotpResponse?.message ??
+            'Failed to send OTP. Please try again.';
         notifyListeners();
         return false;
       }
@@ -222,11 +241,13 @@ class AuthenticationProvider extends ChangeNotifier {
         return true;
       } else {
         // API returned error
-        final apiMessage = _verifyOtpResponse?.message ?? 'Invalid OTP. Please try again.';
+        final apiMessage =
+            _verifyOtpResponse?.message ?? 'Invalid OTP. Please try again.';
 
         // Check if it's a server error
         if (_verifyOtpResponse?.statuscode == 500) {
-          errorMsg = 'Server is temporarily unavailable. Please try again in a few moments.';
+          errorMsg =
+              'Server is temporarily unavailable. Please try again in a few moments.';
         } else {
           errorMsg = apiMessage;
         }
@@ -236,8 +257,10 @@ class AuthenticationProvider extends ChangeNotifier {
       }
     } catch (e) {
       // API call failed
-      if (e.toString().contains('Server error') || e.toString().contains('temporarily unavailable')) {
-        errorMsg = 'Server is temporarily unavailable. Please try again in a few moments.';
+      if (e.toString().contains('Server error') ||
+          e.toString().contains('temporarily unavailable')) {
+        errorMsg =
+            'Server is temporarily unavailable. Please try again in a few moments.';
       } else {
         errorMsg = 'An error occurred. Please try again.';
       }
@@ -256,10 +279,12 @@ class AuthenticationProvider extends ChangeNotifier {
   String formatPhoneNumber(String countryCode, String phoneNumber) {
     // Remove any non-digit characters
     final cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     // Remove leading zero if present
-    final formattedPhone = cleanPhone.startsWith('0') ? cleanPhone.substring(1) : cleanPhone;
-    
+    final formattedPhone = cleanPhone.startsWith('0')
+        ? cleanPhone.substring(1)
+        : cleanPhone;
+
     // Return with country code
     return '$countryCode$formattedPhone';
   }
@@ -283,5 +308,4 @@ class AuthenticationProvider extends ChangeNotifier {
     _selectedCountry = country;
     notifyListeners();
   }
-
 }

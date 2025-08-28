@@ -192,6 +192,97 @@ class BaseApiService {
     throw ApiException('Failed after all retry attempts');
   }
 
+  Future<dynamic> put(
+      String endpoint, {
+        Map<String, String>? headers,
+        dynamic body,
+        bool withAuth = false,
+      }) async {
+    final Uri url = Uri.parse('$_baseUrl$endpoint');
+    headers ??= {};
+    headers.putIfAbsent('Content-Type', () => 'application/json');
+
+    if (withAuth) {
+      final accessToken =
+      await storageService.getString(AppConstants.prefAccessToken);
+      headers['Authorization'] = 'Bearer $accessToken';
+    }
+
+    log('🔹 PUT Request to: $url');
+    log('🔸 Headers: ${jsonEncode(headers)}');
+    log('🔸 Body: $body');
+
+    int retryCount = 0;
+    const maxRetries = 2;
+
+    while (retryCount <= maxRetries) {
+      try {
+        await _checkConnectivity();
+
+        var response = await http.put(url, headers: headers, body: body);
+
+        log('📩 Response Status: ${response.statusCode}');
+        log('📩 Response Body: ${response.body}');
+
+        if (response.statusCode == 401 && withAuth) {
+          log('🔄 Access token expired. Trying to refresh...');
+          bool refreshed = await _refreshAccessToken();
+
+          if (refreshed) {
+            final newAccessToken =
+            await storageService.getString(AppConstants.prefAccessToken);
+            if (newAccessToken != null && newAccessToken.isNotEmpty) {
+              headers['Authorization'] = 'Bearer $newAccessToken';
+
+              log('🔁 Retrying PUT with refreshed token...');
+              response = await http.put(url, headers: headers, body: body);
+
+              log('📩 Retried Response Status: ${response.statusCode}');
+              log('📩 Retried Response Body: ${response.body}');
+            } else {
+              log('❌ Failed to get new access token after refresh');
+              await logout();
+              throw AuthenticationException(
+                  'Authentication failed. Please login again.');
+            }
+          } else {
+            log('❌ Token refresh failed. User needs to login again.');
+            await logout();
+            throw AuthenticationException('Session expired. Please login again.');
+          }
+        }
+
+        // Retry on server error
+        if ((response.statusCode >= 500 && response.statusCode < 600) &&
+            retryCount < maxRetries) {
+          log('⚠️ Server error (${response.statusCode}), retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+          await Future.delayed(const Duration(seconds: 1));
+          retryCount++;
+          continue;
+        }
+
+        return _processResponse(response);
+      } on SocketException {
+        throw NetworkException('No internet connection');
+      } catch (e) {
+        if (e is ApiException) {
+          if (e.toString().contains('Server error') && retryCount < maxRetries) {
+            log('⚠️ Server error exception, retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');
+            await Future.delayed(const Duration(seconds: 1));
+            retryCount++;
+            continue;
+          }
+          throw e;
+        }
+
+        log('❌ PUT Exception: $e');
+        throw ApiException('Unexpected error during PUT');
+      }
+    }
+
+    throw ApiException('Failed after all retry attempts');
+  }
+
   Future<void> _checkConnectivity() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult == ConnectivityResult.none) {

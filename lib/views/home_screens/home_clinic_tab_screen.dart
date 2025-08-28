@@ -70,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      '${storage.getString(AppConstants.prefUserName)}',
+                      "${storage.getString(AppConstants.prefFirstName)} ${storage.getString(AppConstants.prefLastName)}",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -171,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 Text(
-                                  '${storage.getString(AppConstants.prefUserName)}',
+                                  '${storage.getString(AppConstants.prefFirstName)!+" "+storage.getString(AppConstants.prefLastName)!}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF660033),

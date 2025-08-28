@@ -191,10 +191,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         final success = await provider.verifyOtpWithValidation(phoneNumber, otpValue);
                         
                         if (success) {
+                      /*    Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ServiceDetailScreen(serviceId: serviceID),
+                            ),
+                          );*/
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const PersonalizeScreen(),
+                              builder: (_) =>  PersonalizeScreen(isVerified: true,),
                             ),
                           );
                         } else {

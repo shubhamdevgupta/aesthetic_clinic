@@ -10,7 +10,6 @@ import '../utils/GlobalExceptionHandler.dart';
 
 class ServiceProvider extends ChangeNotifier{
   final ServiceRepository serviceRepository= ServiceRepository();
-  final LocalStorageService _localStorage = LocalStorageService();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -66,7 +65,6 @@ class ServiceProvider extends ChangeNotifier{
       }
 
     } catch (e) {
-      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
       if (e is! AuthenticationException) {
         GlobalExceptionHandler.handleException(e as Exception);
       }

@@ -8,7 +8,9 @@ class AppConstants {
   static const String prefAccessToken = 'accesstoken';
   static const String prefRefreshToken = 'refreshtoken';
   static const String prefUserId = 'userId';
-  static const String prefUserName = 'username';
+  static const String prefFirstName = 'firstName';
+  static const String prefLastName = 'lastName';
+  static const String prefEmail = 'emailId';
   static const String prefName = 'name';
   static const String prefMobile = 'mobile';
 
