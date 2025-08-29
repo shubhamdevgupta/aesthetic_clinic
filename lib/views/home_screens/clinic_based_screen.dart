@@ -29,6 +29,9 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
         final recommendedServices = provider.appConfigResponse!.data
             .expand((item) => item.recommendedServices)
             .toList();
+        final recommendedProducts = provider.appConfigResponse!.data
+            .expand((item) => item.recommendedProducts)
+            .toList();
         final personalizeServices = provider.appConfigResponse!.data
             .expand((item) => item.personalisedServices)
             .toList();
@@ -81,13 +84,39 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   final recommended = recommendedServices[length];
                   return topChoiceItem(
                     recommended.name,
+                    recommended.description,
                     recommended.image,
                     context,
                   );
                 },
               ),
             ),
-
+            //
+            const Text(
+              "Get Our Trusted Products",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF660033),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 180,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: recommendedProducts.length,
+                itemBuilder: (context, length) {
+                  final personalize = recommendedProducts[length];
+                  return topChoiceItem(
+                    personalize.name,
+                    personalize.description,
+                    personalize.featuredImage,
+                    context,
+                  );
+                },
+              ),
+            ),
             // Our Personalized service  for You
             const Text(
               "Our Personalise Services for You",
@@ -107,6 +136,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   final personalize = personalizeServices[length];
                   return topChoiceItem(
                     personalize.name,
+                    personalize.description,
                     personalize.image,
                     context,
                   );
@@ -121,8 +151,9 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
 
   static Widget topChoiceItem(
     String title,
-    String imageUrl,
-    BuildContext context,
+    String description,
+      String imageUrl,
+      BuildContext context,
   ) {
     return InkWell(
       onTap: () {
@@ -131,56 +162,93 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           builder: (context) => ServicePopup(
-            title: "Summer Hydration Drip",
-            description:
-                "A Little Enhancement, A Lot of Confidence with Expert Injectables in Dubai",
+            title: title,
+            description:description,
             price: "200",
             duration: "30 Mins",
-            imageUrl: "https://yourimageurl.com/sample.jpg",
+            imageUrl: imageUrl,
           ),
         );
       },
       child: Container(
-        width: 140,
+        width: 160, // tweak as needed
         margin: const EdgeInsets.only(right: 12),
-        child: Column(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            children: [
+              // Background image
+              Image.network(
                 imageUrl,
-                height: 120,
-                width: 140,
+                height: 200,
+                width: 160,
                 fit: BoxFit.cover,
-                // Downscale a bit to reduce decode cost
-                cacheWidth: 560,
-                cacheHeight: 480,
+                cacheWidth: 640,  // optional downscale
+                cacheHeight: 800, // optional downscale
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return _ShimmerPlaceholder(
-                    width: 140,
-                    height: 120,
-                    borderRadius: 12,
+                    width: 160,
+                    height: 200,
+                    borderRadius: 16,
                   );
                 },
                 errorBuilder: (context, error, stackTrace) => Container(
-                  height: 120,
-                  width: 140,
+                  height: 200,
+                  width: 160,
                   color: const Color(0xFFFFEBEE),
                   alignment: Alignment.center,
                   child: const Icon(Icons.broken_image, color: Colors.red),
                 ),
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ],
+
+              // Your rectangle image at the bottom
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Image.asset(
+                  'assets/icons/ic_rectangle.png',
+                  height: 64,          // adjust to match your asset
+                  fit: BoxFit.fill,    // ensures full-width coverage
+                ),
+              ),
+
+              // Text on top of the rectangle
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 10, // sits nicely within the rectangle
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      "55", // e.g., "Starting From AED100"
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+      )
+      ,
+
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:aesthetic_clinic/views/booking_screens/booking_slot_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../profile_screens/get_help_screen.dart';
@@ -105,7 +106,7 @@ class BookingScreen extends StatelessWidget {
               const Expanded(
                 child: TabBarView(
                   children: [
-                    UpcomingBookingsScreen(),
+                    BookingSlotScreen(),
                     PastBookingsScreen(),
                   ],
                 ),
@@ -118,30 +119,6 @@ class BookingScreen extends StatelessWidget {
   }
 }
 
-class UpcomingBookingsScreen extends StatelessWidget {
-  final bool hasBookings;
-
-  const UpcomingBookingsScreen({super.key, this.hasBookings = false});
-
-  @override
-  Widget build(BuildContext context) {
-    if (!hasBookings) {
-      return _EmptyBookingsView(
-        title: "You Don't have any Upcoming Bookings",
-        showPrimaryAction: true,
-        primaryActionLabel: 'Explore Our Services',
-        onPrimaryAction: () {},
-      );
-    }
-
-    // Placeholder for future list of upcoming bookings
-    return _SingleBookingCard(
-      isUpcoming: true,
-      onPrimaryAction: () {},
-      onSecondaryAction: () {},
-    );
-  }
-}
 
 class PastBookingsScreen extends StatelessWidget {
   final bool hasBookings;

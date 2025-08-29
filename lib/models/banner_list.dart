@@ -39,12 +39,14 @@ class DataItem {
   final AppConfigs appConfigs;
   final List<Service> topServices;
   final List<Service> recommendedServices;
+  final List<RecommendedProduct> recommendedProducts;
   final List<Service> personalisedServices;
 
   DataItem({
     required this.appConfigs,
     required this.topServices,
     required this.recommendedServices,
+    required this.recommendedProducts,
     required this.personalisedServices,
   });
 
@@ -63,16 +65,19 @@ class DataItem {
           ?.map((e) => Service.fromJson(e))
           .toList() ??
           [],
+      recommendedProducts: (json['recommendedProducts'] as List<dynamic>?)
+          ?.map((e) => RecommendedProduct.fromJson(e))
+          .toList() ??
+          [],
     );
   }
 
   Map<String, dynamic> toJson() => {
     "appConfigs": appConfigs.toJson(),
     "topServices": topServices.map((e) => e.toJson()).toList(),
-    "recommendedServices":
-    recommendedServices.map((e) => e.toJson()).toList(),
-    "personalisedservices":
-    personalisedServices.map((e) => e.toJson()).toList(),
+    "recommendedServices": recommendedServices.map((e) => e.toJson()).toList(),
+    "personalisedservices": personalisedServices.map((e) => e.toJson()).toList(),
+    "recommendedProducts": recommendedProducts.map((e) => e.toJson()).toList(),
   };
 }
 
@@ -172,6 +177,74 @@ class ConfigData {
     "actionUrl": actionUrl,
   };
 }
+class RecommendedProduct {
+  final String id;
+  final String name;
+  final String title;
+  final String slug;
+  final String description;
+  final String excerpt;
+  final String code;
+  final String grossPrice;
+  final String discount;
+  final String netPrice;
+  final String featuredImage;
+  final bool recommended;
+  final String serviceId;
+
+  RecommendedProduct({
+    required this.id,
+    required this.name,
+    required this.title,
+    required this.slug,
+    required this.description,
+    required this.excerpt,
+    required this.code,
+    required this.grossPrice,
+    required this.discount,
+    required this.netPrice,
+    required this.featuredImage,
+    required this.recommended,
+    required this.serviceId,
+  });
+
+  factory RecommendedProduct.fromJson(Map<String, dynamic> json) {
+    return RecommendedProduct(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      title: json['title'] ?? '',
+      slug: json['slug'] ?? '',
+      description: json['description'] ?? '',
+      excerpt: json['excerpt'] ?? '',
+      code: json['code'] ?? '',
+      grossPrice: json['grossPrice'] ?? '',
+      discount: json['discount'] ?? '',
+      netPrice: json['netPrice'] ?? '',
+      featuredImage: json['featuredImage'] ?? '',
+      recommended: json['recommended'] ?? false,
+      serviceId: json['serviceId'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "title": title,
+      "slug": slug,
+      "description": description,
+      "excerpt": excerpt,
+      "code": code,
+      "grossPrice": grossPrice,
+      "discount": discount,
+      "netPrice": netPrice,
+      "featuredImage": featuredImage,
+      "recommended": recommended,
+      "serviceId": serviceId,
+    };
+  }
+}
+
 
 class Service {
   final String id;

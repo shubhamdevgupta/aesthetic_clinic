@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   // Header + Search + Banner
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    padding: const EdgeInsets.all(8),
                     child: Column(
                       children: [
                         Row(
