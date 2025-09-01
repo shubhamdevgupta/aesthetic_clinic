@@ -35,6 +35,7 @@ dependencies:
   # ✅ Required for localization
   flutter_localizations:
     sdk: flutter
+  smooth_page_indicator: ^1.2.1
 
 dev_dependencies:
   flutter_test:

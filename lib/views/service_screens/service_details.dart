@@ -1,4 +1,4 @@
-
+import 'package:aesthetic_clinic/utils/widgets/auto_scroll_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -8,17 +8,14 @@ import '../../utils/widgets/CartIconButton.dart';
 class ServiceDetailScreen extends StatefulWidget {
   final String serviceId;
 
-  const ServiceDetailScreen({
-    Key? key,
-    required this.serviceId,
-  }) : super(key: key);
+  const ServiceDetailScreen({Key? key, required this.serviceId})
+    : super(key: key);
 
   @override
   State<ServiceDetailScreen> createState() => _ServiceDetailScreenState();
 }
 
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
-  final PageController _pageController = PageController();
   int _currentPage = 0;
 
   @override
@@ -26,7 +23,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     super.initState();
     // Call the API to get service details by ID
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final serviceProvider = Provider.of<ServiceProvider>(context, listen: false);
+      final serviceProvider = Provider.of<ServiceProvider>(
+        context,
+        listen: false,
+      );
       serviceProvider.getServiceBYId(widget.serviceId);
     });
   }
@@ -68,14 +68,16 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        title: Text("Service Detail"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black54),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
           Padding(
-              padding: EdgeInsetsGeometry.only(right: 15),
-              child: CartIconButton(itemCount: 5, onPressed: (){})),
+            padding: EdgeInsetsGeometry.only(right: 15),
+            child: CartIconButton(itemCount: 5, onPressed: () {}),
+          ),
         ],
       ),
       body: Consumer<ServiceProvider>(
@@ -83,9 +85,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           // Show loading indicator while fetching data
           if (serviceProvider.isLoading) {
             return const Center(
-              child: CircularProgressIndicator(
-                color: Colors.red,
-              ),
+              child: CircularProgressIndicator(),
             );
           }
 
@@ -103,10 +103,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   const SizedBox(height: 16),
                   Text(
                     'Unable to load service details',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade600,
-                    ),
+                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -114,7 +111,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       serviceProvider.getServiceBYId(widget.serviceId);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Colors.pink,
                     ),
                     child: const Text(
                       'Retry',
@@ -131,69 +128,20 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
           // Prepare images list based on available images from API
           final List<String> serviceImages = [];
-          if (serviceData?.image != null) {
-            serviceImages.add(serviceData!.image!);
-          }
-          if (serviceData?.topServiceImage != null) {
-            serviceImages.add(serviceData!.topServiceImage!);
-          }
-          if (serviceData?.personalisedServiceImages != null) {
-            serviceImages.add(serviceData!.personalisedServiceImages!);
-          }
-
-          // If no images from API, use fallback
-          if (serviceImages.isEmpty) {
-            serviceImages.add('https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-          }
+          serviceImages.add(serviceData.image);
 
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Image Carousel Section
-                SizedBox(
-                  height: 200,
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: serviceImages.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          image: DecorationImage(
-                            image: NetworkImage(serviceImages[index]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                // Page Indicator
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    serviceImages.length,
-                        (index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: index == _currentPage ? 24 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: index == _currentPage ? Colors.red : Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      );
-                    },
-                  ),
+                AutoScrollingBanner(
+                  items: [serviceData.image],
+                  bannerBuilder: (context, item, index) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(item, fit: BoxFit.cover),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: 24),
@@ -202,19 +150,19 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ServiceCard(
-                    name: serviceData?.name ?? 'Service Name',
-                    price: serviceData?.price != null && serviceData!.price != "0.00"
-                        ? 'AED ${serviceData.price}'
-                        : 'Contact for Price',
-                    description: serviceData?.description ?? 'No description available',
-                    bookings: 'Popular service - Book now',
+                    name: serviceData.name,
+                    price: serviceData.price,
+                    description:
+                        serviceData?.description ?? 'No description available',
                     isOnSale: serviceData?.isRecommended ?? false,
                     isTopService: serviceData?.isTopService ?? false,
                     onBook: () {
                       // Handle booking with actual service data
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Booking ${serviceData?.name ?? 'service'}...'),
+                          content: Text(
+                            'Booking ${serviceData?.name ?? 'service'}...',
+                          ),
                           backgroundColor: Colors.red,
                         ),
                       );
@@ -224,14 +172,14 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
                 // Available Doctors Section (if doctors exist)
                 if (serviceData.doctors?.isNotEmpty == true) ...[
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Available Doctors',
+                          'Choose Your Professional',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -239,93 +187,67 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: serviceData!.doctors!.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            final doctor = serviceData.doctors![index];
-                            return Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey.shade200),
-                              ),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: Colors.red.shade100,
-                                    child: Icon(
-                                      Icons.person,
-                                      color: Colors.red,
-                                      size: 30,
+                        SizedBox(
+                          height: 160, // set height to fit horizontal items
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: serviceData!.doctors!.length,
+                            separatorBuilder: (context, index) => const SizedBox(width: 12),
+                            itemBuilder: (context, index) {
+                              final doctor = serviceData.doctors![index];
+                              return Container(
+                                width: 140, // fixed width for each horizontal card
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade200),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 30,
+                                      backgroundColor: Colors.red.shade100,
+                                      child: Icon(
+                                        Icons.person,
+                                        color: Color(0xFF660033),
+                                        size: 30,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${doctor.title ?? 'Dr.'} ${doctor.name ?? 'Doctor'}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black87,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          doctor.specialization ?? 'Specialist',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade600,
-                                          ),
-                                        ),
-                                        if (doctor.experience != null) ...[
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            '${doctor.experience}+ years experience',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey.shade500,
-                                            ),
-                                          ),
-                                        ],
-                                      ],
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '${doctor.title ?? 'Dr.'} ${doctor.name ?? 'Doctor'}',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF660033),
+                                      ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
-                                          content: Text('View ${doctor.name}\'s profile'),
-                                          backgroundColor: Colors.red,
+                                    if (doctor.experience != null) ...[
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        '${doctor.experience}+ yrs',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey.shade500,
                                         ),
-                                      );
-                                    },
-                                    icon: const Icon(
-                                      Icons.arrow_forward_ios,
-                                      color: Colors.grey,
-                                      size: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ],
 
-                const SizedBox(height: 32),
-
-                // About Section
+// webzila
+                /*// About Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -389,9 +311,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       ),
                     ],
                   ),
-                ),
-
-                const SizedBox(height: 24),
+                ),*/
+                SizedBox(height: 18,),
 
                 // Static Treatment Guide Section (since not in API)
                 Padding(
@@ -421,6 +342,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   ),
                 ),
 
+                SizedBox(height: 14,),
                 // Static Treatment Categories (since not in API response)
                 SizedBox(
                   height: 80,
@@ -428,7 +350,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     itemCount: treatmentCategories.length,
-                    separatorBuilder: (context, index) => const SizedBox(width: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
                     itemBuilder: (context, index) {
                       return Container(
                         width: 120,
@@ -454,37 +377,6 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
                 const SizedBox(height: 24),
 
-                // Additional Info Section (removed since not in API)
-
-                // Static Additional Information
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'What to Expect:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Our professional team will guide you through every step of your treatment journey, ensuring comfort, safety, and optimal results.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
                 // Other Services Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -503,12 +395,13 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1.5,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 1.5,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
                         itemCount: otherServices.length,
                         itemBuilder: (context, index) {
                           final service = otherServices[index];
@@ -558,7 +451,6 @@ class ServiceCard extends StatelessWidget {
   final String name;
   final String price;
   final String description;
-  final String bookings;
   final bool isOnSale;
   final bool isTopService;
   final VoidCallback onBook;
@@ -568,7 +460,6 @@ class ServiceCard extends StatelessWidget {
     required this.name,
     required this.price,
     required this.description,
-    required this.bookings,
     required this.isOnSale,
     this.isTopService = false,
     required this.onBook,
@@ -597,7 +488,10 @@ class ServiceCard extends StatelessWidget {
             children: [
               if (isOnSale || isTopService)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isTopService ? Colors.blue : Colors.orange,
                     borderRadius: BorderRadius.circular(4),
@@ -613,24 +507,54 @@ class ServiceCard extends StatelessWidget {
                 ),
               const Spacer(),
               Text(
-                price,
+                "AED $price",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.grey,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            name,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
+          Row(
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF660033),
+                ),
+              ),
+              Spacer(),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: onBook,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF660033),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Book a Slot',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
+
           const SizedBox(height: 8),
           Text(
             description,
@@ -641,50 +565,10 @@ class ServiceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              ElevatedButton(
-                onPressed: onBook,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: const Text(
-                  'Book a Slot',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Row(
-                children: [
-                  Icon(
-                    Icons.star,
-                    size: 16,
-                    color: Colors.amber,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    bookings,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
-
 }
 
 Widget _buildServiceBadge(String text, Color color) {
@@ -697,11 +581,7 @@ Widget _buildServiceBadge(String text, Color color) {
     ),
     child: Text(
       text,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w600,
-        color: color,
-      ),
+      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color),
     ),
   );
 }

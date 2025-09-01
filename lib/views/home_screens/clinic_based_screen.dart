@@ -1,8 +1,8 @@
 import 'package:aesthetic_clinic/providers/home_provider.dart';
-import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/widgets/auto_scroll_banner.dart';
 import '../service_screens/service_details.dart';
 import '../service_screens/service_popup.dart';
 
@@ -23,10 +23,13 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
             child: CircularProgressIndicator(),
           ); // or a placeholder
         }
+        final bannerList = provider.appConfigResponse!.data
+            .expand((item) => item.appConfigs.banner)
+            .toList();
         final topServices = provider.appConfigResponse!.data
             .expand((item) => item.topServices)
             .toList();
-        final recommendedServices = provider.appConfigResponse!.data
+        final topChoices = provider.appConfigResponse!.data
             .expand((item) => item.recommendedServices)
             .toList();
         final recommendedProducts = provider.appConfigResponse!.data
@@ -36,9 +39,69 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
             .expand((item) => item.personalisedServices)
             .toList();
         return ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
 
           children: [
+            AutoScrollingBanner(
+              items: bannerList,
+              bannerBuilder: (context, item, index) {
+                final banner = item.configData;
+
+                return Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        banner.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      left: 16,
+                      right: 140,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            banner.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            banner.subtitle,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 16,
+                      right: 16,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // ✅ handle index-wise click here
+                          print("Book Now clicked on index: $index");
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.pink,
+                        ),
+                        child: const Text("Book Now"),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            SizedBox(height: 10),
             const Text(
               "Our Top Services",
               style: TextStyle(
@@ -63,7 +126,102 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
+            const Text(
+              "Get Our Trusted Products",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF660033),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 120,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: recommendedProducts.length,
+                itemBuilder: (context, length) {
+                  final product = recommendedProducts[length];
+                  return Container(
+                    width: 90,
+                    margin: const EdgeInsets.only(right: 12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        // Network image (circular)
+                        Image.network(
+                          width: 64,
+                          height: 64,
+                          product.featuredImage,
+                          fit: BoxFit.cover,
+                          cacheWidth: 120,
+                          cacheHeight: 120,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return _CircleShimmer(size: 40);
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                                Icons.broken_image,
+                                color: Colors.red,
+                                size: 24,
+                              ),
+                        ),
+
+                        const SizedBox(height: 10),
+                        // Space between label and image
+
+                        // Label at the top
+                        SizedBox(
+                          height: 30,
+                          child: Center(
+                            child: Text(
+                              product.name,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF707070),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Our Personalized service  for You
+            const Text(
+              "Our Personalise Services for You",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF660033),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 160,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: personalizeServices.length,
+                itemBuilder: (context, length) {
+                  final personalize = personalizeServices[length];
+                  return topChoiceItem(
+                    personalize.name,
+                    personalize.description,
+                    personalize.image,
+                    personalize.price,
+                    context,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
 
             // Our Top Choices for You
             const Text(
@@ -79,66 +237,56 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               height: 180,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
-                itemCount: recommendedServices.length,
+                itemCount: topChoices.length,
                 itemBuilder: (context, length) {
-                  final recommended = recommendedServices[length];
-                  return topChoiceItem(
-                    recommended.name,
-                    recommended.description,
-                    recommended.image,
-                    context,
-                  );
-                },
-              ),
-            ),
-            //
-            const Text(
-              "Get Our Trusted Products",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 180,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: recommendedProducts.length,
-                itemBuilder: (context, length) {
-                  final personalize = recommendedProducts[length];
-                  return topChoiceItem(
-                    personalize.name,
-                    personalize.description,
-                    personalize.featuredImage,
-                    context,
-                  );
-                },
-              ),
-            ),
-            // Our Personalized service  for You
-            const Text(
-              "Our Personalise Services for You",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 180,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: personalizeServices.length,
-                itemBuilder: (context, length) {
-                  final personalize = personalizeServices[length];
-                  return topChoiceItem(
-                    personalize.name,
-                    personalize.description,
-                    personalize.image,
-                    context,
+                  final service = topChoices[length];
+                  return InkWell(
+                    onTap: (){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ServiceDetailScreen(serviceId: service.id),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 90,
+                      margin: const EdgeInsets.only(right: 12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          // Label at the top
+                          SizedBox(
+                            height: 30,
+                            child: Center(
+                              child: Text(
+                                service.name,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF707070),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10), // Space between label and image
+                          // Network image (circular)
+                          Image.network(
+                            service.image,
+                            fit: BoxFit.cover,
+                            cacheWidth: 120,
+                            cacheHeight: 120,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return _CircleShimmer(size: 40);
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image, color: Colors.red, size: 24),
+                          ),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
@@ -152,8 +300,9 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   static Widget topChoiceItem(
     String title,
     String description,
-      String imageUrl,
-      BuildContext context,
+    String imageUrl,
+    String price,
+    BuildContext context,
   ) {
     return InkWell(
       onTap: () {
@@ -163,8 +312,8 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
           backgroundColor: Colors.transparent,
           builder: (context) => ServicePopup(
             title: title,
-            description:description,
-            price: "200",
+            description: description,
+            price: "2",
             duration: "30 Mins",
             imageUrl: imageUrl,
           ),
@@ -183,8 +332,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 height: 200,
                 width: 160,
                 fit: BoxFit.cover,
-                cacheWidth: 640,  // optional downscale
-                cacheHeight: 800, // optional downscale
+                cacheWidth: 640,
+                // optional downscale
+                cacheHeight: 800,
+                // optional downscale
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return _ShimmerPlaceholder(
@@ -209,8 +360,8 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 bottom: 0,
                 child: Image.asset(
                   'assets/icons/ic_rectangle.png',
-                  height: 64,          // adjust to match your asset
-                  fit: BoxFit.fill,    // ensures full-width coverage
+                  height: 64, // adjust to match your asset
+                  fit: BoxFit.fill, // ensures full-width coverage
                 ),
               ),
 
@@ -234,7 +385,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      "55", // e.g., "Starting From AED100"
+                      "Starting From $price", // e.g., "Starting From AED100"
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -246,9 +397,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
             ],
           ),
         ),
-      )
-      ,
-
+      ),
     );
   }
 }
@@ -293,8 +442,6 @@ class ServiceItem extends StatelessWidget {
                     fontSize: 12,
                     color: Color(0xFF707070),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
