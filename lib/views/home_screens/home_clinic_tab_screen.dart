@@ -14,7 +14,6 @@ import '../../services/LocalStorageService.dart';
 import '../booking_screens/booking_screen.dart';
 import '../profile_screens/profile_screen.dart';
 import '../service_screens/service_screen.dart';
-import 'auto_scroll_banner.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -140,9 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
           if (provider.appConfigResponse == null || provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          final bannerList = provider.appConfigResponse!.data
-              .expand((item) => item.appConfigs.banner)
-              .toList();
 
           return DefaultTabController(
             length: 2,
@@ -215,15 +211,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
                             CartIconButton(itemCount: 0, onPressed: () {}),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: AutoScrollingBanner(bannerList: bannerList),
-                        ),
+
                       ],
                     ),
                   ),
@@ -251,8 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.asset('assets/icons/ic_tab_clinic.png',
-                                  height: 20),
+                              ImageIcon(AssetImage('assets/icons/ic_tab_clinic.png')),
                               const SizedBox(width: 6),
                               const Text('Clinic Based'),
                             ],
@@ -262,8 +252,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.asset('assets/icons/ic_tab_home.png',
-                                  height: 20),
+                              ImageIcon(AssetImage('assets/icons/ic_tab_home.png')),
+
                               const SizedBox(width: 6),
                               const Text('Home Based'),
                             ],
