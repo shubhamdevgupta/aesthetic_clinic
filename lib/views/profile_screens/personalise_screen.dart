@@ -5,6 +5,7 @@ import 'package:aesthetic_clinic/views/profile_screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/Appcolor.dart';
 import '../../utils/toast_helper.dart';
 
 class PersonalizeScreen extends StatefulWidget {
@@ -212,7 +213,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                          }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF660033),
+                          backgroundColor:  Appcolor.mehrun,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),

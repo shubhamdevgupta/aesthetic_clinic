@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/all_services.dart';
 import '../../services/LocalStorageService.dart';
+import '../../utils/Appcolor.dart';
 
 class ServiceScreen extends StatefulWidget {
   const ServiceScreen({super.key});
@@ -81,7 +82,7 @@ class _HomeScreenState extends State<ServiceScreen> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF660033),
+                    color: Appcolor.mehrun,
                   ),
                 ),
                 const SizedBox(height: 12),

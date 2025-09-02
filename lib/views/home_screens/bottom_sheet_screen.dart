@@ -3,6 +3,7 @@ import 'package:aesthetic_clinic/views/service_screens/service_details.dart';
 import 'package:aesthetic_clinic/views/service_screens/service_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
 import '../booking_screens/booking_screen.dart';
 import 'home_clinic_tab_screen.dart';
 
@@ -64,7 +65,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               BottomNavigationBar(
                 currentIndex: _currentIndex,
-                selectedItemColor: Color(0xFF660033),
+                selectedItemColor: Appcolor.mehrun,
                 unselectedItemColor: Colors.grey,
                 backgroundColor: Colors.transparent,
                 elevation: 0,

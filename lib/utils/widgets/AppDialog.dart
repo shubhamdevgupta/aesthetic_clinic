@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/authentication_provider.dart';
 import '../AppConstants.dart';
+import '../Appcolor.dart';
 
 
 class AppDialogs {
@@ -16,9 +17,9 @@ class AppDialogs {
           ),
           title: Row(
             children: [
-              const Icon(Icons.logout, color: Color(0xFF660033)),
+              const Icon(Icons.logout, color: Appcolor.mehrun),
               const SizedBox(width: 8),
-              const Text('Logout', style: TextStyle(color: Color(0xFF660033))),
+              const Text('Logout', style: TextStyle(color: Appcolor.mehrun)),
             ],
           ),
           content: const Text('Are you sure you want to logout?'),
@@ -30,7 +31,7 @@ class AppDialogs {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF660033),
+                backgroundColor:  Appcolor.mehrun,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

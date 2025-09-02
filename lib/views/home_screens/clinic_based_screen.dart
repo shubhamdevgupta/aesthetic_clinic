@@ -1,4 +1,6 @@
 import 'package:aesthetic_clinic/providers/home_provider.dart';
+import 'package:aesthetic_clinic/utils/Appcolor.dart';
+import 'package:aesthetic_clinic/views/doctor/doctor_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,10 +17,19 @@ class ClinicBasedScreen extends StatefulWidget {
 
 class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(
+      () => Provider.of<HomeProvider>(context, listen: false).getDoctorData(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, provider, child) {
-        if (provider.appConfigResponse == null || provider.isLoading) {
+        if (provider.appConfigResponse == null ||provider.doctorResponse==null || provider.isLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           ); // or a placeholder
@@ -52,10 +63,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
-                        banner.imageUrl,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.network(banner.imageUrl, fit: BoxFit.cover),
                     ),
                     Positioned(
                       bottom: 16,
@@ -107,7 +115,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
               ),
             ),
             const SizedBox(height: 12),
@@ -132,7 +140,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
               ),
             ),
             const SizedBox(height: 12),
@@ -164,7 +172,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(
                                 Icons.broken_image,
-                                color: Colors.red,
+                                color: Appcolor.mehrun,
                                 size: 24,
                               ),
                         ),
@@ -200,7 +208,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
               ),
             ),
             const SizedBox(height: 12),
@@ -229,23 +237,25 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
               ),
             ),
             const SizedBox(height: 12),
             SizedBox(
-              height: 180,
+              height: 150,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: topChoices.length,
                 itemBuilder: (context, length) {
                   final service = topChoices[length];
+                  final splitName = service.name.split(" ");
                   return InkWell(
-                    onTap: (){
+                    onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ServiceDetailScreen(serviceId: service.id),
+                          builder: (context) =>
+                              ServiceDetailScreen(serviceId: service.id),
                         ),
                       );
                     },
@@ -264,7 +274,8 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                 textAlign: TextAlign.center,
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: Color(0xFF707070),
+                                  color: Appcolor.textColor,
+                                  overflow: TextOverflow.clip
                                 ),
                               ),
                             ),
@@ -282,7 +293,11 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                               return _CircleShimmer(size: 40);
                             },
                             errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image, color: Colors.red, size: 24),
+                                const Icon(
+                                  Icons.broken_image,
+                                  color: Colors.red,
+                                  size: 24,
+                                ),
                           ),
                         ],
                       ),
@@ -290,6 +305,84 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   );
                 },
               ),
+            ),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Choose Your Professional',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Appcolor.mehrun,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 160, // set height to fit horizontal items
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: provider.doctorResponse!.data.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 12),
+                    itemBuilder: (context, index) {
+                      final doctor = provider.doctorResponse!.data[index];
+                      return InkWell(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (contex)=>DoctorProfileScreen(doctorId: doctor.id,)));
+                        },
+                        child: Container(
+                          width: 140, // fixed width for each horizontal card
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.red.shade100,
+                                child: Icon(
+                                  Icons.person,
+                                  color: Appcolor.mehrun,
+                                  size: 30,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '${doctor.title} ${doctor.name}',
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Appcolor.mehrun,
+                                  overflow: TextOverflow.clip,
+                                ),
+                              ),
+                              if (doctor.experience != null) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  '${doctor.experience}+ yrs',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Appcolor.textColor,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ],
         );
@@ -440,7 +533,7 @@ class ServiceItem extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF707070),
+                    color: Appcolor.textColor,
                   ),
                 ),
               ),
@@ -537,7 +630,7 @@ class _CircleShimmer extends StatelessWidget {
       height: size,
       child: const CircularProgressIndicator(
         strokeWidth: 2,
-        color: Color(0xFF660033),
+        color: Appcolor.mehrun,
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
 
+import '../../utils/Appcolor.dart';
+
 class CountrySelectionScreen extends StatefulWidget {
   const CountrySelectionScreen({super.key});
 
@@ -77,13 +79,13 @@ class _CountrySelectionScreenState extends State<CountrySelectionScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Select Country"),
-        backgroundColor: const Color(0xFF660033),
+        backgroundColor:  Appcolor.mehrun,
         foregroundColor: Colors.white,
       ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF660033)),
+                valueColor: AlwaysStoppedAnimation<Color>(Appcolor.mehrun),
               ),
             )
           : Column(
@@ -97,7 +99,7 @@ class _CountrySelectionScreenState extends State<CountrySelectionScreen> {
                       hintText: 'Search country name or code',
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFF660033)),
+                        borderSide: BorderSide(color: Appcolor.mehrun),
                       ),
                     ),
                     autofocus: true,

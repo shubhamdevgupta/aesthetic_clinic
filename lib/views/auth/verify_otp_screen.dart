@@ -9,6 +9,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../utils/Appcolor.dart';
 import '../../utils/LoaderUtils.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -89,7 +90,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   "${provider.selectedCountry.phoneCode}${provider.phoneController.text}",
                   style: const TextStyle(
                     fontSize: 18,
-                    color: Color(0xFF660033),
+                    color: Appcolor.mehrun,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -108,9 +109,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     }
                   },
                   pinTheme: PinTheme(
-                    activeColor: Color(0xFF660033),
+                    activeColor: Appcolor.mehrun,
                     inactiveColor: Colors.grey.shade700,
-                    selectedColor: Color(0xFF660033),
+                    selectedColor: Appcolor.mehrun,
                     shape: PinCodeFieldShape.box,
                     borderRadius: BorderRadius.circular(8),
                     fieldHeight: 50,
@@ -211,7 +212,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF660033),
+                        backgroundColor: Appcolor.mehrun,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

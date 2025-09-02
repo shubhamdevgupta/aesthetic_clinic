@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/service_provider.dart';
+import '../../utils/Appcolor.dart';
 import '../../utils/widgets/CartIconButton.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
@@ -16,7 +17,6 @@ class ServiceDetailScreen extends StatefulWidget {
 }
 
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
-  int _currentPage = 0;
 
   @override
   void initState() {
@@ -211,7 +211,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                       backgroundColor: Colors.red.shade100,
                                       child: Icon(
                                         Icons.person,
-                                        color: Color(0xFF660033),
+                                        color: Appcolor.mehrun,
                                         size: 30,
                                       ),
                                     ),
@@ -222,7 +222,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
-                                        color: Color(0xFF660033),
+                                        color: Appcolor.mehrun,
                                       ),
                                     ),
                                     if (doctor.experience != null) ...[
@@ -524,7 +524,7 @@ class ServiceCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF660033),
+                  color: Appcolor.mehrun,
                 ),
               ),
               Spacer(),
@@ -533,7 +533,7 @@ class ServiceCard extends StatelessWidget {
                   ElevatedButton(
                     onPressed: onBook,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF660033),
+                      backgroundColor: Appcolor.mehrun,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,

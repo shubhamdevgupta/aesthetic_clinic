@@ -1,10 +1,11 @@
 import 'package:aesthetic_clinic/views/booking_screens/booking_slot_screen.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
 import '../profile_screens/get_help_screen.dart';
 
 
-const Color kPrimaryColor = Color(0xFF660033);
+const Color kPrimaryColor = Appcolor.mehrun;
 const Color kUnselectedTabText = Color(0xFF9E9E9E);
 const Color kCardSubtitle = Color(0xFF707070);
 const double kTabHeight = 44;

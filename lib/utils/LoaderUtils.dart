@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'Appcolor.dart';
+
 class LoaderUtils {
   /// Shows or hides a default loader dialog with optional message
   static void toggleLoadingDialog(BuildContext context, bool isLoading, {String? message}) {
@@ -77,7 +79,7 @@ class LoaderUtils {
                   height: 56,
                   child: CircularProgressIndicator(
                     strokeWidth: 4,
-                    color: Color(0xFF660033),
+                    color: Appcolor.mehrun,
                   ),
                 ),
                 SizedBox(height: 16),

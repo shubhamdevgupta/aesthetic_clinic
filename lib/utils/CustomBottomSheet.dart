@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'Appcolor.dart';
+
 class CustomBottomSheet {
   static Future<T?> showCustomBottomSheet<T>({
     required BuildContext context,
@@ -270,7 +272,7 @@ class BottomSheetHelper {
       isScrollControlled: true,
       builder: (BuildContext context) {
         return CustomBottomSheetContent(
-          backgroundColor: const Color(0xFF660033),
+          backgroundColor:  Appcolor.mehrun,
           borderRadius: 32.0,
           elevation: 20.0,
           padding: const EdgeInsets.all(28.0),

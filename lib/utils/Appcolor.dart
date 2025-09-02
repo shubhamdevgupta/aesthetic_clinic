@@ -11,6 +11,7 @@ class Appcolor{
   static const Color greenlignt = Color(0xFF3337B4);
   static const Color errormesssagecolor = Color(0xFFDE3929);
   static const Color grey = Color(0xFF777676);
+  static const Color textColor = Color(0xFF707070);
   static const Color lightgrey = Color(0x42868686);
   static const Color lightgreyss = Color(0xFFCCCCCC);
   static const Color btncolor = Color(0xFF0D3A98);
@@ -32,6 +33,7 @@ class Appcolor{
   static const Color dark = Color(0xff565350);
   static const Color greenlight = Color(0xff7c9305);
   static const Color greysec = Color(0xffd7d5d5);
+  static const Color mehrun = Color(0xFF660033);
 
 
 

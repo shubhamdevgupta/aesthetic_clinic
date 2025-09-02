@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../utils/AppConstants.dart';
+import '../../utils/Appcolor.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -66,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
               width: screenWidth,
               height: screenHeight / 1.1,
               decoration: BoxDecoration(
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(screenWidth),
                   topRight: Radius.circular(screenWidth),

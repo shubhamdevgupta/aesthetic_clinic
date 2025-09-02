@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../Appcolor.dart';
+
 class CartIconButton extends StatelessWidget {
   final int itemCount;
   final VoidCallback onPressed;
@@ -31,7 +33,7 @@ class CartIconButton extends StatelessWidget {
           child: IconButton(
             icon: Icon(
               Icons.shopping_cart_outlined,
-              color: Color(0xFF660033), // mehroon color
+              color: Appcolor.mehrun, // mehroon color
             ),
             onPressed: onPressed,
           ),
@@ -45,7 +47,7 @@ class CartIconButton extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Color(0xFF660033), // mehroon badge
+                color: Appcolor.mehrun, // mehroon badge
                 shape: BoxShape.circle,
               ),
               constraints: BoxConstraints(

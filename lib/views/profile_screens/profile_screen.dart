@@ -6,6 +6,7 @@ import 'package:aesthetic_clinic/views/profile_screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/LocalStorageService.dart';
+import '../../utils/Appcolor.dart';
 import 'get_help_screen.dart';
 
 
@@ -199,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Icon(
               icon,
-              color: const Color(0xFF660033),
+              color:  Appcolor.mehrun,
               size: 24,
             ),
             if (hasBadge)
@@ -256,7 +257,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Text(
           text,
           style: TextStyle(
-            color: const Color(0xFF660033),
+            color:  Appcolor.mehrun,
             fontSize: 14,
             decoration: TextDecoration.underline,
           ),

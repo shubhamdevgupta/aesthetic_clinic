@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -95,7 +97,7 @@ class SettingsScreen extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           icon,
-          color: const Color(0xFF660033),
+          color:  Appcolor.mehrun,
         ),
         title: Text(
           title,
@@ -121,7 +123,7 @@ class SettingsScreen extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: Color(0xFF660033),
+          color: Appcolor.mehrun,
           fontSize: 14,
           decoration: TextDecoration.underline,
         ),

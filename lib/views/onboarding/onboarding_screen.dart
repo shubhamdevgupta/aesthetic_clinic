@@ -5,6 +5,7 @@ import 'package:aesthetic_clinic/views/home_screens/bottom_sheet_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../utils/Appcolor.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -65,7 +66,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF660033),
+                        backgroundColor: Appcolor.mehrun,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
+
 class GetHelpScreen extends StatelessWidget {
   const GetHelpScreen({super.key});
 
@@ -56,7 +58,7 @@ class GetHelpScreen extends StatelessWidget {
                     icon: const Icon(
                       Icons.phone_outlined,
                       size: 28,
-                      color: Color(0xFF660033),
+                      color: Appcolor.mehrun,
                     ),
                     titleTop: 'Connect on',
                     titleBottom: 'Call',
@@ -138,7 +140,7 @@ class GetHelpScreen extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: Color(0xFF660033),
+          color: Appcolor.mehrun,
           fontSize: 14,
           decoration: TextDecoration.underline,
         ),
@@ -185,7 +187,7 @@ class _HelpActionCard extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: const Color(0xFF660033).withOpacity(0.08),
+                color:  Appcolor.mehrun.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,

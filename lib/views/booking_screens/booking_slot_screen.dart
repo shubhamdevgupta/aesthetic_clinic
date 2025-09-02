@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
+
 class BookingSlotScreen extends StatefulWidget {
   const BookingSlotScreen({super.key});
 
@@ -83,7 +85,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                             margin: const EdgeInsets.only(right: 12),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: isSelected ? const Color(0xFF660033) : Colors.grey[100],
+                              color: isSelected ?  Appcolor.mehrun : Colors.grey[100],
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -146,11 +148,11 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                         children: [
                           IconButton(
                             onPressed: _previousMonth,
-                            icon: const Icon(Icons.chevron_left, color: Color(0xFF660033)),
+                            icon: const Icon(Icons.chevron_left, color: Appcolor.mehrun),
                           ),
                           IconButton(
                             onPressed: _nextMonth,
-                            icon: const Icon(Icons.chevron_right, color: Color(0xFF660033)),
+                            icon: const Icon(Icons.chevron_right, color: Appcolor.mehrun),
                           ),
                         ],
                       ),
@@ -203,11 +205,11 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                             color: !isAvailable
                                 ? Colors.grey[200]
                                 : isSelected
-                                ? const Color(0xFF660033)
+                                ?  Appcolor.mehrun
                                 : Colors.grey[100],
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(
-                              color: isSelected ? const Color(0xFF660033) : Colors.grey[300]!,
+                              color: isSelected ?  Appcolor.mehrun : Colors.grey[300]!,
                               width: 1,
                             ),
                           ),
@@ -219,7 +221,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                     ? Colors.grey[400]
                                     : isSelected
                                     ? Colors.white
-                                    : Color(0xFF660033),
+                                    : Appcolor.mehrun,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -303,7 +305,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                       child: OutlinedButton(
                         onPressed: _handleAddMoreServices,
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xFF660033)),
+                          side: const BorderSide(color: Appcolor.mehrun),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -312,7 +314,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                         child: const Text(
                           'Add More Services',
                           style: TextStyle(
-                            color: Color(0xFF660033),
+                            color: Appcolor.mehrun,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -324,7 +326,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                       child: ElevatedButton(
                         onPressed: selectedTimeSlot != null ? _handleProceedBooking : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF660033),
+                          backgroundColor:  Appcolor.mehrun,
                           disabledBackgroundColor: Colors.grey[300],
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -417,13 +419,13 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFF660033)
+                      ?  Appcolor.mehrun
                       : isToday
-                      ? const Color(0xFF660033).withOpacity(0.1)
+                      ?  Appcolor.mehrun.withOpacity(0.1)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                   border: isToday && !isSelected
-                      ? Border.all(color: const Color(0xFF660033), width: 1)
+                      ? Border.all(color:  Appcolor.mehrun, width: 1)
                       : null,
                 ),
                 child: Center(
@@ -437,7 +439,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                           : isSelected
                           ? Colors.white
                           : isToday
-                          ? const Color(0xFF660033)
+                          ?  Appcolor.mehrun
                           : Colors.black87,
                     ),
                   ),
@@ -477,7 +479,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Add More Services clicked'),
-        backgroundColor: Color(0xFF660033),
+        backgroundColor: Appcolor.mehrun,
       ),
     );
   }
@@ -512,12 +514,12 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Booking confirmed!'),
-                  backgroundColor: Color(0xFF660033),
+                  backgroundColor: Appcolor.mehrun,
                 ),
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF660033),
+              backgroundColor:  Appcolor.mehrun,
             ),
             child: const Text('Confirm', style: TextStyle(color: Colors.white)),
           ),

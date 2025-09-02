@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
+
 class HomeBasedScreen extends StatefulWidget {
   const HomeBasedScreen({super.key});
 
@@ -18,7 +20,7 @@ class _HomeBasedScreenState extends State<HomeBasedScreen> {
         Text(
           "Coming Soon...",
           style: TextStyle(
-            color: Color(0xFF660033),
+            color: Appcolor.mehrun,
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),

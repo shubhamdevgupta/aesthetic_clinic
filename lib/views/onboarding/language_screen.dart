@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../providers/locale_provider.dart';
+import '../../utils/Appcolor.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   @override
@@ -64,7 +65,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                     MaterialPageRoute(builder: (_) => const SendOtpScreen()),
                   );                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF660033),
+                  backgroundColor: Appcolor.mehrun,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -108,7 +109,7 @@ class LanguageTile extends StatelessWidget {
           ),
           title: Text(title, style: TextStyle(fontSize: 18)),
           trailing: isSelected
-              ? Icon(Icons.check_circle, color: Color(0xFF660033))
+              ? Icon(Icons.check_circle, color: Appcolor.mehrun)
               : Icon(Icons.radio_button_off),
           onTap: onTap,
         ),

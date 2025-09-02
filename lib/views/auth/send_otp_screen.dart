@@ -8,6 +8,7 @@ import 'package:country_picker/country_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
+import '../../utils/Appcolor.dart';
 import '../../utils/LoaderUtils.dart';
 import '../onboarding/onboarding_screen.dart';
 import 'country_selection_screen.dart';
@@ -175,7 +176,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF660033),
+                          backgroundColor:  Appcolor.mehrun,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),

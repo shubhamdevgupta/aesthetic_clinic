@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/LocalStorageService.dart';
+import '../../utils/Appcolor.dart';
 import '../booking_screens/booking_screen.dart';
 import '../profile_screens/profile_screen.dart';
 import '../service_screens/service_screen.dart';
@@ -32,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
           () =>
           Provider.of<HomeProvider>(context, listen: false).getDashboardData(),
     );
-    print("userid--  ${storage.getString(AppConstants.prefUserId)}");
   }
 
   @override
@@ -45,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                const Color(0xFF660033),
-                const Color(0xFF660033).withOpacity(0.8),
+                 Appcolor.mehrun,
+                 Appcolor.mehrun.withOpacity(0.8),
               ],
             ),
           ),
@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   '${storage.getString(AppConstants.prefFirstName)!+" "+storage.getString(AppConstants.prefLastName)!}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF660033),
+                                    color: Appcolor.mehrun,
                                     fontSize: 16,
                                   ),
                                 ),
@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: TabBar(
                       indicator: BoxDecoration(
-                        color: const Color(0xFF660033),
+                        color:  Appcolor.mehrun,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       labelColor: Colors.white,

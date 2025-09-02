@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/Appcolor.dart';
+
 class ServicePopup extends StatefulWidget {
   final String title;
   final String description;
@@ -60,7 +62,7 @@ class _ServicePopupState extends State<ServicePopup> {
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
               ),
             ),
 
@@ -117,7 +119,7 @@ class _ServicePopupState extends State<ServicePopup> {
                 // Add to Cart Button
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF660033),
+                    backgroundColor:  Appcolor.mehrun,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Appcolor.dart';
 import 'CustomBottomSheet.dart';
 
 class BottomSheetExamples {
@@ -21,7 +22,7 @@ class BottomSheetExamples {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF660033),
+                  color: Appcolor.mehrun,
                 ),
               ),
               IconButton(
@@ -43,7 +44,7 @@ class BottomSheetExamples {
             ),
             child: Row(
               children: [
-                Icon(Icons.spa, color: Color(0xFF660033), size: 24),
+                Icon(Icons.spa, color: Appcolor.mehrun, size: 24),
                 SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -154,7 +155,7 @@ class BottomSheetExamples {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF660033),
+                backgroundColor: Appcolor.mehrun,
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -324,7 +325,7 @@ class BottomSheetExamples {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF660033),
+                      color: Appcolor.mehrun,
                     ),
                   ),
                 ),
@@ -455,12 +456,12 @@ class BottomSheetExamples {
             Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Color(0xFF660033).withOpacity(0.1),
+                color: Appcolor.mehrun.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
                 icon,
-                color: Color(0xFF660033),
+                color: Appcolor.mehrun,
                 size: 24,
               ),
             ),
