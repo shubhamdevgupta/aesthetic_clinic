@@ -17,7 +17,6 @@ class ServiceDetailScreen extends StatefulWidget {
 }
 
 class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -82,11 +81,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       ),
       body: Consumer<ServiceProvider>(
         builder: (context, serviceProvider, child) {
-          // Show loading indicator while fetching data
           if (serviceProvider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
 
           // Show error message if service detail is null
@@ -134,17 +130,20 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AutoScrollingBanner(
-                  items: [serviceData.image],
-                  bannerBuilder: (context, item, index) {
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(item, fit: BoxFit.cover),
-                    );
-                  },
+                Padding(
+                  padding: EdgeInsetsGeometry.all(8),
+                  child: AutoScrollingBanner(
+                    items: [serviceData.image],
+                    bannerBuilder: (context, item, index) {
+                      return ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(item, fit: BoxFit.cover),
+                      );
+                    },
+                  ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
 
                 // Main Service Card
                 Padding(
@@ -163,7 +162,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           content: Text(
                             'Booking ${serviceData?.name ?? 'service'}...',
                           ),
-                          backgroundColor: Colors.red,
+                          backgroundColor: Appcolor.mehrun,
                         ),
                       );
                     },
@@ -171,7 +170,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                 ),
 
                 // Available Doctors Section (if doctors exist)
-                if (serviceData.doctors?.isNotEmpty == true) ...[
+                if (serviceData.doctors.isNotEmpty == true) ...[
                   const SizedBox(height: 18),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -183,7 +182,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Appcolor.mehrun,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -191,21 +190,109 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           height: 160, // set height to fit horizontal items
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            itemCount: serviceData!.doctors!.length,
-                            separatorBuilder: (context, index) => const SizedBox(width: 12),
+                            itemCount: serviceData.doctors.length,
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(width: 12),
                             itemBuilder: (context, index) {
-                              final doctor = serviceData.doctors![index];
+                              final doctor = serviceData.doctors[index];
                               return Container(
-                                width: 140, // fixed width for each horizontal card
+                                width: 140,
+                                // fixed width for each horizontal card
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
+                                  color: Colors.grey.shade200,
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey.shade200),
+                                  border: Border.all(
+                                    color: Colors.grey.shade200,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    /*SizedBox(
+                                      height: 190, // set height to fit horizontal items
+                                      child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: provider.doctorResponse!.data.length,
+                                        separatorBuilder: (context, index) =>
+                                        const SizedBox(width: 12),
+                                        itemBuilder: (context, index) {
+                                          final doctor = provider.doctorResponse!.data[index];
+                                          return InkWell(
+                                            onTap: (){
+                                              Navigator.push(context, MaterialPageRoute(builder: (contex)=>DoctorProfileScreen(doctorId: doctor.id,)));
+                                            },
+                                            child: Container(
+                                              width: 140, // fixed width for each horizontal card
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                borderRadius: BorderRadius.circular(12),
+                                                border: Border.all(color: Colors.grey.shade200),
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+
+                                                  SizedBox(
+                                                    width: 84,
+                                                    height: 84,
+                                                    child: ClipOval(
+                                                      child: Image.network(
+                                                        '${doctor.image}',
+                                                        fit: BoxFit.cover,
+                                                        cacheWidth: 120,
+                                                        cacheHeight: 120,
+                                                        loadingBuilder: (context, child, loadingProgress) {
+                                                          if (loadingProgress == null) return child;
+                                                          return const ShimmerPlaceholder(
+                                                            width: 64,
+                                                            height: 64,
+                                                            isCircle: true,
+                                                          );
+                                                        },
+                                                        errorBuilder: (context, error, stackTrace) =>
+                                                        const CircleAvatar(
+                                                          backgroundColor: Colors.grey,
+                                                          child: Icon(
+                                                            Icons.broken_image,
+                                                            color: Appcolor.mehrun,
+                                                            size: 24,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    '${doctor.title} ${doctor.name}',
+                                                    textAlign: TextAlign.center,
+                                                    maxLines: 2,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Appcolor.mehrun,
+                                                      overflow: TextOverflow.clip,
+                                                    ),
+                                                  ),
+                                                  if (doctor.experience != null) ...[
+                                                    const SizedBox(height: 6),
+                                                    Text(
+                                                      '${doctor.experience}+ yrs',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Appcolor.textColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+*/
                                     CircleAvatar(
                                       radius: 30,
                                       backgroundColor: Colors.red.shade100,
@@ -217,12 +304,14 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      '${doctor.title ?? 'Dr.'} ${doctor.name ?? 'Doctor'}',
+                                      '${doctor.title} ${doctor.name}',
                                       textAlign: TextAlign.center,
+                                      maxLines: 2,
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                         color: Appcolor.mehrun,
+                                        overflow: TextOverflow.clip,
                                       ),
                                     ),
                                     if (doctor.experience != null) ...[
@@ -230,8 +319,8 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                       Text(
                                         '${doctor.experience}+ yrs',
                                         style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade500,
+                                          fontSize: 14,
+                                          color: Appcolor.textColor,
                                         ),
                                       ),
                                     ],
@@ -246,7 +335,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   ),
                 ],
 
-// webzila
+                // webzila
                 /*// About Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -312,7 +401,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     ],
                   ),
                 ),*/
-                SizedBox(height: 18,),
+                SizedBox(height: 18),
 
                 // Static Treatment Guide Section (since not in API)
                 Padding(
@@ -320,12 +409,12 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Why Choose Our Services?',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Appcolor.mehrun,
                           height: 1.3,
                         ),
                       ),
@@ -334,7 +423,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         'We combine advanced medical technology with personalized care to deliver exceptional results. Our experienced team ensures safe, effective treatments tailored to your unique needs.',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey.shade600,
+                          color: Appcolor.textColor,
                           height: 1.5,
                         ),
                       ),
@@ -342,7 +431,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   ),
                 ),
 
-                SizedBox(height: 14,),
+                SizedBox(height: 14),
                 // Static Treatment Categories (since not in API response)
                 SizedBox(
                   height: 80,
@@ -356,7 +445,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       return Container(
                         width: 120,
                         decoration: BoxDecoration(
-                          color: Colors.red,
+                          color: Appcolor.mehrun,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
@@ -388,7 +477,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Appcolor.mehrun,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -468,7 +557,6 @@ class ServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -518,42 +606,44 @@ class ServiceCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Appcolor.mehrun,
+              Expanded( // 👈 this makes text take remaining space only
+                child: Text(
+                  name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Appcolor.mehrun,
+                  ),
                 ),
               ),
-              Spacer(),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: onBook,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Appcolor.mehrun,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text(
-                      'Book a Slot',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+              const SizedBox(width: 8), 
+              ElevatedButton(
+                onPressed: onBook,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Appcolor.mehrun,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
                   ),
-                ],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Book a Slot',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ],
           ),
+
 
           const SizedBox(height: 8),
           Text(
@@ -569,19 +659,4 @@ class ServiceCard extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget _buildServiceBadge(String text, Color color) {
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.1),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: color.withOpacity(0.3)),
-    ),
-    child: Text(
-      text,
-      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color),
-    ),
-  );
 }

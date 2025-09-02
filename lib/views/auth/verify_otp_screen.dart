@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
-import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
 import 'package:aesthetic_clinic/views/profile_screens/personalise_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';

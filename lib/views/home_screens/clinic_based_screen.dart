@@ -4,6 +4,8 @@ import 'package:aesthetic_clinic/views/doctor/doctor_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/CircleShimer.dart';
+import '../../utils/ShimerPlaceholder.dart';
 import '../../utils/widgets/auto_scroll_banner.dart';
 import '../service_screens/service_details.dart';
 import '../service_screens/service_popup.dart';
@@ -167,7 +169,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                           cacheHeight: 120,
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
-                            return _CircleShimmer(size: 40);
+                            return CircleShimmer(size: 40);
                           },
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(
@@ -290,7 +292,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                             cacheHeight: 120,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
-                              return _CircleShimmer(size: 40);
+                              return CircleShimmer(size: 40);
                             },
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(
@@ -320,7 +322,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
-                  height: 160, // set height to fit horizontal items
+                  height: 190, // set height to fit horizontal items
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: provider.doctorResponse!.data.length,
@@ -344,13 +346,33 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
 
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundColor: Colors.red.shade100,
-                                child: Icon(
-                                  Icons.person,
-                                  color: Appcolor.mehrun,
-                                  size: 30,
+                              SizedBox(
+                                width: 84,
+                                height: 84,
+                                child: ClipOval(
+                                  child: Image.network(
+                                    '${doctor.image}',
+                                    fit: BoxFit.cover,
+                                    cacheWidth: 120,
+                                    cacheHeight: 120,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return const ShimmerPlaceholder(
+                                        width: 64,
+                                        height: 64,
+                                        isCircle: true,
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) =>
+                                    const CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      child: Icon(
+                                        Icons.broken_image,
+                                        color: Appcolor.mehrun,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -431,7 +453,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 // optional downscale
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return _ShimmerPlaceholder(
+                  return ShimmerPlaceholder(
                     width: 160,
                     height: 200,
                     borderRadius: 16,
@@ -551,7 +573,7 @@ class ServiceItem extends StatelessWidget {
                 cacheHeight: 120,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return _CircleShimmer(size: 40);
+                  return CircleShimmer(size: 40);
                 },
                 errorBuilder: (context, error, stackTrace) =>
                     const Icon(Icons.broken_image, color: Colors.red, size: 24),
@@ -564,74 +586,6 @@ class ServiceItem extends StatelessWidget {
   }
 }
 
-class _ShimmerPlaceholder extends StatefulWidget {
-  final double width;
-  final double height;
-  final double borderRadius;
 
-  const _ShimmerPlaceholder({
-    required this.width,
-    required this.height,
-    this.borderRadius = 8,
-  });
 
-  @override
-  State<_ShimmerPlaceholder> createState() => _ShimmerPlaceholderState();
-}
 
-class _ShimmerPlaceholderState extends State<_ShimmerPlaceholder>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1200),
-  )..repeat();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Container(
-          width: widget.width,
-          height: widget.height,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(widget.borderRadius),
-            gradient: LinearGradient(
-              begin: Alignment(-1 + _controller.value * 2, 0),
-              end: Alignment(1 + _controller.value * 2, 0),
-              colors: const [
-                Color(0xFFF1F1F1),
-                Color(0xFFE7E7E7),
-                Color(0xFFF1F1F1),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
-class _CircleShimmer extends StatelessWidget {
-  final double size;
-
-  const _CircleShimmer({required this.size});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: const CircularProgressIndicator(
-        strokeWidth: 2,
-        color: Appcolor.mehrun,
-      ),
-    );
-  }
-}

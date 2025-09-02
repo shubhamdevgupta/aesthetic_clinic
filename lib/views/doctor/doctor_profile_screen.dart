@@ -2,11 +2,14 @@ import 'package:aesthetic_clinic/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../utils/Appcolor.dart';
+import '../../utils/ShimerPlaceholder.dart';
+
 class DoctorProfileScreen extends StatefulWidget {
   final String doctorId;
 
   const DoctorProfileScreen({Key? key, required this.doctorId})
-    : super(key: key);
+      : super(key: key);
 
   @override
   State<DoctorProfileScreen> createState() => _DoctorProfileScreenState();
@@ -16,10 +19,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   @override
   void initState() {
     super.initState();
-  /*  WidgetsBinding.instance.addPostFrameCallback((_) {
-      final homeProvider = Provider.of<HomeProvider>(context, listen: false);
-      homeProvider.getDoctorbyId(widget.doctorId);
-    });*/
+    Future.microtask(
+          () => Provider.of<HomeProvider>(context, listen: false).getDoctorbyId(widget.doctorId),
+    );
   }
 
   @override
@@ -37,6 +39,14 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
+
+          if (provider.doctorDetailResponse == null || provider.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            ); // or a placeholder
+          }
+          final doctor = provider.doctorDetailResponse!.data;
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -52,65 +62,80 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   child: Row(
                     children: [
                       // Doctor Image
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: NetworkImage(
-                          'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+                      SizedBox(
+                        width: 84,
+                        height: 84,
+                        child: ClipOval(
+                          child: Image.network(
+                            '${doctor!.image}',
+                            fit: BoxFit.cover,
+                            cacheWidth: 120,
+                            cacheHeight: 120,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const ShimmerPlaceholder(
+                                width: 64,
+                                height: 64,
+                                isCircle: true,
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                            const CircleAvatar(
+                              backgroundColor: Colors.grey,
+                              child: Icon(
+                                Icons.broken_image,
+                                color: Appcolor.mehrun,
+                                size: 24,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
+
                       const SizedBox(width: 16),
                       // Doctor Info
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "",
+                            Text(
+                              "${provider.doctorDetailResponse!.data!
+                                  .title} ${provider.doctorDetailResponse!.data!
+                                  .name}",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: Appcolor.mehrun,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Specialist Dermatologist &\nAesthetic Medicine Expert',
+                              '${doctor.specialization}',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey.shade600,
+                                color: Appcolor.textColor,
                                 height: 1.3,
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 4),
                             Row(
                               children: [
                                 Text(
                                   'Experience: ',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     color: Colors.grey.shade600,
                                   ),
                                 ),
-                                const Text(
-                                  '6+ Years',
+                                Text(
+                                  '${doctor.experience}+ years',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
+                                    color: Appcolor.mehrun,
                                   ),
                                 ),
                                 const Spacer(),
-                                // Rating Stars
-                                Row(
-                                  children: List.generate(
-                                    5,
-                                    (index) => const Icon(
-                                      Icons.star,
-                                      size: 14,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ],
@@ -124,7 +149,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
                 // About Section
                 Text(
-                  "I'm Dr. Loma, a board-certified specialist dermatologist with a deep passion for both medical and aesthetic dermatology. With over six years of clinical experience in Dermatology and Venereology, I offer a comprehensive approach to skin health—combining evidence-based medical treatments with the latest aesthetic advancements.",
+                  '${doctor.bio}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade700,
@@ -140,12 +165,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.red,
+                    color: Appcolor.mehrun,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Medical Dermatology, Dermatologic Surgery, Laser Treatments for Skin Rejuvenation, Botulinum Toxin Injections, Dermal Fillers, Mesotherapy and PRP Skin Rejuvenation Therapies',
+                  '${doctor.specialization}',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey.shade700,
@@ -161,7 +186,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Appcolor.mehrun,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -182,7 +207,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: Appcolor.mehrun,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -197,54 +222,59 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
                 const SizedBox(height: 30),
 
-                // Action Buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          // Handle check reviews
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.red),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 16,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            // Handle check reviews
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Appcolor.mehrun),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                        ),
-                        child: const Text(
-                          'Check Reviews',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // Handle check availability
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: const Text(
-                          'Check Availability',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
+                          child: const Text(
+                            'Check Reviews',
+                            style: TextStyle(
+                              color: Appcolor.mehrun,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // Handle check availability
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Appcolor.mehrun,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Check Availability',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
           );

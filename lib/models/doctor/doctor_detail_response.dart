@@ -42,6 +42,12 @@ class DoctorData {
   final String? description;
   final String? contextId;
   final int? slotDuration;
+  final String? createdBy;
+  final String? updatedBy;
+  final String? userId;
+  final String? createdAt;
+  final String? updatedAt;
+  final String? deletedAt;
   final UserData? userData;
   final Creator? creator;
   final Creator? updater;
@@ -66,6 +72,12 @@ class DoctorData {
     this.description,
     this.contextId,
     this.slotDuration,
+    this.createdBy,
+    this.updatedBy,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
+    this.deletedAt,
     this.userData,
     this.creator,
     this.updater,
@@ -92,6 +104,12 @@ class DoctorData {
       description: json['description'],
       contextId: json['context_id'],
       slotDuration: json['slotDuration'],
+      createdBy: json['createdBy'],
+      updatedBy: json['updatedBy'],
+      userId: json['userId'],
+      createdAt: json['createdAt'],
+      updatedAt: json['updatedAt'],
+      deletedAt: json['deletedAt'],
       userData:
       json['Userdata'] != null ? UserData.fromJson(json['Userdata']) : null,
       creator:
@@ -126,6 +144,12 @@ class DoctorData {
       "description": description,
       "context_id": contextId,
       "slotDuration": slotDuration,
+      "createdBy": createdBy,
+      "updatedBy": updatedBy,
+      "userId": userId,
+      "createdAt": createdAt,
+      "updatedAt": updatedAt,
+      "deletedAt": deletedAt,
       "Userdata": userData?.toJson(),
       "Creator": creator?.toJson(),
       "Updater": updater?.toJson(),

@@ -20,7 +20,7 @@ class HomeRepository{
       rethrow;
     }
   }
-  Future<DoctorResponse> getDoctorData( ) async {
+  Future<DoctorResponse> getDoctorData() async {
     try {
       final response = await _apiService.get(
           '/doctors',withAuth: true);

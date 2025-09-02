@@ -69,6 +69,8 @@ class HomeProvider extends ChangeNotifier{
 
   Future<void> getDoctorbyId(String doctorId) async {
     _isLoading = true;
+    notifyListeners();
+    _doctorDetailModel=null;
     try {
       final response = await homeRepository.getDoctorbyId(doctorId);
 

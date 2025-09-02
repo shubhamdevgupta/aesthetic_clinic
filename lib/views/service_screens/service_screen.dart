@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../models/all_services.dart';
 import '../../services/LocalStorageService.dart';
 import '../../utils/Appcolor.dart';
 
@@ -156,15 +154,6 @@ class _HomeScreenState extends State<ServiceScreen> {
 
                 // Show subservices if selected
                 if (provider.selectedService != null) ...[
-                  const SizedBox(height: 20),
-                  Text(
-                    "${provider.selectedService!.name} → Sub Services",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
 
                   if (provider.selectedService!.subServices.isNotEmpty)
                     GridView.builder(
@@ -231,18 +220,21 @@ class _HomeScreenState extends State<ServiceScreen> {
                       },
                     )
                   else
-                    Column(
-                      children: [
-                        Image.asset(
-                          "assets/images/no_service.png", // dummy image
-                          height: 120,
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          "No sub-services available",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
+                    Visibility(
+                      visible: false,
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            "assets/images/no_service.png", // dummy image
+                            height: 120,
+                          ),
+                          const SizedBox(height: 8),
+                          const Text(
+                            "No sub-services available",
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
                     ),
                 ],
               ],
