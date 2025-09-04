@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Center(
                   child: Text(
                     "Amara Welcome you to the personalised...",
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 14, color: Appcolor.textColor),
                   ),
                 ),
                 Padding(
