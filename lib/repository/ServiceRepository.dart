@@ -14,7 +14,7 @@ class ServiceRepository{
 Future<GetAllService> getAllServices( ) async {
   try {
     // Call the POST method from BaseApiService
-    final response = await _apiService.get('/services/list',withAuth: true);
+    final response = await _apiService.get('/services/main-services',withAuth: true);
 
     return GetAllService.fromJson(response);
   } catch (e) {

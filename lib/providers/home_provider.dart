@@ -4,90 +4,78 @@ import 'package:aesthetic_clinic/repository/HomeRepository.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../models/banner_list.dart';
+import '../services/ui_state.dart';
 import '../utils/CustomException.dart';
-import '../utils/GlobalExceptionHandler.dart';
 
-class HomeProvider extends ChangeNotifier{
+class HomeProvider extends ChangeNotifier {
   final HomeRepository homeRepository = HomeRepository();
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
-
-  AppConfigurationResponse? _appConfigurationResponse;
-  AppConfigurationResponse? get appConfigResponse => _appConfigurationResponse;
-
-  DoctorResponse? _doctorResponse;
-  DoctorResponse? get doctorResponse => _doctorResponse;
-
-  DoctorDetailModel? _doctorDetailModel;
-  DoctorDetailModel? get doctorDetailResponse => _doctorDetailModel;
+  UiState<AppConfigurationResponse> dashboardState = Idle();
+  UiState<DoctorResponse> doctorState = Idle();
+  UiState<DoctorDetailModel> doctorDetailState = Idle();
 
   Future<void> getDashboardData() async {
-    _isLoading = true;
+    dashboardState = Loading();
+    notifyListeners();
+
     try {
       final response = await homeRepository.getDashboardData();
-
-      if(response.status && response.statuscode==200){
-        _appConfigurationResponse=response;
+      if (response.status && response.statuscode == 200) {
+        dashboardState = Success(response);
+      } else {
+        dashboardState = Error("Unexpected response");
       }
-
-    } catch (e, stack) {
-      debugPrint("Error: $e");
-      debugPrint("StackTrace: $stack");
-
-      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
-      if (e is! AuthenticationException) {
-        GlobalExceptionHandler.handleException(e as Exception);
-      }
+    } on NetworkException {
+      dashboardState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      dashboardState = Error("Something went wrong: $e");
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
+
   Future<void> getDoctorData() async {
-    _isLoading = true;
+    doctorState = Loading();
+    notifyListeners();
+
     try {
       final response = await homeRepository.getDoctorData();
-
-      if(response.status && response.statuscode==200){
-        _doctorResponse=response;
+      if (response.status && response.statuscode == 200) {
+        doctorState = Success(response);
+      } else {
+        doctorState = Error("Unexpected response format");
       }
-
-    } catch (e, stack) {
-      debugPrint("Error: $e");
-      debugPrint("StackTrace: $stack");
-
-      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
-      if (e is! AuthenticationException) {
-        GlobalExceptionHandler.handleException(e as Exception);
-      }
+    } on NetworkException {
+      doctorState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      doctorState = Error("Something went wrong: $e");
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> getDoctorbyId(String doctorId) async {
-    _isLoading = true;
+  Future<void> getDoctorById(String doctorId) async {
+    doctorDetailState = Loading();
     notifyListeners();
-    _doctorDetailModel=null;
+
     try {
       final response = await homeRepository.getDoctorbyId(doctorId);
-
-      if(response.status! && response.statusCode==200){
-        _doctorDetailModel=response;
+      if (response.status! && response.statusCode == 200) {
+        doctorDetailState = Success(response);
+      } else {
+        doctorDetailState = Error("Unexpected response format");
       }
-
-    } catch (e, stack) {
-      debugPrint("Error: $e");
-      debugPrint("StackTrace: $stack");
-
-      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
-      if (e is! AuthenticationException) {
-        GlobalExceptionHandler.handleException(e as Exception);
-      }
+    } on NetworkException {
+      doctorDetailState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      doctorDetailState = Error("Something went wrong: $e");
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }

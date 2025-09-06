@@ -1,31 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class AutoScrollingBanner<T> extends StatefulWidget {
-  final List<T> items; // dynamic list of items
+class AutoScrollingBanner extends StatefulWidget {
+  final List<dynamic> items; // String URLs or objects with fields
   final double height;
   final Duration autoScrollDelay;
-  final Widget Function(BuildContext context, T item, int index) bannerBuilder;
-  final List<Widget> Function(BuildContext context, T item, int index)?
-  stackChildrenBuilder; // optional stack children
   final Widget? onEmpty;
 
   const AutoScrollingBanner({
     super.key,
     required this.items,
-    required this.bannerBuilder,
-    this.stackChildrenBuilder,
     this.height = 180,
     this.autoScrollDelay = const Duration(seconds: 3),
     this.onEmpty,
   });
 
   @override
-  State<AutoScrollingBanner<T>> createState() =>
-      _AutoScrollingBannerState<T>();
+  State<AutoScrollingBanner> createState() => _AutoScrollingBannerState();
 }
 
-class _AutoScrollingBannerState<T> extends State<AutoScrollingBanner<T>> {
+class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
   final PageController _pageController = PageController();
   int currentPage = 0;
 
@@ -75,38 +68,187 @@ class _AutoScrollingBannerState<T> extends State<AutoScrollingBanner<T>> {
             controller: _pageController,
             itemCount: widget.items.length,
             itemBuilder: (context, index) {
-              final base = widget.bannerBuilder(context, widget.items[index], index);
+              final banner = widget.items[index];
 
-              // Wrap with Stack if optional children exist
-              if (widget.stackChildrenBuilder != null) {
-                final children =
-                widget.stackChildrenBuilder!(context, widget.items[index], index);
+              // ✅ Handle both String and object cases
+              String imageUrl = "";
+              String title = "";
+              String subtitle = "";
 
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    base,
-                    ...children,
-                  ],
-                );
+              if (banner is String) {
+                imageUrl = banner;
+              } else if (banner is Map) {
+                imageUrl = banner["image"] ?? "";
+                title = banner["title"] ?? "";
+                subtitle = banner["subtitle"] ?? "";
+              } else {
+                try {
+                  imageUrl = banner.image ?? "";
+                  title = banner.title ?? "";
+                  subtitle = banner.subtitle ?? "";
+                } catch (_) {}
               }
 
-              return base;
+              final hasText = title.isNotEmpty || subtitle.isNotEmpty;
+
+              return Container(
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    // Banner Image
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        cacheWidth: 800,
+                        cacheHeight: 400,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade300,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.broken_image,
+                                size: 48, color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // Gradient only if text exists
+                    if (hasText)
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 100,
+                          decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.7),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    // Title & Subtitle (optional)
+                    if (hasText)
+                      Positioned(
+                        bottom: 16,
+                        left: 16,
+                        right: 140,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (title.isNotEmpty)
+                              Text(
+                                title,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            if (subtitle.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                subtitle,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                    // Book Now Button
+                    Positioned(
+                      bottom: 16,
+                      right: 16,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          print("Book Now clicked on banner index: $index");
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.pink,
+                          elevation: 2,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: const Text(
+                          "Book Now",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ),
-        const SizedBox(height: 8),
-        SmoothPageIndicator(
-          controller: _pageController,
-          count: widget.items.length,
-          effect: const WormEffect(
-            dotHeight: 8,
-            dotWidth: 8,
-            spacing: 6,
-            activeDotColor: Colors.pink,
-            dotColor: Colors.grey,
+
+        // Page Indicator
+        if (widget.items.length > 1) ...[
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              widget.items.length,
+                  (index) => AnimatedContainer(
+                duration: const Duration(milliseconds: 500),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                height: 6,
+                width: currentPage == index ? 20 : 6,
+                decoration: BoxDecoration(
+                  color: currentPage == index
+                      ? Colors.pink
+                      : Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ],
     );
   }

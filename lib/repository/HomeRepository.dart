@@ -10,36 +10,20 @@ class HomeRepository{
 
 
   Future<AppConfigurationResponse> getDashboardData( ) async {
-    try {
       final response = await _apiService.get(
           '/app-configs/list',withAuth: true);
-
       return AppConfigurationResponse.fromJson(response);
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      rethrow;
-    }
   }
   Future<DoctorResponse> getDoctorData() async {
-    try {
       final response = await _apiService.get(
           '/doctors',withAuth: true);
 
       return DoctorResponse.fromJson(response);
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      rethrow;
-    }
   }
   Future<DoctorDetailModel> getDoctorbyId(String doctorId) async {
-    try {
       final response = await _apiService.get(
           '/doctors/$doctorId',withAuth: true);
 
       return DoctorDetailModel.fromJson(response);
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      rethrow;
-    }
   }
 }

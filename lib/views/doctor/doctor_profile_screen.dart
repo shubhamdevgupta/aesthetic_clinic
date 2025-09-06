@@ -1,7 +1,9 @@
+import 'package:aesthetic_clinic/models/doctor/doctor_detail_response.dart';
 import 'package:aesthetic_clinic/providers/home_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/ui_state.dart';
 import '../../utils/Appcolor.dart';
 import '../../utils/ShimerPlaceholder.dart';
 
@@ -20,7 +22,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-          () => Provider.of<HomeProvider>(context, listen: false).getDoctorbyId(widget.doctorId),
+          () => Provider.of<HomeProvider>(context, listen: false).getDoctorById(widget.doctorId),
     );
   }
 
@@ -39,13 +41,17 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
-
-          if (provider.doctorDetailResponse == null || provider.isLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            ); // or a placeholder
+          final doctorState = provider.doctorState;
+          if ( doctorState is Loading) {
+            return const Center(child: CircularProgressIndicator());
           }
-          final doctor = provider.doctorDetailResponse!.data;
+
+          if (doctorState is Error) {
+            return Center(child: Text(""));
+          }
+          final doctor = (doctorState as Success<DoctorDetailModel>).response.data;
+
+        //  final doctor = provider.doctorDetailResponse!.data;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
@@ -99,9 +105,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "${provider.doctorDetailResponse!.data!
-                                  .title} ${provider.doctorDetailResponse!.data!
-                                  .name}",
+                              "${doctor.title} ${doctor.name}",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

@@ -29,10 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-          () =>
-          Provider.of<HomeProvider>(context, listen: false).getDashboardData(),
-    );
+
   }
 
   @override
@@ -45,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                 Appcolor.mehrun,
-                 Appcolor.mehrun.withOpacity(0.8),
+                Appcolor.mehrun,
+                Appcolor.mehrun.withOpacity(0.8),
               ],
             ),
           ),
@@ -136,9 +133,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
-          if (provider.appConfigResponse == null || provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
 
           return DefaultTabController(
             length: 2,
@@ -211,17 +205,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
+                            SizedBox(
+                              width: 8,
+                            ),
                             CartIconButton(itemCount: 0, onPressed: () {}),
                           ],
                         ),
-
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  // TabBar (real buttons look)
+                  // TabBar (full width, no white spaces)
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     height: 48,
@@ -229,37 +225,63 @@ class _HomeScreenState extends State<HomeScreen> {
                       border: Border.all(color: Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: TabBar(
-                      indicator: BoxDecoration(
-                        color:  Appcolor.mehrun,
-                        borderRadius: BorderRadius.circular(10),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(11), // Slightly smaller to fit inside border
+                      child: TabBar(
+                        padding: EdgeInsets.zero,
+                        labelPadding: EdgeInsets.zero,
+                        indicatorPadding: EdgeInsets.zero,
+                        indicator: BoxDecoration(
+                          color: Appcolor.mehrun,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.grey[600],
+                        dividerColor: Colors.transparent,
+                        splashFactory: NoSplash.splashFactory,
+                        overlayColor: MaterialStateProperty.all(Colors.transparent),
+                        tabs: [
+                          Tab(
+                            child: Container(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ImageIcon(
+                                    AssetImage('assets/icons/ic_tab_clinic.png'),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Clinic Based',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Tab(
+                            child: Container(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ImageIcon(
+                                    AssetImage('assets/icons/ic_tab_home.png'),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Home Based',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      labelColor: Colors.white,
-                      unselectedLabelColor: Colors.grey[600],
-                      dividerColor: Colors.transparent,
-                      tabs: [
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ImageIcon(AssetImage('assets/icons/ic_tab_clinic.png')),
-                              const SizedBox(width: 6),
-                              const Text('Clinic Based'),
-                            ],
-                          ),
-                        ),
-                        Tab(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ImageIcon(AssetImage('assets/icons/ic_tab_home.png')),
-
-                              const SizedBox(width: 6),
-                              const Text('Home Based'),
-                            ],
-                          ),
-                        ),
-                      ],
                     ),
                   ),
 

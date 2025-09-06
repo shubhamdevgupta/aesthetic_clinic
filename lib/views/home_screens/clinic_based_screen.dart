@@ -4,6 +4,9 @@ import 'package:aesthetic_clinic/views/doctor/doctor_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/banner_list.dart';
+import '../../models/doctor/doctor_response.dart';
+import '../../services/ui_state.dart';
 import '../../utils/CircleShimer.dart';
 import '../../utils/ShimerPlaceholder.dart';
 import '../../utils/widgets/auto_scroll_banner.dart';
@@ -21,390 +24,432 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   @override
   void initState() {
     super.initState();
-
-    Future.microtask(
-      () => Provider.of<HomeProvider>(context, listen: false).getDoctorData(),
-    );
+    Future.microtask(() async {
+      final provider = Provider.of<HomeProvider>(context, listen: false);
+      await provider.getDashboardData();
+      await provider.getDoctorData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeProvider>(
       builder: (context, provider, child) {
-        if (provider.appConfigResponse == null ||provider.doctorResponse==null || provider.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          ); // or a placeholder
+        final dashboardState = provider.dashboardState;
+        final doctorState = provider.doctorState;
+
+        // Loading/Error/NoInternet checks
+        if (dashboardState is Loading || doctorState is Loading) {
+          return const Center(child: CircularProgressIndicator());
         }
-        final bannerList = provider.appConfigResponse!.data
-            .expand((item) => item.appConfigs.banner)
-            .toList();
-        final topServices = provider.appConfigResponse!.data
-            .expand((item) => item.topServices)
-            .toList();
-        final topChoices = provider.appConfigResponse!.data
-            .expand((item) => item.recommendedServices)
-            .toList();
-        final recommendedProducts = provider.appConfigResponse!.data
-            .expand((item) => item.recommendedProducts)
-            .toList();
-        final personalizeServices = provider.appConfigResponse!.data
-            .expand((item) => item.personalisedServices)
-            .toList();
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+        if (dashboardState is Error) {
+          return Center(child: Text("dashboardState"));
+        }
+        if (doctorState is Error) {
+          return Center(child: Text(""));
+        }
+        if (dashboardState is NoInternet || doctorState is NoInternet) {
+          return const Center(child: Text("No Internet Connection"));
+        }
+        if (dashboardState is! Success || doctorState is! Success) {
+          return const SizedBox.shrink();
+        }
 
-          children: [
-            AutoScrollingBanner(
-              items: bannerList,
-              bannerBuilder: (context, item, index) {
-                final banner = item.configData;
+        // ✅ Extract API response safely
+        final dashboardResponse =
+            (dashboardState as Success<AppConfigurationResponse>).response;
+        final doctorResponse =
+            (doctorState as Success<DoctorResponse>).response;
 
-                return Stack(
-                  fit: StackFit.expand,
+        // Handle nested lists safely with null fallback
+        final bannerList = dashboardResponse.data
+            .expand((item) => item.appConfigs?.banner ?? [])
+            .map((banner) => banner.configData?.imageUrl ?? "")
+            .toList();
+
+        final topServices = dashboardResponse.data
+            .expand((item) => item.topServices ?? [])
+            .toList();
+
+        final topChoices = dashboardResponse.data
+            .expand((item) => item.recommendedServices ?? [])
+            .toList();
+
+        final recommendedProducts = dashboardResponse.data
+            .expand((item) => item.recommendedProducts ?? [])
+            .toList();
+
+        final personalizeServices = dashboardResponse.data
+            .expand((item) => item.personalisedServices ?? [])
+            .toList();
+
+        return CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // ✅ Banner
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+                child: AutoScrollingBanner(items: bannerList, height: 200),
+              ),
+            ),
+
+            // ✅ Top Services
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(banner.imageUrl, fit: BoxFit.cover),
-                    ),
-                    Positioned(
-                      bottom: 16,
-                      left: 16,
-                      right: 140,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            banner.title,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            banner.subtitle,
-                            style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                    const Text(
+                      "Our Top Services",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Appcolor.mehrun,
                       ),
                     ),
-                    Positioned(
-                      bottom: 16,
-                      right: 16,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          // ✅ handle index-wise click here
-                          print("Book Now clicked on index: $index");
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 80,
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: topServices.length,
+                        itemBuilder: (context, index) {
+                          final service = topServices[index];
+                          return ServiceItem(
+                            imageUrl: service.topServiceImage!,
+                            label: service.name,
+                            serviceID: service.id,
+                          );
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.pink,
-                        ),
-                        child: const Text("Book Now"),
                       ),
                     ),
                   ],
-                );
-              },
-            ),
-            SizedBox(height: 10),
-            const Text(
-              "Our Top Services",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Appcolor.mehrun,
+                ),
               ),
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 80,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: topServices.length,
-                itemBuilder: (context, length) {
-                  final service = topServices[length];
-                  return ServiceItem(
-                    imageUrl: service.topServiceImage!,
-                    label: service.name,
-                    serviceID: service.id,
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 18),
-            const Text(
-              "Get Our Trusted Products",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Appcolor.mehrun,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 120,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: recommendedProducts.length,
-                itemBuilder: (context, length) {
-                  final product = recommendedProducts[length];
-                  return Container(
-                    width: 90,
-                    margin: const EdgeInsets.only(right: 12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        // Network image (circular)
-                        Image.network(
-                          width: 64,
-                          height: 64,
-                          product.featuredImage,
-                          fit: BoxFit.cover,
-                          cacheWidth: 120,
-                          cacheHeight: 120,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return CircleShimmer(size: 40);
-                          },
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(
-                                Icons.broken_image,
-                                color: Appcolor.mehrun,
-                                size: 24,
-                              ),
-                        ),
 
-                        const SizedBox(height: 10),
-                        // Space between label and image
-
-                        // Label at the top
-                        SizedBox(
-                          height: 30,
-                          child: Center(
-                            child: Text(
-                              product.name,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF707070),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Our Personalized service  for You
-            const Text(
-              "Our Personalise Services for You",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Appcolor.mehrun,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 160,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: personalizeServices.length,
-                itemBuilder: (context, length) {
-                  final personalize = personalizeServices[length];
-                  return topChoiceItem(
-                    personalize.name,
-                    personalize.description,
-                    personalize.image,
-                    personalize.price,
-                    context,
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Our Top Choices for You
-            const Text(
-              "Our Top Choices for You",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Appcolor.mehrun,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              height: 150,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: topChoices.length,
-                itemBuilder: (context, length) {
-                  final service = topChoices[length];
-                  final splitName = service.name.split(" ");
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ServiceDetailScreen(serviceId: service.id),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 90,
-                      margin: const EdgeInsets.only(right: 12),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          // Label at the top
-                          SizedBox(
-                            height: 30,
-                            child: Center(
-                              child: Text(
-                                service.name,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Appcolor.textColor,
-                                  overflow: TextOverflow.clip
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 10), // Space between label and image
-                          // Network image (circular)
-                          Image.network(
-                            service.image,
-                            fit: BoxFit.cover,
-                            cacheWidth: 120,
-                            cacheHeight: 120,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return CircleShimmer(size: 40);
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(
-                                  Icons.broken_image,
-                                  color: Colors.red,
-                                  size: 24,
-                                ),
-                          ),
-                        ],
+            // ✅ Trusted Products
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Get Our Trusted Products",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Appcolor.mehrun,
                       ),
                     ),
-                  );
-                },
-              ),
-            ),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Choose Your Professional',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Appcolor.mehrun,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  height: 190, // set height to fit horizontal items
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: provider.doctorResponse!.data.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 12),
-                    itemBuilder: (context, index) {
-                      final doctor = provider.doctorResponse!.data[index];
-                      return InkWell(
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (contex)=>DoctorProfileScreen(doctorId: doctor.id,)));
-                        },
-                        child: Container(
-                          width: 140, // fixed width for each horizontal card
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-
-                              SizedBox(
-                                width: 84,
-                                height: 84,
-                                child: ClipOval(
-                                  child: Image.network(
-                                    '${doctor.image}',
-                                    fit: BoxFit.cover,
-                                    cacheWidth: 120,
-                                    cacheHeight: 120,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return const ShimmerPlaceholder(
-                                        width: 64,
-                                        height: 64,
-                                        isCircle: true,
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) =>
-                                    const CircleAvatar(
-                                      backgroundColor: Colors.grey,
-                                      child: Icon(
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 120,
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: recommendedProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = recommendedProducts[index];
+                          return Container(
+                            width: 90,
+                            margin: const EdgeInsets.only(right: 12),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Image.network(
+                                  width: 64,
+                                  height: 64,
+                                  product.featuredImage,
+                                  fit: BoxFit.cover,
+                                  cacheWidth: 120,
+                                  cacheHeight: 120,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return CircleShimmer(size: 64);
+                                      },
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(
                                         Icons.broken_image,
                                         color: Appcolor.mehrun,
                                         size: 24,
                                       ),
+                                ),
+                                const SizedBox(height: 10),
+                                Expanded(
+                                  child: Center(
+                                    child: Text(
+                                      product.name,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF707070),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                '${doctor.title} ${doctor.name}',
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Appcolor.mehrun,
-                                  overflow: TextOverflow.clip,
-                                ),
-                              ),
-                              if (doctor.experience != null) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  '${doctor.experience}+ yrs',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Appcolor.textColor,
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ✅ Personalized Services
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Our Personalise Services for You",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Appcolor.mehrun,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 160,
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: personalizeServices.length,
+                        itemBuilder: (context, index) {
+                          final personalize = personalizeServices[index];
+                          return _topChoiceItem(
+                            personalize.name,
+                            personalize.description,
+                            personalize.image,
+                            personalize.price,
+                            context,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // ✅ Top Choices
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Our Top Choices for You",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Appcolor.mehrun,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 150,
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: topChoices.length,
+                        itemBuilder: (context, index) {
+                          final service = topChoices[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ServiceDetailScreen(
+                                    serviceId: service.id,
                                   ),
                                 ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                              );
+                            },
+                            child: Container(
+                              width: 90,
+                              margin: const EdgeInsets.only(right: 12),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Center(
+                                      child: Text(
+                                        service.name,
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Appcolor.textColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Image.network(
+                                      service.image,
+                                      fit: BoxFit.cover,
+                                      cacheWidth: 120,
+                                      cacheHeight: 120,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return CircleShimmer(size: 40);
+                                          },
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.red,
+                                                size: 24,
+                                              ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
+            ),
+
+            // ✅ Doctors
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 18, 8, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Choose Your Professional',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Appcolor.mehrun,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 190,
+                      child: ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: doctorResponse.data.length,
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(width: 12),
+                        itemBuilder: (context, index) {
+                          final doctor = doctorResponse.data[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      DoctorProfileScreen(doctorId: doctor.id),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 140,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: Colors.grey.shade200),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 84,
+                                    height: 84,
+                                    child: ClipOval(
+                                      child: Image.network(
+                                        '${doctor.image}',
+                                        fit: BoxFit.cover,
+                                        cacheWidth: 120,
+                                        cacheHeight: 120,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return const ShimmerPlaceholder(
+                                                width: 84,
+                                                height: 84,
+                                                isCircle: true,
+                                              );
+                                            },
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const CircleAvatar(
+                                                  backgroundColor: Colors.grey,
+                                                  child: Icon(
+                                                    Icons.broken_image,
+                                                    color: Appcolor.mehrun,
+                                                    size: 24,
+                                                  ),
+                                                ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    '${doctor.title} ${doctor.name}',
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Appcolor.mehrun,
+                                    ),
+                                  ),
+                                  if (doctor.experience != null) ...[
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      '${doctor.experience}+ yrs',
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Appcolor.textColor,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         );
@@ -412,7 +457,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
     );
   }
 
-  static Widget topChoiceItem(
+  static Widget _topChoiceItem(
     String title,
     String description,
     String imageUrl,
@@ -435,62 +480,57 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
         );
       },
       child: Container(
-        width: 160, // tweak as needed
+        width: 160,
         margin: const EdgeInsets.only(right: 12),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
-              // Background image
               Image.network(
                 imageUrl,
-                height: 200,
+                height: 160,
                 width: 160,
                 fit: BoxFit.cover,
                 cacheWidth: 640,
-                // optional downscale
-                cacheHeight: 800,
-                // optional downscale
+                cacheHeight: 640,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return ShimmerPlaceholder(
+                  return const ShimmerPlaceholder(
                     width: 160,
-                    height: 200,
+                    height: 160,
                     borderRadius: 16,
                   );
                 },
                 errorBuilder: (context, error, stackTrace) => Container(
-                  height: 200,
+                  height: 160,
                   width: 160,
                   color: const Color(0xFFFFEBEE),
                   alignment: Alignment.center,
                   child: const Icon(Icons.broken_image, color: Colors.red),
                 ),
               ),
-
-              // Your rectangle image at the bottom
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: Image.asset(
                   'assets/icons/ic_rectangle.png',
-                  height: 64, // adjust to match your asset
-                  fit: BoxFit.fill, // ensures full-width coverage
+                  height: 64,
+                  fit: BoxFit.fill,
                 ),
               ),
-
-              // Text on top of the rectangle
               Positioned(
                 left: 12,
                 right: 12,
-                bottom: 10, // sits nicely within the rectangle
+                bottom: 10,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -500,7 +540,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      "Starting From $price", // e.g., "Starting From AED100"
+                      "Starting From $price",
                       style: const TextStyle(
                         color: Colors.white70,
                         fontSize: 12,
@@ -546,13 +586,14 @@ class ServiceItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // Label at the top
-            SizedBox(
-              height: 30,
+            Expanded(
+              flex: 2,
               child: Center(
                 child: Text(
                   label,
                   textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Appcolor.textColor,
@@ -560,23 +601,27 @@ class ServiceItem extends StatelessWidget {
                 ),
               ),
             ),
-
-            const SizedBox(height: 10), // Space between label and image
-            // Network image (circular)
-            ClipOval(
-              child: Image.network(
-                imageUrl,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-                cacheWidth: 120,
-                cacheHeight: 120,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return CircleShimmer(size: 40);
-                },
-                errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.broken_image, color: Colors.red, size: 24),
+            const SizedBox(height: 10),
+            Expanded(
+              flex: 2,
+              child: ClipOval(
+                child: Image.network(
+                  imageUrl,
+                  width: 40,
+                  height: 40,
+                  fit: BoxFit.cover,
+                  cacheWidth: 120,
+                  cacheHeight: 120,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return CircleShimmer(size: 40);
+                  },
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.broken_image,
+                    color: Colors.red,
+                    size: 24,
+                  ),
+                ),
               ),
             ),
           ],
@@ -585,7 +630,3 @@ class ServiceItem extends StatelessWidget {
     );
   }
 }
-
-
-
-

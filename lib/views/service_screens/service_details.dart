@@ -75,7 +75,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         actions: [
           Padding(
             padding: EdgeInsetsGeometry.only(right: 15),
-            child: CartIconButton(itemCount: 5, onPressed: () {}),
+            child: CartIconButton(itemCount: 0, onPressed: () {}),
           ),
         ],
       ),
@@ -132,20 +132,20 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               children: [
                 Padding(
                   padding: EdgeInsetsGeometry.all(8),
-                  child: AutoScrollingBanner(
-                    items: [serviceData.image],
-                    bannerBuilder: (context, item, index) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.network(item, fit: BoxFit.cover),
-                      );
-                    },
+                  child: // In your ClinicBasedScreen build method, replace the current banner section with:
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+                    child: AutoScrollingBanner(
+                      items: [serviceData.image],
+                    ),
                   ),
                 ),
 
                 const SizedBox(height: 8),
 
                 // Main Service Card
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: ServiceCard(
@@ -569,6 +569,8 @@ class ServiceCard extends StatelessWidget {
           ),
         ],
       ),
+      // 👇 Add padding inside container
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -604,11 +606,11 @@ class ServiceCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded( // 👈 this makes text take remaining space only
+              Expanded(
                 child: Text(
                   name,
                   maxLines: 2,
@@ -620,7 +622,7 @@ class ServiceCard extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 8), 
+              const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: onBook,
                 style: ElevatedButton.styleFrom(
@@ -643,9 +645,7 @@ class ServiceCard extends StatelessWidget {
               ),
             ],
           ),
-
-
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             description,
             style: TextStyle(
@@ -654,7 +654,6 @@ class ServiceCard extends StatelessWidget {
               height: 1.4,
             ),
           ),
-          const SizedBox(height: 12),
         ],
       ),
     );

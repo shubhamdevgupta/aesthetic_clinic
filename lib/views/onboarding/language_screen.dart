@@ -21,14 +21,16 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
     LocaleProvider localeProvider = Provider.of<LocaleProvider>(context);
     String selectedLanguage = localeProvider.locale.languageCode;
     return Scaffold(
+      appBar: AppBar(
+        title: Center(
+          child: Text(
+            localization.language,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ),
       body: Column(
         children: [
-          const SizedBox(height: 120),
-
-          Text(localization.language,style: TextStyle(fontFamily: 'Helvetica',fontSize: 24),),
-          // English Option
-          const SizedBox(height: 20),
-
           LanguageTile(
             flagAsset: 'assets/icons/en.png',
             title: 'English',
@@ -78,7 +80,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               ),
             ),
           ),
-          SizedBox(height: 80,)
         ],
       ),
     );
