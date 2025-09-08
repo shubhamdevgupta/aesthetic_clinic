@@ -28,7 +28,7 @@ class _UpcomingBookingScreenState extends State<UpcomingBookingScreen> {
       builder: (context, provider, _) {
         final state = provider.bookingState;
 
-        if (state is Loading) {
+        if (state is Loading || state is Idle) {
           return const Center(child: CircularProgressIndicator());
         }
 
