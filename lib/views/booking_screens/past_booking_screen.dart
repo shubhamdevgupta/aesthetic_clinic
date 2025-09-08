@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/models/appointment/booking_response.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/services/ui_state.dart';
+import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,7 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
         if (past.isEmpty) {
           return const _EmptyBookingsView(
             title: "You Don't have any Past Bookings",
-            showPrimaryAction: false,
+            showPrimaryAction: true,
           );
         }
 
@@ -69,11 +70,12 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
               isUpcoming: false,
               title: b.service.name,
               minutes: b.doctorSlot.duration,
-              subtitle:
-                  'A Little Enhancement, A Lot of Confidence with Expert Injectables in Dubai',
-              dateLine: _formatBookingDate(b.date) + ' with ${b.doctor.title} ${b.doctor.name}',
+              subtitle: b.purpose,
+              dateLine: '${_formatBookingDate(b.date)} ${b.doctorSlot.startTime} with ${b.doctor.title} ${b.doctor.name}',
               bookingId: b.id,
-              onPrimaryAction: () {},
+              onPrimaryAction: () {
+
+              },
               onSecondaryAction: () {},
             );
           },
@@ -92,14 +94,15 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
     return b.status != 1;
   }
 
+   List<String> _monthShort = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
   String _formatBookingDate(String iso) {
     final d = DateTime.tryParse(iso);
     if (d == null) return iso;
-   // final month = _monthShort[d.month - 1];
-    final hour = d.hour % 12 == 0 ? 12 : d.hour % 12;
-    final ampm = d.hour >= 12 ? 'PM' : 'AM';
-    final minute = d.minute.toString().padLeft(2, '0');
-    return 'date data ';
+    final month = _monthShort[d.month - 1];
+    return '$month ${d.day}';
   }
 }
 
@@ -165,42 +168,6 @@ class _EmptyBookingsView extends StatelessWidget {
   }
 }
 
-class _SingleBookingCard extends StatelessWidget {
-  final bool isUpcoming;
-  final VoidCallback onPrimaryAction;
-  final VoidCallback onSecondaryAction;
-
-  const _SingleBookingCard({
-    required this.isUpcoming,
-    required this.onPrimaryAction,
-    required this.onSecondaryAction,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            _BookingCard(
-              isUpcoming: isUpcoming,
-              title: 'Title',
-              minutes: 30,
-              subtitle: 'Subtitle',
-              dateLine: 'Date',
-              bookingId: 'ID',
-              onPrimaryAction: onPrimaryAction,
-              onSecondaryAction: onSecondaryAction,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _BookingCard extends StatelessWidget {
   final bool isUpcoming;
   final String title;
@@ -243,18 +210,9 @@ class _BookingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$minutes Mins',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
-              ),
-              Text(
-                'Booking ID: $bookingId',
-                style: TextStyle(color: Colors.grey[400], fontSize: 11),
-              ),
-            ],
+          Text(
+            '$minutes Mins',
+            style: TextStyle(color: Colors.grey[600], fontSize: 12),
           ),
           const SizedBox(height: 8),
           Text(
@@ -289,7 +247,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ),
                   onPressed: onPrimaryAction,
-                  child: Text(isUpcoming ? 'Reschedule' : 'Submit Review'),
+                  child: Text(isUpcoming ? 'Reschedule' : 'Submit Review',style: TextStyle(color: Appcolor.white),),
                 ),
               ),
               const SizedBox(width: 12),
