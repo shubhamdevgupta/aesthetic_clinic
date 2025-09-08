@@ -1,80 +1,143 @@
-import 'package:aesthetic_clinic/models/all_services.dart';
-import 'package:aesthetic_clinic/models/service_detail_response.dart';
+import 'package:aesthetic_clinic/models/appointment/booking_response.dart' hide Service;
+import 'package:aesthetic_clinic/models/service/all_services.dart' hide Service;
+import 'package:aesthetic_clinic/models/appointment/appointment_response.dart'
+    hide Service;
+import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
+import 'package:aesthetic_clinic/models/service/sub_service.dart';
 import 'package:aesthetic_clinic/repository/ServiceRepository.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../models/banner_list.dart' hide Service;
-import '../services/LocalStorageService.dart';
+import '../models/banner_list.dart';
+import '../services/ui_state.dart';
 import '../utils/CustomException.dart';
-import '../utils/GlobalExceptionHandler.dart';
 
-class ServiceProvider extends ChangeNotifier{
-  final ServiceRepository serviceRepository= ServiceRepository();
+class ServiceProvider extends ChangeNotifier {
+  final ServiceRepository serviceRepository = ServiceRepository();
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  UiState<GetAllService> serviceState = Idle();
+  UiState<ServiceResponse> subServiceState = Idle();
+  UiState<ServiceDetailResponse> serviceDetialState = Idle();
+  UiState<AppointmentResponse> appointmentState = Idle();
 
-
-  GetAllService? _serviceResponse;
-  GetAllService? get serviceResponse => _serviceResponse;
-
-  ServiceDetailResponse? _serviceDetailResponse;
-  ServiceDetailResponse? get serviceDetailResponse => _serviceDetailResponse;
-
+  UiState<BookingResponse> bookingState = Idle();
 
   Service? _selectedService;
+
   Service? get selectedService => _selectedService;
 
-  Future<void> getAllServices() async {
-    _isLoading = true;
+  Future<void> getMainServices() async {
+    serviceState = Loading();
     notifyListeners();
     try {
-      final response = await serviceRepository.getAllServices();
-
-      if(response.status && response.statuscode==200){
-        _serviceResponse=response;
-        final topServices = _serviceResponse!.data
-            .where((item) => item.isTopService)
-            .toList();
-
-        if (topServices.isNotEmpty) {
-          _selectedService = topServices[0];
-        }
+      final response = await serviceRepository.getMainServices();
+      if (response.status && response.statuscode == 200) {
+        serviceState = Success(response);
+      } else {
+        serviceState = Error("Unexpected response");
       }
-
+    } on NetworkException {
+      serviceState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
     } catch (e) {
-      // Don't handle AuthenticationException here - let GlobalExceptionHandler handle it
-      if (e is! AuthenticationException) {
-        GlobalExceptionHandler.handleException(e as Exception);
-      }
-      _serviceResponse = null;
+      serviceState = Error("Something went wrong: $e");
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
 
-  Future<void> getServiceBYId(String serviceId) async {
-    _isLoading = true;
+  Future<void> getSubService(String parentId) async {
+    subServiceState = Loading();
     notifyListeners();
     try {
-      final response = await serviceRepository.getServicebyID(serviceId);
-
-      if(response.status && response.statuscode==200){
-        _serviceDetailResponse=response;
+      final response = await serviceRepository.getSubService(parentId);
+      if (response.status && response.statusCode == 200) {
+        subServiceState = Success(response);
+      } else {
+        subServiceState = Error("Unexpected response");
       }
-
+    } on NetworkException {
+      subServiceState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
     } catch (e) {
-      if (e is! AuthenticationException) {
-        GlobalExceptionHandler.handleException(e as Exception);
-      }
-      _serviceDetailResponse = null;
+      subServiceState = Error("Something went wrong: $e");
     } finally {
-      _isLoading = false;
       notifyListeners();
     }
   }
 
+  Future<void> getServiceDetial(String serviceId) async {
+    serviceDetialState = Loading();
+    notifyListeners();
+    try {
+      final response = await serviceRepository.getServiceDetial(serviceId);
+      if (response.status && response.statuscode == 200) {
+        serviceDetialState = Success(response);
+      } else {
+        serviceDetialState = Error("Unexpected response");
+      }
+    } on NetworkException {
+      serviceDetialState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      serviceDetialState = Error("Something went wrong: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getBookingList() async {
+    bookingState = Loading();
+    notifyListeners();
+    try {
+      final response = await serviceRepository.getBookingList();
+      if (response.status && response.statuscode == 200) {
+        bookingState = Success(response);
+      } else {
+        bookingState = Error("Unexpected response");
+      }
+    } on NetworkException {
+      bookingState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      bookingState = Error("Something went wrong: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> bookAppointment(
+    String clientId,
+    String serviceId,
+    String doctorId,
+    String slotId,
+    String date,
+    String description,
+    String purpose,
+    String prescription
+  ) async {
+    appointmentState = Loading();
+    notifyListeners();
+    try {
+      final response = await serviceRepository.bookAppointment(clientId,serviceId,doctorId,slotId,date,description,purpose,prescription);
+      if (response.status && response.statusCode == 200) {
+        appointmentState = Success(response);
+      } else {
+        appointmentState = Error("Unexpected response");
+      }
+    } on NetworkException {
+      appointmentState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      appointmentState = Error("Something went wrong: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
 
   void selectService(Service service) {
     _selectedService = service;

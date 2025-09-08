@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:aesthetic_clinic/models/doctor/doctor_detail_response.dart';
 import 'package:aesthetic_clinic/models/doctor/doctor_response.dart';
 
 import '../models/banner_list.dart';
+import '../models/doctor/get_review.dart';
+import '../models/doctor/submit_doctor_review.dart';
 import '../services/BaseApiService.dart';
 import '../utils/GlobalExceptionHandler.dart';
 
@@ -25,5 +29,35 @@ class HomeRepository{
           '/doctors/$doctorId',withAuth: true);
 
       return DoctorDetailModel.fromJson(response);
+  }
+
+  Future<ReviewResponse> submitReview(
+      String rating,
+      String review,
+      String doctorId,
+      ) async {
+    try {
+      final response = await _apiService.post(
+        '/doctors/$doctorId/reviews',
+        body: jsonEncode({'rating': rating, 'review': review}),
+      withAuth: true);
+      return ReviewResponse.fromJson(response);
+    } catch (e) {
+      GlobalExceptionHandler.handleException(e as Exception);
+      rethrow;
+    }
+  }
+
+  Future<DoctorReview> getReview(
+      String doctorId) async {
+    try {
+      final response = await _apiService.get(
+        '/doctors/$doctorId/reviews',
+      withAuth: true);
+      return DoctorReview.fromJson(response);
+    } catch (e) {
+      GlobalExceptionHandler.handleException(e as Exception);
+      rethrow;
+    }
   }
 }

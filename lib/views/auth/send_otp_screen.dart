@@ -1,16 +1,14 @@
-import 'dart:ui';
-
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import '../../l10n/app_localizations.dart';
 import '../../utils/Appcolor.dart';
 import '../../utils/LoaderUtils.dart';
-import '../onboarding/onboarding_screen.dart';
 import 'country_selection_screen.dart';
 
 class SendOtpScreen extends StatefulWidget {
@@ -23,10 +21,13 @@ class SendOtpScreen extends StatefulWidget {
 class _SendOtpScreenState extends State<SendOtpScreen> {
   bool _isNavigating = false;
 
-  Future<void> _navigateToCountryPicker(BuildContext context, AuthenticationProvider provider) async {
+  Future<void> _navigateToCountryPicker(
+    BuildContext context,
+    AuthenticationProvider provider,
+  ) async {
     // Prevent multiple taps
     if (_isNavigating) return;
-    
+
     setState(() {
       _isNavigating = true;
     });
@@ -54,14 +55,15 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
       appBar: AppBar(
         title: Center(
           child: Text(
-              localization.loginSignup,
+            localization.loginSignup,
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
       ),
       body: Consumer<AuthenticationProvider>(
         builder: (context, provider, child) {
-          if(provider.isLoading)return LoaderUtils.conditionalLoader(isLoading: provider.isLoading);
+          if (provider.isLoading)
+            return LoaderUtils.conditionalLoader(isLoading: provider.isLoading);
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),
@@ -85,10 +87,18 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: _isNavigating ? null : () => _navigateToCountryPicker(context, provider),
+                              onTap: _isNavigating
+                                  ? null
+                                  : () => _navigateToCountryPicker(
+                                      context,
+                                      provider,
+                                    ),
                               borderRadius: BorderRadius.circular(6),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 10,
+                                ),
                                 child: Row(
                                   children: [
                                     Text(
@@ -113,18 +123,15 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                             ),
                           ),
                         ),
-                        Container(
-                          height: 48,
-                          width: 1,
-                          color: Colors.grey,
-                        ),
+                        Container(height: 48, width: 1, color: Colors.grey),
                         Flexible(
                           flex: 7,
                           child: TextField(
                             controller: provider.phoneController,
                             keyboardType: TextInputType.phone,
                             inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly, // ✅ Only digits allowed
+                              FilteringTextInputFormatter.digitsOnly,
+                              // ✅ Only digits allowed
                             ],
                             onChanged: (value) {
                               if (provider.errorMsg.isNotEmpty) {
@@ -135,8 +142,12 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                               labelText: "Phone Number",
                               floatingLabelBehavior: FloatingLabelBehavior.auto,
                               isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-                              border: InputBorder.none, // If you want no visible border
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 12,
+                              ),
+                              border: InputBorder
+                                  .none, // If you want no visible border
                             ),
                           ),
                         ),
@@ -148,25 +159,40 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
 
                   Spacer(),
 
-                  Center(child: Text(localization.sendOtpMsg,style: TextStyle(fontSize: 12,color: Colors.grey.shade600)),),
+                  Center(
+                    child: Text(
+                      localization.sendOtpMsg,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                  ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 16,
+                    ),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () async {
                           final rawPhone = provider.phoneController.text.trim();
                           final phoneNumber = provider.formatPhoneNumber(
-                            provider.selectedCountry.phoneCode, 
-                            rawPhone
+                            provider.selectedCountry.phoneCode,
+                            rawPhone,
                           );
 
-                          final success = await provider.sendOtpWithValidation(phoneNumber);
-                          
+                          final success = await provider.sendOtpWithValidation(
+                            phoneNumber,
+                          );
+
                           if (success) {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (_) => const OtpVerificationScreen()),
+                              MaterialPageRoute(
+                                builder: (_) => const OtpVerificationScreen(),
+                              ),
                             );
                           } else {
                             ToastHelper.showErrorSnackBar(
@@ -176,7 +202,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:  Appcolor.mehrun,
+                          backgroundColor: Appcolor.mehrun,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -184,7 +210,10 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                         ),
                         child: Text(
                           localization.sendOtp,
-                          style: const TextStyle(fontSize: 18, color: Colors.white),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),

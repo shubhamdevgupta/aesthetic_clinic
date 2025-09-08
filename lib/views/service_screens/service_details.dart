@@ -1,3 +1,5 @@
+import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
+import 'package:aesthetic_clinic/services/ui_state.dart';
 import 'package:aesthetic_clinic/utils/widgets/auto_scroll_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +28,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         context,
         listen: false,
       );
-      serviceProvider.getServiceBYId(widget.serviceId);
+      serviceProvider.getServiceDetial(widget.serviceId);
     });
   }
 
@@ -81,12 +83,14 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
       ),
       body: Consumer<ServiceProvider>(
         builder: (context, serviceProvider, child) {
-          if (serviceProvider.isLoading) {
+          final serviceDetialState = serviceProvider.serviceDetialState;
+
+          if (serviceDetialState is Loading) {
             return const Center(child: CircularProgressIndicator());
           }
 
           // Show error message if service detail is null
-          if (serviceProvider.serviceDetailResponse == null) {
+          if (serviceDetialState is Error) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -104,7 +108,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      serviceProvider.getServiceBYId(widget.serviceId);
+                      serviceProvider.getServiceDetial(widget.serviceId);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pink,
@@ -119,8 +123,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             );
           }
 
-          // Get service data from API response
-          final serviceData = serviceProvider.serviceDetailResponse!.data;
+          final serviceData = (serviceDetialState as Success<ServiceDetailResponse>).response.data;
 
           // Prepare images list based on available images from API
           final List<String> serviceImages = [];

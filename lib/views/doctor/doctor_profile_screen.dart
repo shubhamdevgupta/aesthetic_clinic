@@ -1,5 +1,6 @@
 import 'package:aesthetic_clinic/models/doctor/doctor_detail_response.dart';
 import 'package:aesthetic_clinic/providers/home_provider.dart';
+import 'package:aesthetic_clinic/views/doctor/doctor_review_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,8 +42,8 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
-          final doctorState = provider.doctorState;
-          if ( doctorState is Loading) {
+          final doctorState = provider.doctorDetailState;
+          if ( doctorState is Loading || doctorState is Idle) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -236,7 +237,12 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            // Handle check reviews
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DoctorReviewScreen(doctorData :doctor)
+                              ),
+                            );
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Appcolor.mehrun),

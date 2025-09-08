@@ -1,5 +1,7 @@
 import 'package:aesthetic_clinic/models/doctor/doctor_detail_response.dart';
 import 'package:aesthetic_clinic/models/doctor/doctor_response.dart';
+import 'package:aesthetic_clinic/models/doctor/get_review.dart';
+import 'package:aesthetic_clinic/models/doctor/submit_doctor_review.dart';
 import 'package:aesthetic_clinic/repository/HomeRepository.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -10,9 +12,18 @@ import '../utils/CustomException.dart';
 class HomeProvider extends ChangeNotifier {
   final HomeRepository homeRepository = HomeRepository();
 
+  TextEditingController reviewController=TextEditingController();
+
   UiState<AppConfigurationResponse> dashboardState = Idle();
   UiState<DoctorResponse> doctorState = Idle();
   UiState<DoctorDetailModel> doctorDetailState = Idle();
+
+  UiState<DoctorReview> doctorReviewState = Idle();
+  UiState<ReviewResponse> submitReviewState = Idle();
+
+  double _selectedRating = 0.0;
+
+  double get selectedRating => _selectedRating;
 
   Future<void> getDashboardData() async {
     dashboardState = Loading();
@@ -79,4 +90,56 @@ class HomeProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
+  Future<void> submitReview(String rating,String review,String doctorId) async {
+    submitReviewState = Loading();
+    notifyListeners();
+
+    try {
+      final response = await homeRepository.submitReview(rating,review,doctorId);
+      if (response.status && response.statuscode == 200) {
+        submitReviewState = Success(response);
+      } else {
+        submitReviewState = Error("Unexpected response format");
+      }
+    } on NetworkException {
+      submitReviewState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      submitReviewState = Error("Something went wrong: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> getDoctorReview(String doctorId) async {
+    doctorReviewState = Loading();
+    notifyListeners();
+
+    try {
+      final response = await homeRepository.getReview(doctorId);
+      print("review data --- $response");
+      if (response.status && response.statuscode == 200) {
+        doctorReviewState = Success(response);
+      } else {
+        doctorReviewState = Error("Unexpected response format");
+      }
+    } on NetworkException {
+      doctorReviewState = NoInternet();
+    } on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      doctorReviewState = Error("Something went wrong: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  void setSelectedRating(double rating) {
+    _selectedRating = rating;
+    notifyListeners();
+  }
+
 }

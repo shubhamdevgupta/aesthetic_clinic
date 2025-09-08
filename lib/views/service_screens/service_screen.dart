@@ -1,4 +1,12 @@
+import 'package:aesthetic_clinic/views/service_screens/service_details.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/service/all_services.dart';
+import '../../models/service/sub_service.dart';
+import '../../providers/service_provider.dart';
+import '../../services/ui_state.dart';
+import '../../utils/Appcolor.dart';
 
 class ServiceScreen extends StatefulWidget {
   const ServiceScreen({Key? key}) : super(key: key);
@@ -8,80 +16,16 @@ class ServiceScreen extends StatefulWidget {
 }
 
 class _ServicesScreenState extends State<ServiceScreen> {
-  List<Map<String, dynamic>> mainCategories = [];
-  List<Map<String, dynamic>> featuredServices = [];
-  bool isLoading = false;
-
+  int _selectedCategoryIndex = 0;
+  String? _selectedCategoryId;
+  bool _requestedInitialSub = false;
   @override
   void initState() {
     super.initState();
-
-    loadData();
-  }
-
-  // Replace this method with your API calls
-  Future<void> loadData() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    // TODO: Replace with actual API calls
-    // Example structure for your data:
-
-    // Main categories data structure
-    mainCategories = [
-      {
-        'id': 1,
-        'name': 'Laser Hair\nRemoval',
-        'image': 'assets/laser_hair.png', // Replace with your image URLs
-      },
-      {
-        'id': 2,
-        'name': 'Dermatology and\nAesthetics',
-        'image': 'assets/dermatology.png',
-      },
-      {
-        'id': 3,
-        'name': 'Dental\nServices',
-        'image': 'assets/dental.png',
-      },
-      {
-        'id': 4,
-        'name': 'Hijama\nTherapy',
-        'image': 'assets/hijama.png',
-      },
-    ];
-
-    // Featured services data structure
-    featuredServices = [
-      {
-        'id': 1,
-        'name': 'Injectables',
-        'startingPrice': 'AED 100',
-        'image': 'assets/injectables.jpg',
-      },
-      {
-        'id': 2,
-        'name': 'Skin Tightening',
-        'startingPrice': 'AED 200',
-        'image': 'assets/skin_tightening.jpg',
-      },
-      {
-        'id': 3,
-        'name': 'Deep Cleansing',
-        'startingPrice': 'AED 150',
-        'image': 'assets/deep_cleansing.jpg',
-      },
-      {
-        'id': 4,
-        'name': 'Acne Treatment',
-        'startingPrice': 'AED 120',
-        'image': 'assets/acne_treatment.jpg',
-      },
-    ];
-
-    setState(() {
-      isLoading = false;
+    // Trigger main services fetch after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ServiceProvider>(context, listen: false);
+      provider.getMainServices();
     });
   }
 
@@ -90,45 +34,92 @@ class _ServicesScreenState extends State<ServiceScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
+        child: Consumer<ServiceProvider>(
+          builder: (context, provider, _) {
+            final state = provider.serviceState;
 
-                // Main Categories Section
-                const Text(
-                  'Our Main Categories',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF7B2D8E),
+            if (state is Loading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (state is Error) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.error_outline,
+                      size: 64,
+                      color: Colors.grey.shade400,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => provider.getMainServices(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Appcolor.mehrun,
+                      ),
+                      child: const Text(
+                        'Retry',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (state is Success<GetAllService>) {
+              final services = state.response.data;
+              if (!_requestedInitialSub && services.isNotEmpty) {
+                _requestedInitialSub = true;
+                _selectedCategoryIndex = 0;
+                _selectedCategoryId = services.first.id;
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Provider.of<ServiceProvider>(context, listen: false)
+                      .getSubService(_selectedCategoryId!);
+                });
+              }
+
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      const Text(
+                        'Our Main Categories',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Appcolor.mehrun,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildMainCategoriesGrid(services),
+                      const SizedBox(height: 24),
+                      _buildSubServicesSection(provider),
+                      const SizedBox(height: 100),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
+              );
+            }
 
-                // Main Categories Horizontal Scroll
-                _buildMainCategoriesGrid(),
-
-                const SizedBox(height: 30),
-
-                // Featured Services Grid (2x2 with horizontal scroll)
-                _buildFeaturedServicesGrid(),
-
-                const SizedBox(height: 100), // Space for bottom navigation
-              ],
-            ),
-          ),
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
   }
 
-  Widget _buildMainCategoriesGrid() {
+  Widget _buildMainCategoriesGrid(List<Service> categories) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
@@ -139,22 +130,27 @@ class _ServicesScreenState extends State<ServiceScreen> {
         height: 120,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
-          itemCount: mainCategories.length,
+          itemCount: categories.length,
           itemBuilder: (context, index) {
-            final category = mainCategories[index];
+            final service = categories[index];
             return Container(
               margin: EdgeInsets.only(
                 left: 8,
-                right: index < mainCategories.length - 1 ? 8 : 8,
+                right: index < categories.length - 1 ? 8 : 8,
               ),
               width: 90,
               child: _buildCategoryCard(
-                category['name'],
-                category['image'],
-                    () {
-                  // TODO: Navigate to category details
-                  print('Tapped on ${category['name']}');
+                service.name,
+                service.topServiceImage ?? service.image,
+                () {
+                  setState(() {
+                    _selectedCategoryIndex = index;
+                    _selectedCategoryId = service.id;
+                  });
+                  Provider.of<ServiceProvider>(context, listen: false)
+                      .getSubService(service.id);
                 },
+                isSelected: _selectedCategoryIndex == index,
               ),
             );
           },
@@ -163,13 +159,14 @@ class _ServicesScreenState extends State<ServiceScreen> {
     );
   }
 
-  Widget _buildCategoryCard(String title, String imagePath, VoidCallback onTap) {
+  Widget _buildCategoryCard(String title, String imageUrl, VoidCallback onTap,
+      {bool isSelected = false}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: 90,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isSelected ? Appcolor.mehrun.withOpacity(0.08) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -179,6 +176,10 @@ class _ServicesScreenState extends State<ServiceScreen> {
               offset: const Offset(0, 2),
             ),
           ],
+          border: Border.all(
+            color: isSelected ? Appcolor.mehrun : Colors.transparent,
+            width: isSelected ? 1 : 0,
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -187,28 +188,30 @@ class _ServicesScreenState extends State<ServiceScreen> {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: Colors.grey[200],
+                color:
+                    isSelected ? Appcolor.mehrun.withOpacity(0.1) : Colors.grey[200],
                 borderRadius: BorderRadius.circular(8),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  imagePath,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Placeholder when image fails to load
-                    return Container(
-                      color: Colors.grey[200],
-                      child: Icon(
-                        Icons.image,
-                        color: Colors.grey[400],
-                        size: 25,
-                      ),
-                    );
-                  },
-                ),
+                child: imageUrl.isNotEmpty
+                    ? Image.network(
+                        imageUrl,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[200],
+                            child: Icon(
+                              Icons.image,
+                              color: Colors.grey[400],
+                              size: 25,
+                            ),
+                          );
+                        },
+                      )
+                    : Icon(Icons.image, color: Colors.grey[400], size: 25),
               ),
             ),
             const SizedBox(height: 8),
@@ -231,129 +234,152 @@ class _ServicesScreenState extends State<ServiceScreen> {
       ),
     );
   }
-
-  Widget _buildFeaturedServicesGrid() {
-    return SizedBox(
-      height: 450, // Fixed height for horizontal scroll
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: (featuredServices.length / 2).ceil(), // Number of columns
-        itemBuilder: (context, columnIndex) {
-          return Container(
-            width: MediaQuery.of(context).size.width * 0.48, // Card width
-            margin: EdgeInsets.only(
-              right: columnIndex < (featuredServices.length / 2).ceil() - 1 ? 12 : 0,
+  Widget _buildSubServicesSection(ServiceProvider provider) {
+    final state = provider.subServiceState;
+    if (state is Loading) {
+      return SizedBox(
+        height: 240,
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (state is Error) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 12),
+          Icon(Icons.error_outline, size: 48, color: Colors.grey.shade400),
+          const SizedBox(height: 8),
+          Text(
+            "",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            onPressed: _selectedCategoryId == null
+                ? null
+                : () => provider.getSubService(_selectedCategoryId!),
+            style: ElevatedButton.styleFrom(backgroundColor: Appcolor.mehrun),
+            child:
+                const Text('Retry', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      );
+    }
+    if (state is Success<ServiceResponse>) {
+      final items = state.response.data;
+      if (items.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 32),
+            child: Text(
+              'No sub services found',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade600,
+              ),
             ),
-            child: Column(
-              children: [
-                // First card in column
-                if (columnIndex * 2 < featuredServices.length)
-                  Expanded(
-                    child: _buildFeaturedServiceCard(
-                      featuredServices[columnIndex * 2]['name'],
-                      featuredServices[columnIndex * 2]['startingPrice'],
-                      featuredServices[columnIndex * 2]['image'],
-                          () {
-                        print('Tapped on ${featuredServices[columnIndex * 2]['name']}');
-                      },
-                    ),
-                  ),
-                const SizedBox(height: 12),
-                // Second card in column
-                if (columnIndex * 2 + 1 < featuredServices.length)
-                  Expanded(
-                    child: _buildFeaturedServiceCard(
-                      featuredServices[columnIndex * 2 + 1]['name'],
-                      featuredServices[columnIndex * 2 + 1]['startingPrice'],
-                      featuredServices[columnIndex * 2 + 1]['image'],
-                          () {
-                        print('Tapped on ${featuredServices[columnIndex * 2 + 1]['name']}');
-                      },
-                    ),
-                  ),
-              ],
+          ),
+        );
+      }
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.85,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+        ),
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return _SubServiceCard(item: item);
+        },
+      );
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+class _SubServiceCard extends StatelessWidget {
+  final ServiceItem item;
+  const _SubServiceCard({Key? key, required this.item}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            spreadRadius: 1,
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: (){
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ServiceDetailScreen(
+                serviceId: item.id,
+              ),
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildFeaturedServiceCard(String title, String price, String imagePath, VoidCallback onTap,) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(12),
           child: Stack(
             children: [
-              // Background Image
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Placeholder when image fails to load
-                    return Container(
-                      color: Colors.grey[300],
-                      child: Icon(
-                        Icons.image,
-                        color: Colors.grey[500],
-                        size: 50,
-                      ),
-                    );
-                  },
-                ),
+              Positioned.fill(
+                child: item.image.isNotEmpty
+                    ? Image.network(
+                        item.image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            Container(color: Colors.grey[300]),
+                      )
+                    : Container(color: Colors.grey[300]),
               ),
-              // Gradient Overlay
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.7),
-                    ],
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Appcolor.withOpacity(Appcolor.mehrun, 0.8),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              // Content
               Positioned(
-                bottom: 16,
-                left: 16,
-                right: 16,
+                left: 12,
+                right: 12,
+                bottom: 12,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      item.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Starting From $price',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
+                      'Starting From AED ${item.price}',
+                      style: const TextStyle(color: Colors.white, fontSize: 11),
                     ),
                   ],
                 ),
@@ -363,10 +389,5 @@ class _ServicesScreenState extends State<ServiceScreen> {
         ),
       ),
     );
-  }
-
-  // Method to refresh data - call this when you want to reload from API
-  Future<void> refreshData() async {
-    await loadData();
   }
 }

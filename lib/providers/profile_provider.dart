@@ -1,7 +1,7 @@
-import 'package:aesthetic_clinic/models/all_services.dart';
+import 'package:aesthetic_clinic/models/service/all_services.dart';
 import 'package:aesthetic_clinic/models/profile/profile_data.dart';
 import 'package:aesthetic_clinic/models/profile/update_profile.dart';
-import 'package:aesthetic_clinic/models/service_detail_response.dart';
+import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
 import 'package:aesthetic_clinic/repository/ProfileRepository.dart';
 import 'package:aesthetic_clinic/repository/ServiceRepository.dart';
 import 'package:flutter/cupertino.dart';

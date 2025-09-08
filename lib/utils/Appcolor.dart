@@ -34,7 +34,9 @@ class Appcolor{
   static const Color greenlight = Color(0xff7c9305);
   static const Color greysec = Color(0xffd7d5d5);
   static const Color mehrun = Color(0xFF660033);
-
+  static Color withOpacity(Color color, double opacity) {
+    return color.withOpacity(opacity);
+  }
 
 
 
