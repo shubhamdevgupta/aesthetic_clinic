@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/LocalStorageService.dart';
 import '../../utils/Appcolor.dart';
-import '../booking_screens/booking_screen.dart';
+import '../booking_screens/booking_tab_screen.dart';
 import '../profile_screens/profile_screen.dart';
 import '../service_screens/service_screen.dart';
 

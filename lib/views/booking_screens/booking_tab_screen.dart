@@ -1,5 +1,5 @@
-import 'package:aesthetic_clinic/views/booking_screens/booking_slot_screen.dart';
 import 'package:aesthetic_clinic/views/booking_screens/past_booking_screen.dart';
+import 'package:aesthetic_clinic/views/booking_screens/upcoming_booking_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/Appcolor.dart';
@@ -108,7 +108,7 @@ class BookingScreen extends StatelessWidget {
               const Expanded(
                 child: TabBarView(
                   children: [
-                    BookingSlotScreen(),
+                    UpcomingBookingScreen(),
                     PastBookingsScreen(),
                   ],
                 ),

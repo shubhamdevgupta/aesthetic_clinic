@@ -4,7 +4,7 @@ import 'package:aesthetic_clinic/views/service_screens/service_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../utils/Appcolor.dart';
-import '../booking_screens/booking_screen.dart';
+import '../booking_screens/booking_tab_screen.dart';
 import 'home_clinic_tab_screen.dart';
 
 

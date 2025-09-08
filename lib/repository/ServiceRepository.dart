@@ -94,7 +94,8 @@ class ServiceRepository {
   Future<BookingResponse> getBookingList() async {
     try {
       final response = await _apiService.get(
-        'appointments/list',
+        '/appointments/list',
+        withAuth: true,
       );
       return BookingResponse.fromJson(response);
     } catch (e) {

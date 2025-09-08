@@ -6,14 +6,14 @@ import 'package:provider/provider.dart';
 
 import 'booking_tab_screen.dart';
 
-class PastBookingsScreen extends StatefulWidget {
-  const PastBookingsScreen({super.key});
+class UpcomingBookingScreen extends StatefulWidget {
+  const UpcomingBookingScreen({super.key});
 
   @override
-  State<PastBookingsScreen> createState() => _PastBookingsScreenState();
+  State<UpcomingBookingScreen> createState() => _UpcomingBookingScreenState();
 }
 
-class _PastBookingsScreenState extends State<PastBookingsScreen> {
+class _UpcomingBookingScreenState extends State<UpcomingBookingScreen> {
   @override
   void initState() {
     super.initState();
@@ -51,27 +51,28 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
         }
 
         final bookings = (state as Success<BookingResponse>).response.data;
-        final past = bookings.where((b) => _isPast(b)).toList();
+        final upcoming = bookings.where((b) => _isUpcoming(b)).toList();
 
-        if (past.isEmpty) {
+        if (upcoming.isEmpty) {
           return const _EmptyBookingsView(
-            title: "You Don't have any Past Bookings",
-            showPrimaryAction: false,
+            title: "You Don't have any Upcoming Bookings",
+            showPrimaryAction: true,
           );
         }
 
         return ListView.builder(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: past.length,
+          itemCount: upcoming.length,
           itemBuilder: (context, index) {
-            final b = past[index];
+            final b = upcoming[index];
             return _BookingCard(
-              isUpcoming: false,
+              isUpcoming: true,
               title: b.service.name,
               minutes: b.doctorSlot.duration,
               subtitle:
                   'A Little Enhancement, A Lot of Confidence with Expert Injectables in Dubai',
-              dateLine: _formatBookingDate(b.date) + ' with ${b.doctor.title} ${b.doctor.name}',
+              dateLine:
+                  _formatBookingDate(b.date) + ' with ${b.doctor.title} ${b.doctor.name}',
               bookingId: b.id,
               onPrimaryAction: () {},
               onSecondaryAction: () {},
@@ -82,26 +83,32 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
     );
   }
 
-  bool _isPast(BookingData b) {
+  bool _isUpcoming(BookingData b) {
+    // Consider status 1 as upcoming; adjust if your API differs
     try {
       final d = DateTime.tryParse(b.date);
       if (d != null) {
-        return d.isBefore(DateTime.now());
+        return d.isAfter(DateTime.now());
       }
     } catch (_) {}
-    return b.status != 1;
+    return b.status == 1;
   }
 
   String _formatBookingDate(String iso) {
     final d = DateTime.tryParse(iso);
     if (d == null) return iso;
-   // final month = _monthShort[d.month - 1];
+    final month = _monthShort[d.month - 1];
     final hour = d.hour % 12 == 0 ? 12 : d.hour % 12;
     final ampm = d.hour >= 12 ? 'PM' : 'AM';
     final minute = d.minute.toString().padLeft(2, '0');
-    return 'date data ';
+    return '$month ${d.day}, $hour:$minute$ampm';
   }
 }
+
+const List<String> _monthShort = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
 
 class _EmptyBookingsView extends StatelessWidget {
   final String title;
@@ -112,7 +119,7 @@ class _EmptyBookingsView extends StatelessWidget {
   const _EmptyBookingsView({
     required this.title,
     this.showPrimaryAction = false,
-    this.primaryActionLabel = '',
+    this.primaryActionLabel = 'Explore Our Services',
     this.onPrimaryAction,
   });
 
@@ -149,51 +156,15 @@ class _EmptyBookingsView extends StatelessWidget {
                     ),
                   ),
                   onPressed: onPrimaryAction,
-                  child: const Text(
-                    'Explore Our Services',
-                    style: TextStyle(
+                  child: Text(
+                    primaryActionLabel,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SingleBookingCard extends StatelessWidget {
-  final bool isUpcoming;
-  final VoidCallback onPrimaryAction;
-  final VoidCallback onSecondaryAction;
-
-  const _SingleBookingCard({
-    required this.isUpcoming,
-    required this.onPrimaryAction,
-    required this.onSecondaryAction,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            const SizedBox(height: 12),
-            _BookingCard(
-              isUpcoming: isUpcoming,
-              title: 'Title',
-              minutes: 30,
-              subtitle: 'Subtitle',
-              dateLine: 'Date',
-              bookingId: 'ID',
-              onPrimaryAction: onPrimaryAction,
-              onSecondaryAction: onSecondaryAction,
-            ),
           ],
         ),
       ),
@@ -289,7 +260,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ),
                   onPressed: onPrimaryAction,
-                  child: Text(isUpcoming ? 'Reschedule' : 'Submit Review'),
+                  child: const Text('Reschedule'),
                 ),
               ),
               const SizedBox(width: 12),
@@ -301,14 +272,11 @@ class _BookingCard extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    foregroundColor: isUpcoming ? Colors.black : kPrimaryColor,
+                    foregroundColor: Colors.black,
                   ),
                   onPressed: onSecondaryAction,
-                  icon: Icon(
-                    isUpcoming ? Icons.cancel_outlined : Icons.refresh,
-                    size: 18,
-                  ),
-                  label: Text(isUpcoming ? 'Cancel Booking' : 'Book Again'),
+                  icon: const Icon(Icons.cancel_outlined, size: 18),
+                  label: const Text('Cancel Booking'),
                 ),
               ),
             ],
