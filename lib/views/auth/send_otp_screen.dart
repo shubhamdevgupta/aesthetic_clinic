@@ -62,8 +62,9 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
       ),
       body: Consumer<AuthenticationProvider>(
         builder: (context, provider, child) {
-          if (provider.isLoading)
+          if (provider.isLoading) {
             return LoaderUtils.conditionalLoader(isLoading: provider.isLoading);
+          }
           return SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24.0),

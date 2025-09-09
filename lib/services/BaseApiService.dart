@@ -295,6 +295,8 @@ class BaseApiService {
     switch (response.statusCode) {
       case 200:
         return jsonDecode(response.body);
+        case 201:
+        return jsonDecode(response.body);
       case 400:
         throw ApiException('Bad Request ${handleErrorResp(response.body, '')}');
       case 404:
