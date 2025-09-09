@@ -84,6 +84,10 @@ class BaseApiService {
       } on SocketException {
         throw NetworkException('No internet connection');
       } catch (e) {
+        if (e is AuthenticationException) {
+          log('❌ POST Auth Exception: $e');
+          throw e;
+        }
         if (e is ApiException) {
           // If it's already an ApiException, check if it's a server error we should retry
           if (e.toString().contains('Server error') && retryCount < maxRetries) {
@@ -172,6 +176,10 @@ class BaseApiService {
       } on SocketException {
         throw NetworkException('No internet connection');
       } catch (e) {
+        if (e is AuthenticationException) {
+          log('❌ GET Auth Exception: $e');
+          throw e;
+        }
         if (e is ApiException) {
           // If it's already an ApiException, check if it's a server error we should retry
           if (e.toString().contains('Server error') && retryCount < maxRetries) {
@@ -265,6 +273,10 @@ class BaseApiService {
       } on SocketException {
         throw NetworkException('No internet connection');
       } catch (e) {
+        if (e is AuthenticationException) {
+          log('❌ PUT Auth Exception: $e');
+          throw e;
+        }
         if (e is ApiException) {
           if (e.toString().contains('Server error') && retryCount < maxRetries) {
             log('⚠️ Server error exception, retrying in 1 second... (Attempt ${retryCount + 1}/${maxRetries + 1})');

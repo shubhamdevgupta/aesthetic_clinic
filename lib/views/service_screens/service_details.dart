@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
 import 'package:aesthetic_clinic/services/ui_state.dart';
 import 'package:aesthetic_clinic/utils/widgets/auto_scroll_banner.dart';
+import 'package:aesthetic_clinic/views/booking_screens/booking_slot_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -159,13 +160,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     isOnSale: serviceData?.isRecommended ?? false,
                     isTopService: serviceData?.isTopService ?? false,
                     onBook: () {
-                      // Handle booking with actual service data
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Booking ${serviceData?.name ?? 'service'}...',
-                          ),
-                          backgroundColor: Appcolor.mehrun,
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BookingSlotScreen(serviceId: serviceData.id,)
                         ),
                       );
                     },
@@ -639,7 +637,7 @@ class ServiceCard extends StatelessWidget {
                   ),
                 ),
                 child: const Text(
-                  'Book a Slot',
+                  'Book Slot',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,

@@ -84,11 +84,7 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          // 🔹 Show error if either fails
-        /*  if (doctoReviewState is Error || submitReviewState is Error) {
-            return const Center(child: Text("Something went wrong "));
-          }
-*/
+
           // 🔹 Success: safe cast now
           if (doctoReviewState is Success<DoctorReview>) {
             final doctor = doctoReviewState.response.data;

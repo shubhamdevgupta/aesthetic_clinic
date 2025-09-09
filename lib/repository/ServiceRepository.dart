@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:aesthetic_clinic/models/appointment/appointment_response.dart';
+import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart';
 import 'package:aesthetic_clinic/models/appointment/booking_response.dart';
 import 'package:aesthetic_clinic/models/doctor/get_review.dart';
 import 'package:aesthetic_clinic/models/doctor/submit_doctor_review.dart';
@@ -98,6 +99,19 @@ class ServiceRepository {
         withAuth: true,
       );
       return BookingResponse.fromJson(response);
+    } catch (e) {
+      GlobalExceptionHandler.handleException(e as Exception);
+      rethrow;
+    }
+  }
+
+  Future<AppointmentSlots> getAppointmentSlots(String serviceId) async {
+    try {
+      final response = await _apiService.get(
+        '/appointment-slots?services=$serviceId',
+        withAuth: true,
+      );
+      return AppointmentSlots.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;

@@ -1,3 +1,4 @@
+import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart' hide Service;
 import 'package:aesthetic_clinic/models/appointment/booking_response.dart' hide Service;
 import 'package:aesthetic_clinic/models/service/all_services.dart' hide Service;
 import 'package:aesthetic_clinic/models/appointment/appointment_response.dart'
@@ -17,9 +18,11 @@ class ServiceProvider extends ChangeNotifier {
   UiState<GetAllService> serviceState = Idle();
   UiState<ServiceResponse> subServiceState = Idle();
   UiState<ServiceDetailResponse> serviceDetialState = Idle();
-  UiState<AppointmentResponse> appointmentState = Idle();
+  UiState<AppointmentResponse> bookAppointmentState = Idle();
 
   UiState<BookingResponse> bookingState = Idle();
+
+  UiState<AppointmentSlots> appointmentSlotsState = Idle();
 
   Service? _selectedService;
 
@@ -109,6 +112,25 @@ class ServiceProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> getAppointmentSlots(String serviceId) async {
+    appointmentSlotsState = Loading();
+    notifyListeners();
+    try {
+      final response = await serviceRepository.getAppointmentSlots(serviceId);
+      if (response.status && response.statuscode == 200) {
+        appointmentSlotsState = Success(response);
+      } else {
+        appointmentSlotsState = Error("Unexpected response");
+      }
+    }  on AuthenticationException {
+      rethrow;
+    } catch (e) {
+      appointmentSlotsState = Error("Something went wrong: $e");
+    } finally {
+      notifyListeners();
+    }
+  }
+
   Future<void> bookAppointment(
     String clientId,
     String serviceId,
@@ -119,21 +141,21 @@ class ServiceProvider extends ChangeNotifier {
     String purpose,
     String prescription
   ) async {
-    appointmentState = Loading();
+    bookAppointmentState = Loading();
     notifyListeners();
     try {
       final response = await serviceRepository.bookAppointment(clientId,serviceId,doctorId,slotId,date,description,purpose,prescription);
       if (response.status && response.statusCode == 200) {
-        appointmentState = Success(response);
+        bookAppointmentState = Success(response);
       } else {
-        appointmentState = Error("Unexpected response");
+        bookAppointmentState = Error("Unexpected response");
       }
     } on NetworkException {
-      appointmentState = NoInternet();
+      bookAppointmentState = NoInternet();
     } on AuthenticationException {
       rethrow;
     } catch (e) {
-      appointmentState = Error("Something went wrong: $e");
+      bookAppointmentState = Error("Something went wrong: $e");
     } finally {
       notifyListeners();
     }
