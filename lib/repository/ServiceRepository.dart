@@ -83,7 +83,7 @@ class ServiceRepository {
           'purpose': purpose,
           'prescription': prescription,
         }),
-      );
+      withAuth: true);
       return AppointmentResponse.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);

@@ -124,93 +124,93 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             );
           }
 
-          final serviceData = (serviceDetialState as Success<ServiceDetailResponse>).response.data;
+          if(serviceDetialState is Success<ServiceDetailResponse>){
+            final serviceData = (serviceDetialState).response.data;
+            // Prepare images list based on available images from API
+            final List<String> serviceImages = [];
+            serviceImages.add(serviceData.image);
 
-          // Prepare images list based on available images from API
-          final List<String> serviceImages = [];
-          serviceImages.add(serviceData.image);
-
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsetsGeometry.all(8),
-                  child: // In your ClinicBasedScreen build method, replace the current banner section with:
-
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
-                    child: AutoScrollingBanner(
-                      items: [serviceData.image],
+                    padding: EdgeInsetsGeometry.all(8),
+                    child: // In your ClinicBasedScreen build method, replace the current banner section with:
+
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
+                      child: AutoScrollingBanner(
+                        items: [serviceData.image],
+                      ),
                     ),
                   ),
-                ),
 
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-                // Main Service Card
+                  // Main Service Card
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: ServiceCard(
-                    name: serviceData.name,
-                    price: serviceData.price,
-                    description:
-                        serviceData?.description ?? 'No description available',
-                    isOnSale: serviceData?.isRecommended ?? false,
-                    isTopService: serviceData?.isTopService ?? false,
-                    onBook: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BookingSlotScreen(serviceId: serviceData.id,)
-                        ),
-                      );
-                    },
-                  ),
-                ),
-
-                // Available Doctors Section (if doctors exist)
-                if (serviceData.doctors.isNotEmpty == true) ...[
-                  const SizedBox(height: 18),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Choose Your Professional',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Appcolor.mehrun,
+                    child: ServiceCard(
+                      name: serviceData.name,
+                      price: serviceData.price,
+                      description:
+                      serviceData?.description ?? 'No description available',
+                      isOnSale: serviceData?.isRecommended ?? false,
+                      isTopService: serviceData?.isTopService ?? false,
+                      onBook: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => BookingSlotScreen(serviceId: serviceData.id,)
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 160, // set height to fit horizontal items
-                          child: ListView.separated(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: serviceData.doctors.length,
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 12),
-                            itemBuilder: (context, index) {
-                              final doctor = serviceData.doctors[index];
-                              return Container(
-                                width: 140,
-                                // fixed width for each horizontal card
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Available Doctors Section (if doctors exist)
+                  if (serviceData.doctors.isNotEmpty == true) ...[
+                    const SizedBox(height: 18),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Choose Your Professional',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Appcolor.mehrun,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          SizedBox(
+                            height: 160, // set height to fit horizontal items
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: serviceData.doctors.length,
+                              separatorBuilder: (context, index) =>
+                              const SizedBox(width: 12),
+                              itemBuilder: (context, index) {
+                                final doctor = serviceData.doctors[index];
+                                return Container(
+                                  width: 140,
+                                  // fixed width for each horizontal card
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
                                     color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.grey.shade200,
+                                    ),
                                   ),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    /*SizedBox(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      /*SizedBox(
                                       height: 190, // set height to fit horizontal items
                                       child: ListView.separated(
                                         scrollDirection: Axis.horizontal,
@@ -294,50 +294,50 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                                       ),
                                     ),
 */
-                                    CircleAvatar(
-                                      radius: 30,
-                                      backgroundColor: Colors.red.shade100,
-                                      child: Icon(
-                                        Icons.person,
-                                        color: Appcolor.mehrun,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      '${doctor.title} ${doctor.name}',
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Appcolor.mehrun,
-                                        overflow: TextOverflow.clip,
-                                      ),
-                                    ),
-                                    if (doctor.experience != null) ...[
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        '${doctor.experience}+ yrs',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Appcolor.textColor,
+                                      CircleAvatar(
+                                        radius: 30,
+                                        backgroundColor: Colors.red.shade100,
+                                        child: Icon(
+                                          Icons.person,
+                                          color: Appcolor.mehrun,
+                                          size: 30,
                                         ),
                                       ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        '${doctor.title} ${doctor.name}',
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Appcolor.mehrun,
+                                          overflow: TextOverflow.clip,
+                                        ),
+                                      ),
+                                      if (doctor.experience != null) ...[
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          '${doctor.experience}+ yrs',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Appcolor.textColor,
+                                          ),
+                                        ),
+                                      ],
                                     ],
-                                  ],
-                                ),
-                              );
-                            },
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
 
-                // webzila
-                /*// About Section
+                  // webzila
+                  /*// About Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -402,135 +402,138 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                     ],
                   ),
                 ),*/
-                SizedBox(height: 18),
+                  SizedBox(height: 18),
 
-                // Static Treatment Guide Section (since not in API)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Why Choose Our Services?',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Appcolor.mehrun,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'We combine advanced medical technology with personalized care to deliver exceptional results. Our experienced team ensures safe, effective treatments tailored to your unique needs.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Appcolor.textColor,
-                          height: 1.5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 14),
-                // Static Treatment Categories (since not in API response)
-                SizedBox(
-                  height: 80,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
+                  // Static Treatment Guide Section (since not in API)
+                  Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: treatmentCategories.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(width: 12),
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: 120,
-                        decoration: BoxDecoration(
-                          color: Appcolor.mehrun,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            treatmentCategories[index],
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Why Choose Our Services?',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Appcolor.mehrun,
+                            height: 1.3,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Other Services Section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Our Other Top Services',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Appcolor.mehrun,
+                        const SizedBox(height: 12),
+                        Text(
+                          'We combine advanced medical technology with personalized care to deliver exceptional results. Our experienced team ensures safe, effective treatments tailored to your unique needs.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Appcolor.textColor,
+                            height: 1.5,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.5,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 14),
+                  // Static Treatment Categories (since not in API response)
+                  SizedBox(
+                    height: 80,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: treatmentCategories.length,
+                      separatorBuilder: (context, index) =>
+                      const SizedBox(width: 12),
+                      itemBuilder: (context, index) {
+                        return Container(
+                          width: 120,
+                          decoration: BoxDecoration(
+                            color: Appcolor.mehrun,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              treatmentCategories[index],
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                        itemCount: otherServices.length,
-                        itemBuilder: (context, index) {
-                          final service = otherServices[index];
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: service['color'],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  service['icon'],
-                                  size: 32,
-                                  color: Colors.grey.shade700,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  service['name'],
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Other Services Section
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Our Other Top Services',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Appcolor.mehrun,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1.5,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          itemCount: otherServices.length,
+                          itemBuilder: (context, index) {
+                            final service = otherServices[index];
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: service['color'],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    service['icon'],
+                                    size: 32,
                                     color: Colors.grey.shade700,
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    service['name'],
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(height: 32),
-              ],
-            ),
-          );
+                  const SizedBox(height: 32),
+                ],
+              ),
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+
         },
       ),
     );

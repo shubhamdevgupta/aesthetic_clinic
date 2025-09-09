@@ -1,5 +1,7 @@
-import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart' hide Service;
-import 'package:aesthetic_clinic/models/appointment/booking_response.dart' hide Service;
+import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart'
+    hide Service;
+import 'package:aesthetic_clinic/models/appointment/booking_response.dart'
+    hide Service;
 import 'package:aesthetic_clinic/models/service/all_services.dart' hide Service;
 import 'package:aesthetic_clinic/models/appointment/appointment_response.dart'
     hide Service;
@@ -27,6 +29,14 @@ class ServiceProvider extends ChangeNotifier {
   Service? _selectedService;
 
   Service? get selectedService => _selectedService;
+
+  int _selectedDoctorIndex=0;
+  int get selectedDoctorIndex => _selectedDoctorIndex;
+
+  DateTime selectedDate = DateTime.now();
+
+  Slot? _selectedSlot;
+  Slot? get selectedSlot => _selectedSlot;
 
   Future<void> getMainServices() async {
     serviceState = Loading();
@@ -122,7 +132,7 @@ class ServiceProvider extends ChangeNotifier {
       } else {
         appointmentSlotsState = Error("Unexpected response");
       }
-    }  on AuthenticationException {
+    } on AuthenticationException {
       rethrow;
     } catch (e) {
       appointmentSlotsState = Error("Something went wrong: $e");
@@ -139,12 +149,21 @@ class ServiceProvider extends ChangeNotifier {
     String date,
     String description,
     String purpose,
-    String prescription
+    String prescription,
   ) async {
     bookAppointmentState = Loading();
     notifyListeners();
     try {
-      final response = await serviceRepository.bookAppointment(clientId,serviceId,doctorId,slotId,date,description,purpose,prescription);
+      final response = await serviceRepository.bookAppointment(
+        clientId,
+        serviceId,
+        doctorId,
+        slotId,
+        date,
+        description,
+        purpose,
+        prescription,
+      );
       if (response.status && response.statusCode == 200) {
         bookAppointmentState = Success(response);
       } else {
@@ -163,6 +182,22 @@ class ServiceProvider extends ChangeNotifier {
 
   void selectService(Service service) {
     _selectedService = service;
+    notifyListeners();
+  }
+
+  void setSelectedSlot(Slot slot) {
+    _selectedSlot = slot;
+    notifyListeners();
+  }
+  void setSelectedDate(DateTime dateTime) {
+    selectedDate = dateTime;
+    _selectedSlot=null;
+    notifyListeners();
+  }
+
+  void setSelectedDoctorIndex(int index) {
+    _selectedDoctorIndex = index;
+    _selectedSlot = null;
     notifyListeners();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/models/appointment/booking_response.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/services/ui_state.dart';
+import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -69,8 +70,7 @@ class _UpcomingBookingScreenState extends State<UpcomingBookingScreen> {
               isUpcoming: true,
               title: b.service.name,
               minutes: b.doctorSlot.duration,
-              subtitle:
-                  'A Little Enhancement, A Lot of Confidence with Expert Injectables in Dubai',
+              subtitle:b.purpose,
               dateLine:
                   _formatBookingDate(b.date) + ' with ${b.doctor.title} ${b.doctor.name}',
               bookingId: b.id,
@@ -214,18 +214,9 @@ class _BookingCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '$minutes Mins',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
-              ),
-              Text(
-                'Booking ID: $bookingId',
-                style: TextStyle(color: Colors.grey[400], fontSize: 11),
-              ),
-            ],
+          Text(
+            '$minutes Mins',
+            style: TextStyle(color: Colors.grey[600], fontSize: 12),
           ),
           const SizedBox(height: 8),
           Text(
@@ -260,7 +251,7 @@ class _BookingCard extends StatelessWidget {
                     ),
                   ),
                   onPressed: onPrimaryAction,
-                  child: const Text('Reschedule'),
+                  child:  Text('Reschedule',style: TextStyle(color: Appcolor.white),),
                 ),
               ),
               const SizedBox(width: 12),

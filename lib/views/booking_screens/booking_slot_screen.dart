@@ -1,14 +1,17 @@
 import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
+import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/LocalStorageService.dart';
 import '../../services/ui_state.dart';
 import '../../utils/Appcolor.dart';
+import '../../utils/ShimerPlaceholder.dart';
 
 class BookingSlotScreen extends StatefulWidget {
   final String serviceId;
-
   BookingSlotScreen({Key? key, required this.serviceId}) : super(key: key);
 
   @override
@@ -16,6 +19,7 @@ class BookingSlotScreen extends StatefulWidget {
 }
 
 class _BookingSlotScreenState extends State<BookingSlotScreen> {
+  final LocalStorageService storage = LocalStorageService();
   @override
   void initState() {
     super.initState();
@@ -26,10 +30,6 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
       ).getAppointmentSlots(widget.serviceId),
     );
   }
-
-  int selectedDoctorIndex = 0; // Default to first doctor
-  DateTime selectedDate = DateTime.now();
-  Slot? selectedSlot;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,6 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
       ),
       body: Consumer<ServiceProvider>(
         builder: (context, provider, child) {
-
           final appointmentSlotsState = provider.appointmentSlotsState;
 
           // 🔹 Show loader for Idle & Loading (for either state)
@@ -54,14 +53,17 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if(appointmentSlotsState is Success<AppointmentSlots>){
+          if (appointmentSlotsState is Success<AppointmentSlots>) {
             final appointmentSlot = appointmentSlotsState.response.data;
 
             if (appointmentSlot.isEmpty) {
               return const Center(child: Text('No doctors available'));
             }
 
-            final int doctorIndex = selectedDoctorIndex < appointmentSlot.length ? selectedDoctorIndex : 0;
+            final int doctorIndex =
+                provider.selectedDoctorIndex < appointmentSlot.length
+                ? provider.selectedDoctorIndex
+                : 0;
             final selectedSchedule = appointmentSlot[doctorIndex];
 
             // Build available dates set for the selected doctor in current month
@@ -69,11 +71,15 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                 .map((d) => _parseYmd(d.date))
                 .where((dt) => dt != null)
                 .map((dt) => DateTime(dt!.year, dt.month, dt.day))
-                .where((dt) => dt.month == selectedDate.month && dt.year == selectedDate.year)
+                .where(
+                  (dt) =>
+                      dt.month == provider.selectedDate.month &&
+                      dt.year == provider.selectedDate.year,
+                )
                 .toSet();
 
             // Slots for the currently selected date
-            final String selectedDateStr = _toYyyyMmDd(selectedDate);
+            final String selectedDateStr = _toYyyyMmDd(provider.selectedDate);
             final slotsForDay = selectedSchedule.dates
                 .where((d) => d.date == selectedDateStr)
                 .map((d) => d.slots)
@@ -102,18 +108,16 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
 
                         // Horizontal Doctor List
                         SizedBox(
-                          height: 120,
+                          height: 150,
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: appointmentSlot.length,
                             itemBuilder: (context, index) {
-                              final isSelected = selectedDoctorIndex == index;
+                              final isSelected =
+                                  provider.selectedDoctorIndex == index;
                               return GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    selectedDoctorIndex = index;
-                                    selectedSlot = null; // Reset time selection
-                                  });
+                                  provider.setSelectedDoctorIndex(index);
                                 },
                                 child: Container(
                                   width: 100,
@@ -127,23 +131,48 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                   ),
                                   child: Column(
                                     children: [
-                                      CircleAvatar(
-                                        radius: 25,
-                                        backgroundColor: isSelected
-                                            ? Colors.white.withOpacity(0.3)
-                                            : Colors.grey[200],
-                                        child: const Icon(
-                                          Icons.person,
-                                          color: Colors.grey,
-                                          size: 30,
+                                      ClipOval(
+                                        child: Image.network(
+                                          appointmentSlot[index].doctor.image,
+                                          fit: BoxFit.cover,
+                                          cacheWidth: 120,
+                                          cacheHeight: 120,
+                                          loadingBuilder:
+                                              (
+                                                context,
+                                                child,
+                                                loadingProgress,
+                                              ) {
+                                                if (loadingProgress == null) {
+                                                  return child;
+                                                }
+                                                return const ShimmerPlaceholder(
+                                                  width: 84,
+                                                  height: 84,
+                                                  isCircle: true,
+                                                );
+                                              },
+                                          errorBuilder:
+                                              (context, error, stackTrace) =>
+                                                  const CircleAvatar(
+                                                    backgroundColor:
+                                                        Colors.grey,
+                                                    child: Icon(
+                                                      Icons.broken_image,
+                                                      color: Appcolor.mehrun,
+                                                      size: 24,
+                                                    ),
+                                                  ),
                                         ),
                                       ),
+
                                       const SizedBox(height: 8),
                                       Text(
                                         appointmentSlot[index].doctor.name
                                             .split(' ')
                                             .take(2)
                                             .join(' '),
+                                        overflow: TextOverflow.fade,
                                         style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w600,
@@ -156,7 +185,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                       ),
                                       Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: List.generate(5, (starIndex) {
                                           return Icon(
                                             Icons.star,
@@ -182,7 +211,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '${_getMonthName(selectedDate.month)} ${selectedDate.year}',
+                              '${_getMonthName(provider.selectedDate.month)} ${provider.selectedDate.year}',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -192,14 +221,30 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                             Row(
                               children: [
                                 IconButton(
-                                  onPressed: _previousMonth,
+                                  onPressed: () {
+                                    provider.setSelectedDate(
+                                      DateTime(
+                                        provider.selectedDate.year,
+                                        provider.selectedDate.month - 1,
+                                        1,
+                                      ),
+                                    );
+                                  },
                                   icon: const Icon(
                                     Icons.chevron_left,
                                     color: Appcolor.mehrun,
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: _nextMonth,
+                                  onPressed: () {
+                                    provider.setSelectedDate(
+                                      DateTime(
+                                        provider.selectedDate.year,
+                                        provider.selectedDate.month + 1,
+                                        1,
+                                      ),
+                                    );
+                                  },
                                   icon: const Icon(
                                     Icons.chevron_right,
                                     color: Appcolor.mehrun,
@@ -213,9 +258,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                         const SizedBox(height: 16),
 
                         // Calendar Grid
-                        _buildCalendar(availableDates),
-
-                        const SizedBox(height: 32),
+                        _buildCalendar(availableDates, provider),
 
                         // Available Slots Section
                         const Text(
@@ -234,25 +277,24 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            childAspectRatio: 2.5,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                childAspectRatio: 2.5,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
                           itemCount: slotsForDay.length,
                           itemBuilder: (context, index) {
                             final slot = slotsForDay[index];
-                            final isSelected = selectedSlot?.id == slot.id;
+                            final isSelected =
+                                provider.selectedSlot?.id == slot.id;
                             final isAvailable = slot.appointments.isEmpty;
 
                             return GestureDetector(
                               onTap: isAvailable
                                   ? () {
-                                setState(() {
-                                  selectedSlot = slot;
-                                });
-                              }
+                                      provider.setSelectedSlot(slot);
+                                    }
                                   : null,
                               child: Container(
                                 decoration: BoxDecoration(
@@ -287,8 +329,6 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                             );
                           },
                         ),
-
-                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
@@ -309,7 +349,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                   ),
                   child: Column(
                     children: [
-                      if (selectedSlot != null) ...[
+                      if (provider.selectedSlot != null) ...[
                         Container(
                           padding: const EdgeInsets.symmetric(
                             vertical: 12,
@@ -319,18 +359,21 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                             color: Colors.grey[50],
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          child: Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 4, // space between words
+                            runSpacing: 4, // space between lines
                             children: [
                               Text(
-                                'Proceed with ',
+                                'Proceed with',
                                 style: TextStyle(
                                   color: Colors.grey[600],
                                   fontSize: 14,
                                 ),
                               ),
                               Text(
-                                '${_getMonthName(selectedDate.month).substring(0, 3)} ${selectedDate.day}, ${_formatTime(selectedSlot!.startTime)}',
+                                '${_getMonthName(provider.selectedDate.month).substring(0, 3)} ${provider.selectedDate.day}, ${_formatTime(provider.selectedSlot!.startTime)}',
                                 style: const TextStyle(
                                   color: Colors.black87,
                                   fontSize: 14,
@@ -338,7 +381,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                 ),
                               ),
                               const Text(
-                                ' with ',
+                                'with',
                                 style: TextStyle(
                                   color: Colors.grey,
                                   fontSize: 14,
@@ -358,6 +401,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 16),
                       ],
 
@@ -371,7 +415,9 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                               ),
                               child: const Text(
                                 'Add More Services',
@@ -386,8 +432,12 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton(
-                              onPressed: selectedSlot != null
-                                  ? _handleProceedBooking
+                              onPressed: provider.selectedSlot != null
+                                  ? () async{
+                                      if (provider.selectedSlot == null) return;
+                                      String formattedDate = DateFormat('yyyy-MM-dd').format(provider.selectedDate);
+                                     await provider.bookAppointment(storage.getString(AppConstants.prefUserId)!, widget.serviceId, appointmentSlot[provider.selectedDoctorIndex].doctorId, provider.selectedSlot!.id, formattedDate, "description", "purpose", "prescription");
+                                    }
                                   : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Appcolor.mehrun,
@@ -395,15 +445,26 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                               ),
                               child: Consumer<ServiceProvider>(
                                 builder: (context, provider, _) {
-                                  if (provider.appointmentSlotsState is Success<AppointmentSlots>) {
-                                    final data = (provider.appointmentSlotsState as Success<AppointmentSlots>).response.data;
-                                    final int idx = selectedDoctorIndex < data.length ? selectedDoctorIndex : 0;
+                                  if (provider.appointmentSlotsState
+                                      is Success<AppointmentSlots>) {
+                                    final data =
+                                        (provider.appointmentSlotsState
+                                                as Success<AppointmentSlots>)
+                                            .response
+                                            .data;
+                                    final int? idx =
+                                        provider.selectedDoctorIndex <
+                                            data.length
+                                        ? provider.selectedDoctorIndex
+                                        : 0;
                                     return Text(
-                                      _formatPrice(_derivePrice(data[idx])),
+                                      _formatPrice(_derivePrice(data[idx!])),
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 14,
@@ -425,18 +486,24 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
             );
           }
           return const Center(child: CircularProgressIndicator());
-
         },
       ),
     );
   }
 
-  Widget _buildCalendar(Set<DateTime> availableDates) {
+  Widget _buildCalendar(
+    Set<DateTime> availableDates,
+    ServiceProvider provider,
+  ) {
     final now = DateTime.now();
-    final firstDayOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
+    final firstDayOfMonth = DateTime(
+      provider.selectedDate.year,
+      provider.selectedDate.month,
+      1,
+    );
     final lastDayOfMonth = DateTime(
-      selectedDate.year,
-      selectedDate.month + 1,
+      provider.selectedDate.year,
+      provider.selectedDate.month + 1,
       0,
     );
     final daysInMonth = lastDayOfMonth.day;
@@ -486,8 +553,8 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
             }
 
             final date = DateTime(
-              selectedDate.year,
-              selectedDate.month,
+              provider.selectedDate.year,
+              provider.selectedDate.month,
               dayNumber,
             );
             final isToday =
@@ -495,21 +562,20 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                 date.month == now.month &&
                 date.year == now.year;
             final isSelected =
-                date.day == selectedDate.day &&
-                date.month == selectedDate.month &&
-                date.year == selectedDate.year;
+                date.day == provider.selectedDate.day &&
+                date.month == provider.selectedDate.month &&
+                date.year == provider.selectedDate.year;
             final isPast = date.isBefore(
               DateTime(now.year, now.month, now.day),
             );
-            final isAvailableDate = availableDates.contains(DateTime(date.year, date.month, date.day));
+            final isAvailableDate = availableDates.contains(
+              DateTime(date.year, date.month, date.day),
+            );
 
             return GestureDetector(
               onTap: (!isPast && isAvailableDate)
                   ? () {
-                      setState(() {
-                        selectedDate = date;
-                        selectedSlot = null; // Reset time selection
-                      });
+                      provider.setSelectedDate(date);
                     }
                   : null,
               child: Container(
@@ -568,90 +634,12 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
     return months[month - 1];
   }
 
-  void _previousMonth() {
-    setState(() {
-      selectedDate = DateTime(selectedDate.year, selectedDate.month - 1, 1);
-      selectedSlot = null;
-    });
-  }
-
-  void _nextMonth() {
-    setState(() {
-      selectedDate = DateTime(selectedDate.year, selectedDate.month + 1, 1);
-      selectedSlot = null;
-    });
-  }
-
   void _handleAddMoreServices() {
     // Handle add more services logic
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Add More Services clicked'),
         backgroundColor: Appcolor.mehrun,
-      ),
-    );
-  }
-
-  void _handleProceedBooking() {
-    if (selectedSlot == null) return;
-
-    // Handle booking logic
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Booking Confirmation'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Consumer<ServiceProvider>(
-              builder: (context, provider, _) {
-                if (provider.appointmentSlotsState is Success<AppointmentSlots>) {
-                  final data = (provider.appointmentSlotsState as Success<AppointmentSlots>).response.data;
-                  final int index = selectedDoctorIndex < data.length ? selectedDoctorIndex : 0;
-                  final name = data.isNotEmpty ? data[index].doctor.name : '';
-                  return Text('Doctor: $name');
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-            Text(
-              'Date: ${_getMonthName(selectedDate.month)} ${selectedDate.day}, ${selectedDate.year}',
-            ),
-            Text('Time: ${_formatTime(selectedSlot!.startTime)}'),
-            Consumer<ServiceProvider>(
-              builder: (context, provider, _) {
-                if (provider.appointmentSlotsState is Success<AppointmentSlots>) {
-                  final data = (provider.appointmentSlotsState as Success<AppointmentSlots>).response.data;
-                  final int index = selectedDoctorIndex < data.length ? selectedDoctorIndex : 0;
-                  final price = _derivePrice(data[index]);
-                  return Text('Amount: ${_formatPrice(price)}');
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Booking confirmed!'),
-                  backgroundColor: Appcolor.mehrun,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Appcolor.mehrun),
-            child: const Text('Confirm', style: TextStyle(color: Colors.white)),
-          ),
-        ],
       ),
     );
   }
