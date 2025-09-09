@@ -232,6 +232,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                         itemBuilder: (context, index) {
                           final personalize = personalizeServices[index];
                           return _topChoiceItem(
+                            personalize.id,
                             personalize.name,
                             personalize.description,
                             personalize.image,
@@ -458,6 +459,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   }
 
   static Widget _topChoiceItem(
+    String serviceId,
     String title,
     String description,
     String imageUrl,
@@ -471,6 +473,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           builder: (context) => ServicePopup(
+            id: serviceId,
             title: title,
             description: description,
             price: "2",

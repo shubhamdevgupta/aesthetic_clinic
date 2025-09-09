@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../utils/Appcolor.dart';
+import '../booking_screens/booking_slot_screen.dart';
 
 class ServicePopup extends StatefulWidget {
+  final String id;
   final String title;
   final String description;
   final String price;
@@ -11,6 +13,7 @@ class ServicePopup extends StatefulWidget {
 
   const ServicePopup({
     Key? key,
+    required this.id,
     required this.title,
     required this.description,
     required this.price,
@@ -129,8 +132,12 @@ class _ServicePopupState extends State<ServicePopup> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
-                    // handle add to cart logic
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BookingSlotScreen(serviceId: widget.id,)
+                      ),
+                    );
                   },
                   child: Text(
                     "AED ${(int.parse(widget.price) * quantity).toStringAsFixed(2)}",
