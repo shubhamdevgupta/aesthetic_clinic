@@ -101,14 +101,12 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
-                  child: AutoScrollingBanner(
-                    items: bannerList,
-                    height: 200,
-                  ),
+                  child: AutoScrollingBanner(items: bannerList, height: 200),
                 ),
               ),
 
               // ✅ Top Services
+              // Replace your SliverToBoxAdapter with this
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
@@ -125,7 +123,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 80,
+                        height: 140, // enough room for text + image
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
@@ -162,7 +160,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 120,
+                        height: 160, // increased height to fit image + text
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
@@ -170,44 +168,40 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                           itemBuilder: (context, index) {
                             final product = recommendedProducts[index];
                             return Container(
-                              width: 90,
-                              margin: const EdgeInsets.only(right: 12),
+                              width: 100,
+                              margin: const EdgeInsets.only(right: 16),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Image.network(
-                                    width: 64,
-                                    height: 64,
-                                    product.featuredImage,
-                                    fit: BoxFit.cover,
-                                    cacheWidth: 120,
-                                    cacheHeight: 120,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                          if (loadingProgress == null)
-                                            return child;
-                                          return CircleShimmer(size: 64);
-                                        },
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(
-                                              Icons.broken_image,
-                                              color: Appcolor.mehrun,
-                                              size: 24,
-                                            ),
-                                  ),
-                                  const SizedBox(height: 10),
                                   Expanded(
-                                    child: Center(
-                                      child: Text(
-                                        product.name,
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF707070),
-                                        ),
+                                    flex: 7,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Image.network(
+                                        product.featuredImage,
+                                        fit: BoxFit.contain,
+                                        // show full product
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(
+                                                  Icons.broken_image,
+                                                  color: Appcolor.mehrun,
+                                                  size: 40,
+                                                ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      product.name,
+                                      textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF707070),
                                       ),
                                     ),
                                   ),
@@ -225,7 +219,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               // ✅ Personalized Services
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -239,7 +233,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 160,
+                        height: 180,
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
@@ -250,7 +244,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                               personalize.id,
                               personalize.name,
                               personalize.description,
-                              personalize.image,
+                              personalize.personalisedServiceImages,
                               personalize.price,
                               context,
                             );
@@ -483,13 +477,13 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   }
 
   static Widget _topChoiceItem(
-    String serviceId,
-    String title,
-    String description,
-    String imageUrl,
-    String price,
-    BuildContext context,
-  ) {
+      String serviceId,
+      String title,
+      String description,
+      String imageUrl,
+      String price,
+      BuildContext context,
+      ) {
     return InkWell(
       onTap: () {
         showModalBottomSheet(
@@ -500,80 +494,69 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
             id: serviceId,
             title: title,
             description: description,
-            price: "2",
+            price: price,
             duration: "30 Mins",
             imageUrl: imageUrl,
           ),
         );
       },
       child: Container(
-        width: 160,
+        width: 140,
         margin: const EdgeInsets.only(right: 12),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
+              // Background image
               Image.network(
                 imageUrl,
-                height: 160,
-                width: 160,
-                fit: BoxFit.cover,
-                cacheWidth: 640,
-                cacheHeight: 640,
+                width: double.infinity,
+                height: 200, // fixed height for consistency
+                fit: BoxFit.cover, // ✅ ensures image fills area nicely
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const ShimmerPlaceholder(
                     width: 160,
-                    height: 160,
+                    height: 200,
                     borderRadius: 16,
                   );
                 },
                 errorBuilder: (context, error, stackTrace) => Container(
-                  height: 160,
-                  width: 160,
+                  height: 200,
                   color: const Color(0xFFFFEBEE),
                   alignment: Alignment.center,
                   child: const Icon(Icons.broken_image, color: Colors.red),
                 ),
               ),
+
+              // Positioned text
               Positioned(
-                left: 0,
-                right: 0,
+                left: 8,
+                right: 8,
                 bottom: 0,
-                child: Image.asset(
-                  'assets/icons/ic_rectangle.png',
-                  height: 64,
-                  fit: BoxFit.fill,
-                ),
-              ),
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 10,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        height: 1.2,
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style:  TextStyle(
+                          color: Appcolor.mehrun,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      "Starting From $price",
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
+                      Text(
+                        "Starting From $price",
+                        style:  TextStyle(
+                          color: Appcolor.textColor,
+                          fontSize: 12,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -599,6 +582,7 @@ class ServiceItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      borderRadius: BorderRadius.circular(16),
       onTap: () {
         Navigator.push(
           context,
@@ -609,12 +593,11 @@ class ServiceItem extends StatelessWidget {
       },
       child: Container(
         width: 90,
-        margin: const EdgeInsets.only(right: 12),
+        margin: const EdgeInsets.only(right: 16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Expanded(
-              flex: 2,
+              flex: 3,
               child: Center(
                 child: Text(
                   label,
@@ -628,29 +611,27 @@ class ServiceItem extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            // Image first (takes 70%)
+            const SizedBox(height: 6),
             Expanded(
-              flex: 2,
+              flex: 7,
               child: ClipOval(
                 child: Image.network(
                   imageUrl,
-                  width: 40,
-                  height: 40,
-                  fit: BoxFit.cover,
-                  cacheWidth: 120,
-                  cacheHeight: 120,
+                  fit: BoxFit.contain, // ensures full image shown
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
-                    return CircleShimmer(size: 40);
+                    return CircleShimmer(size: 48);
                   },
                   errorBuilder: (context, error, stackTrace) => const Icon(
                     Icons.broken_image,
                     color: Colors.red,
-                    size: 24,
+                    size: 32,
                   ),
                 ),
               ),
             ),
+
           ],
         ),
       ),
