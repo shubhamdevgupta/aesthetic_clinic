@@ -1,3 +1,4 @@
+import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:flutter/material.dart';
 
 class AutoScrollingBanner extends StatefulWidget {
@@ -33,14 +34,15 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
   void autoScroll() {
     if (!mounted || widget.items.isEmpty) return;
 
-    currentPage = (currentPage + 1) % widget.items.length;
+    final nextPage = (currentPage + 1) % widget.items.length;
 
     _pageController.animateToPage(
-      currentPage,
-      duration: const Duration(milliseconds: 500),
+      nextPage,
+      duration: const Duration(milliseconds: 900),
       curve: Curves.easeInOut,
     );
 
+    // 🔁 schedule next auto-scroll
     Future.delayed(widget.autoScrollDelay, autoScroll);
   }
 
@@ -67,10 +69,14 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
           child: PageView.builder(
             controller: _pageController,
             itemCount: widget.items.length,
+            onPageChanged: (index) {
+              setState(() {
+                currentPage = index;
+              });
+            },
             itemBuilder: (context, index) {
               final banner = widget.items[index];
 
-              // ✅ Handle both String and object cases
               String imageUrl = "";
               String title = "";
               String subtitle = "";
@@ -78,7 +84,7 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
               if (banner is String) {
                 imageUrl = banner;
               } else if (banner is Map) {
-                imageUrl = banner["image"] ?? "";
+                imageUrl = banner["imageUrl"] ?? "";
                 title = banner["title"] ?? "";
                 subtitle = banner["subtitle"] ?? "";
               } else {
@@ -154,7 +160,7 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                         ),
                       ),
 
-                    // Title & Subtitle (optional)
+                    // Title & Subtitle
                     if (hasText)
                       Positioned(
                         bottom: 16,
@@ -201,7 +207,7 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: Colors.pink,
+                          foregroundColor: Appcolor.mehrun,
                           elevation: 2,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),

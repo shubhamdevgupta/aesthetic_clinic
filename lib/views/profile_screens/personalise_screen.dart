@@ -53,10 +53,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-        ),
+        leading: BackButton(onPressed: (){Navigator.pop(context);} ,),
         title: const Text(
           'Personalise Profile',
           style: TextStyle(
@@ -78,15 +75,10 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 20),
-
                         // Gender Dropdown
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[50],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                        Divider(thickness:0.5,color: Colors.grey.shade500,),
+                        Padding(
+                          padding: EdgeInsetsGeometry.only(left: 16,right: 16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -140,8 +132,10 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                             ],
                           ),
                         ),
+                        SizedBox(height: 10,),
+                        Divider(thickness:1,color: Colors.grey.shade500,),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 14),
 
                         // Full Name Field
                         _buildInputField(
@@ -150,7 +144,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                           controller: _fullNameController,
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 14),
 
                         // Phone Number Field
                         _buildInputField(
@@ -159,7 +153,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                           controller: _phoneController,
                         ),
 
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 14),
 
                         // Email Address Field
                         _buildInputField(
@@ -168,7 +162,6 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                           controller: _emailController,
                         ),
 
-                        const SizedBox(height: 60),
                       ],
                     ),
                   ),
@@ -192,7 +185,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
                       child: ElevatedButton(
                         onPressed: ()async {
                           final firstName= _fullNameController.text.split(" ");
-                         final success=  await provider.updateProfile(firstName[0],firstName[1], _emailController.text);
+                         final success=  await provider.updateProfile(firstName[0],firstName[1]??" ", _emailController.text);
                          if(success){
                            if(widget.isVerified){
                              Navigator.pushReplacement(
@@ -267,17 +260,13 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     required IconData icon,
     required TextEditingController controller,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return Padding(
+      padding: EdgeInsetsGeometry.only(left: 16,right: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(
             children: [
               Icon(icon, color: Colors.grey[400], size: 20),
@@ -294,6 +283,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               ),
             ],
           ),
+          Divider(thickness: 1,color: Appcolor.withOpacity(Appcolor.grey, 0.6),)
         ],
       ),
     );

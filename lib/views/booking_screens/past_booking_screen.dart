@@ -19,7 +19,7 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ServiceProvider>(context, listen: false).getBookingList();
+      Provider.of<ServiceProvider>(context, listen: false).getBookingList(context);
     });
   }
 
@@ -43,7 +43,7 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
                 Text("", style: TextStyle(color: Colors.grey.shade600)),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed: () => provider.getBookingList(),
+                  onPressed: () => provider.getBookingList(context),
                   child: const Text('Retry'),
                 )
               ],

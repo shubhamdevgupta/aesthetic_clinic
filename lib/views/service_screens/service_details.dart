@@ -29,7 +29,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         context,
         listen: false,
       );
-      serviceProvider.getServiceDetial(widget.serviceId);
+      serviceProvider.getServiceDetial(widget.serviceId,context);
     });
   }
 
@@ -109,7 +109,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      serviceProvider.getServiceDetial(widget.serviceId);
+                      serviceProvider.getServiceDetial(widget.serviceId,context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pink,

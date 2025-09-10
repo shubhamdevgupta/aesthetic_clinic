@@ -9,10 +9,12 @@ import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
 import 'package:aesthetic_clinic/models/service/sub_service.dart';
 import 'package:aesthetic_clinic/repository/ServiceRepository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../models/banner_list.dart';
 import '../services/ui_state.dart';
 import '../utils/CustomException.dart';
+import 'authentication_provider.dart';
 
 class ServiceProvider extends ChangeNotifier {
   final ServiceRepository serviceRepository = ServiceRepository();
@@ -38,7 +40,7 @@ class ServiceProvider extends ChangeNotifier {
   Slot? _selectedSlot;
   Slot? get selectedSlot => _selectedSlot;
 
-  Future<void> getMainServices() async {
+  Future<void> getMainServices(BuildContext context) async {
     serviceState = Loading();
     notifyListeners();
     try {
@@ -51,7 +53,12 @@ class ServiceProvider extends ChangeNotifier {
     } on NetworkException {
       serviceState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       serviceState = Error("Something went wrong: $e");
     } finally {
@@ -59,7 +66,7 @@ class ServiceProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getSubService(String parentId) async {
+  Future<void> getSubService(String parentId,BuildContext context) async {
     subServiceState = Loading();
     notifyListeners();
     try {
@@ -72,7 +79,12 @@ class ServiceProvider extends ChangeNotifier {
     } on NetworkException {
       subServiceState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       subServiceState = Error("Something went wrong: $e");
     } finally {
@@ -80,7 +92,7 @@ class ServiceProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getServiceDetial(String serviceId) async {
+  Future<void> getServiceDetial(String serviceId,BuildContext context) async {
     serviceDetialState = Loading();
     notifyListeners();
     try {
@@ -93,7 +105,12 @@ class ServiceProvider extends ChangeNotifier {
     } on NetworkException {
       serviceDetialState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       serviceDetialState = Error("Something went wrong: $e");
     } finally {
@@ -101,7 +118,7 @@ class ServiceProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getBookingList() async {
+  Future<void> getBookingList(BuildContext context) async {
     bookingState = Loading();
     notifyListeners();
     try {
@@ -114,7 +131,12 @@ class ServiceProvider extends ChangeNotifier {
     } on NetworkException {
       bookingState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       bookingState = Error("Something went wrong: $e");
     } finally {
@@ -122,7 +144,7 @@ class ServiceProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getAppointmentSlots(String serviceId) async {
+  Future<void> getAppointmentSlots(String serviceId,BuildContext context) async {
     appointmentSlotsState = Loading();
     notifyListeners();
     try {
@@ -133,7 +155,12 @@ class ServiceProvider extends ChangeNotifier {
         appointmentSlotsState = Error("Unexpected response");
       }
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       appointmentSlotsState = Error("Something went wrong: $e");
     } finally {
@@ -150,6 +177,7 @@ class ServiceProvider extends ChangeNotifier {
     String description,
     String purpose,
     String prescription,
+      BuildContext context
   ) async {
     bookAppointmentState = Loading();
     notifyListeners();
@@ -172,7 +200,12 @@ class ServiceProvider extends ChangeNotifier {
     } on NetworkException {
       bookAppointmentState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       bookAppointmentState = Error("Something went wrong: $e");
     } finally {

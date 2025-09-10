@@ -105,7 +105,7 @@ class GlobalExceptionHandler {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Clear all persisted data via provider (central place)
       final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
-      await authProvider.logout();
+      await authProvider.logout(context);
       
       // Show standardized unauthorized message
       const String unauthorizedMessage = 'Not authorized. Please login again.';

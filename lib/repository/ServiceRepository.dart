@@ -108,7 +108,7 @@ class ServiceRepository {
   Future<AppointmentSlots> getAppointmentSlots(String serviceId) async {
     try {
       final response = await _apiService.get(
-        '/appointment-slots?services=$serviceId',
+        '/appointment-slots?service=$serviceId',
         withAuth: true,
       );
       return AppointmentSlots.fromJson(response);

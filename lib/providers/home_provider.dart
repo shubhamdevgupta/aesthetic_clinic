@@ -2,8 +2,10 @@ import 'package:aesthetic_clinic/models/doctor/doctor_detail_response.dart';
 import 'package:aesthetic_clinic/models/doctor/doctor_response.dart';
 import 'package:aesthetic_clinic/models/doctor/get_review.dart';
 import 'package:aesthetic_clinic/models/doctor/submit_doctor_review.dart';
+import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/repository/HomeRepository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../models/banner_list.dart';
 import '../services/ui_state.dart';
@@ -12,7 +14,7 @@ import '../utils/CustomException.dart';
 class HomeProvider extends ChangeNotifier {
   final HomeRepository homeRepository = HomeRepository();
 
-  TextEditingController reviewController=TextEditingController();
+  TextEditingController reviewController = TextEditingController();
 
   UiState<AppConfigurationResponse> dashboardState = Idle();
   UiState<DoctorResponse> doctorState = Idle();
@@ -25,7 +27,7 @@ class HomeProvider extends ChangeNotifier {
 
   double get selectedRating => _selectedRating;
 
-  Future<void> getDashboardData() async {
+  Future<void> getDashboardData(BuildContext context) async {
     dashboardState = Loading();
     notifyListeners();
 
@@ -39,7 +41,12 @@ class HomeProvider extends ChangeNotifier {
     } on NetworkException {
       dashboardState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       dashboardState = Error("Something went wrong: $e");
     } finally {
@@ -47,7 +54,7 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getDoctorData() async {
+  Future<void> getDoctorData(BuildContext context) async {
     doctorState = Loading();
     notifyListeners();
 
@@ -61,7 +68,12 @@ class HomeProvider extends ChangeNotifier {
     } on NetworkException {
       doctorState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       doctorState = Error("Something went wrong: $e");
     } finally {
@@ -69,7 +81,7 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getDoctorById(String doctorId) async {
+  Future<void> getDoctorById(String doctorId,BuildContext context) async {
     doctorDetailState = Loading();
     notifyListeners();
 
@@ -83,7 +95,12 @@ class HomeProvider extends ChangeNotifier {
     } on NetworkException {
       doctorDetailState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       doctorDetailState = Error("Something went wrong: $e");
     } finally {
@@ -91,13 +108,21 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-
-  Future<void> submitReview(String rating,String review,String doctorId) async {
+  Future<void> submitReview(
+    String rating,
+    String review,
+    String doctorId,
+      BuildContext context
+  ) async {
     submitReviewState = Loading();
     notifyListeners();
 
     try {
-      final response = await homeRepository.submitReview(rating,review,doctorId);
+      final response = await homeRepository.submitReview(
+        rating,
+        review,
+        doctorId,
+      );
       if (response.status && response.statuscode == 200) {
         submitReviewState = Success(response);
       } else {
@@ -106,7 +131,12 @@ class HomeProvider extends ChangeNotifier {
     } on NetworkException {
       submitReviewState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       submitReviewState = Error("Something went wrong: $e");
     } finally {
@@ -114,7 +144,7 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getDoctorReview(String doctorId) async {
+  Future<void> getDoctorReview(String doctorId,BuildContext context) async {
     doctorReviewState = Loading();
     notifyListeners();
 
@@ -126,10 +156,13 @@ class HomeProvider extends ChangeNotifier {
       } else {
         doctorReviewState = Error("Unexpected response format");
       }
-    } on NetworkException {
-      doctorReviewState = NoInternet();
     } on AuthenticationException {
-      rethrow;
+      if (!context.mounted) return;  // exit early if widget is gone
+      final authProvider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+      await authProvider.logout(context);
     } catch (e) {
       doctorReviewState = Error("Something went wrong: $e");
     } finally {
@@ -141,5 +174,4 @@ class HomeProvider extends ChangeNotifier {
     _selectedRating = rating;
     notifyListeners();
   }
-
 }

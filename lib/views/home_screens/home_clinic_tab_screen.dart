@@ -134,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
           print("object--- ${storage.getString(AppConstants.prefUserId)}");
+          print("object--- ${storage.getString(AppConstants.prefRefreshToken)}");
           return DefaultTabController(
             length: 2,
             initialIndex: 0,
@@ -161,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 Text(
-                                  '${storage.getString(AppConstants.prefFirstName)!+" "+storage.getString(AppConstants.prefLastName)!}',
+                                  "${storage.getString(AppConstants.prefFirstName)!} ${storage.getString(AppConstants.prefLastName)!}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Appcolor.mehrun,

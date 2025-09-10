@@ -25,7 +25,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
     // Trigger main services fetch after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<ServiceProvider>(context, listen: false);
-      provider.getMainServices();
+      provider.getMainServices(context);
     });
   }
 
@@ -60,7 +60,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => provider.getMainServices(),
+                      onPressed: () => provider.getMainServices(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Appcolor.mehrun,
                       ),
@@ -82,7 +82,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
                 _selectedCategoryId = services.first.id;
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Provider.of<ServiceProvider>(context, listen: false)
-                      .getSubService(_selectedCategoryId!);
+                      .getSubService(_selectedCategoryId!,context);
                 });
               }
 
@@ -148,7 +148,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
                     _selectedCategoryId = service.id;
                   });
                   Provider.of<ServiceProvider>(context, listen: false)
-                      .getSubService(service.id);
+                      .getSubService(service.id,context);
                 },
                 isSelected: _selectedCategoryIndex == index,
               ),
@@ -258,7 +258,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
           ElevatedButton(
             onPressed: _selectedCategoryId == null
                 ? null
-                : () => provider.getSubService(_selectedCategoryId!),
+                : () => provider.getSubService(_selectedCategoryId!,context),
             style: ElevatedButton.styleFrom(backgroundColor: Appcolor.mehrun),
             child:
                 const Text('Retry', style: TextStyle(color: Colors.white)),

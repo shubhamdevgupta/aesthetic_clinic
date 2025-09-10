@@ -26,7 +26,7 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
       () => Provider.of<HomeProvider>(
         context,
         listen: false,
-      ).getDoctorReview(widget.doctorData.id ?? ""),
+      ).getDoctorReview(widget.doctorData.id ?? "",context),
     );
   }
 
@@ -207,7 +207,7 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                         await provider.submitReview(
                           provider.selectedRating.toString(),
                           provider.reviewController.text,
-                          widget.doctorData.id ?? "",
+                          widget.doctorData.id ?? "",context
                         );
 
                         // Handle submit success message safely

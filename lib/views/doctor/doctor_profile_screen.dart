@@ -23,7 +23,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-          () => Provider.of<HomeProvider>(context, listen: false).getDoctorById(widget.doctorId),
+          () => Provider.of<HomeProvider>(context, listen: false).getDoctorById(widget.doctorId,context),
     );
   }
 

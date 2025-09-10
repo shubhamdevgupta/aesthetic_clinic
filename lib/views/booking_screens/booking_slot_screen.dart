@@ -27,7 +27,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
       () => Provider.of<ServiceProvider>(
         context,
         listen: false,
-      ).getAppointmentSlots(widget.serviceId),
+      ).getAppointmentSlots(widget.serviceId,context),
     );
   }
 
@@ -436,7 +436,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                   ? () async{
                                       if (provider.selectedSlot == null) return;
                                       String formattedDate = DateFormat('yyyy-MM-dd').format(provider.selectedDate);
-                                     await provider.bookAppointment(storage.getString(AppConstants.prefUserId)!, widget.serviceId, appointmentSlot[provider.selectedDoctorIndex].doctorId, provider.selectedSlot!.id, formattedDate, "description", "purpose", "prescription");
+                                     await provider.bookAppointment(storage.getString(AppConstants.prefUserId)!, widget.serviceId, appointmentSlot[provider.selectedDoctorIndex].doctorId, provider.selectedSlot!.id, formattedDate, "description", "purpose", "prescription",context);
                                     }
                                   : null,
                               style: ElevatedButton.styleFrom(

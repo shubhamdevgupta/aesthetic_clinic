@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 import '../utils/CustomException.dart';
@@ -444,21 +445,6 @@ class BaseApiService {
     log('🗑️ Cleared all stored preferences due to auth failure');
   }
 
-  Future<bool> isUserLoggedIn() async {
-    final accessToken = await storageService.getString(AppConstants.prefAccessToken);
-    final isLoggedIn = await storageService.getBool(AppConstants.prefIsLoggedIn);
-    final refreshToken = await storageService.getString(AppConstants.prefRefreshToken);
-    
-    log('🔍 Checking login state:');
-    log('   - Access Token: ${accessToken != null ? 'Present (${accessToken.length} chars)' : 'Missing'}');
-    log('   - Refresh Token: ${refreshToken != null ? 'Present (${refreshToken.length} chars)' : 'Missing'}');
-    log('   - Is Logged In Flag: $isLoggedIn');
-    
-    final result = accessToken != null && accessToken.isNotEmpty && (isLoggedIn ?? false);
-    log('   - Final Result: $result');
-    
-    return result;
-  }
 
   Future<void> logout() async {
     await _clearStoredTokens();

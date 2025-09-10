@@ -51,7 +51,7 @@ class AppDialogs {
         context,
         listen: false,
       );
-      await authProvider.logout();
+      await authProvider.logout(context);
 
       Navigator.pushReplacementNamed(
         context,

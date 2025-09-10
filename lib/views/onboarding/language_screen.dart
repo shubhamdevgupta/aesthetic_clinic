@@ -57,7 +57,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           Spacer(),
 
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16,),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -80,6 +80,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
               ),
             ),
           ),
+          SizedBox(height: 30,)
         ],
       ),
     );

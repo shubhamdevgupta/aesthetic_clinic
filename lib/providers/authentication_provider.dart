@@ -98,7 +98,7 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
+  Future<void> logout(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
     try {
