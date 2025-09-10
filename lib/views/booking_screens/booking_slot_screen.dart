@@ -186,7 +186,7 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
-                                        children: List.generate(5, (starIndex) {
+                                        children: List.generate(appointmentSlot[index].doctor.averageRating, (app) {
                                           return Icon(
                                             Icons.star,
                                             size: 8,

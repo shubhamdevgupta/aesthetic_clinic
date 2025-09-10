@@ -62,8 +62,8 @@ class ProfileProvider extends ChangeNotifier {
         updateProfileState = Success(response);
         _localStorage.saveString(AppConstants.prefFirstName, firstName);
         _localStorage.saveString(AppConstants.prefLastName, lastName);
-        _localStorage.saveString(AppConstants.prefMobile, response.data.email);
-        _localStorage.saveString(AppConstants.prefEmail, response.data.phone);
+        _localStorage.saveString(AppConstants.prefMobile, response.data.phone);
+        _localStorage.saveString(AppConstants.prefEmail, response.data.email);
       } else {
         updateProfileState = Error(response.message);
       }

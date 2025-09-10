@@ -273,67 +273,76 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 150,
+                        height: 180,
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
-                          itemCount: topChoices.length,
+                          itemCount: personalizeServices.length,
                           itemBuilder: (context, index) {
-                            final service = topChoices[index];
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ServiceDetailScreen(
-                                      serviceId: service.id,
-                                    ),
+                            final service = personalizeServices[index];
+                            return Container(
+                              width: 160, // 👈 FIX: set width
+                              margin: const EdgeInsets.only(right: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.06),
+                                    spreadRadius: 1,
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
                                   ),
-                                );
-                              },
-                              child: Container(
-                                width: 90,
-                                margin: const EdgeInsets.only(right: 12),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Stack(
+                                  fit: StackFit.expand, // 👈 make stack fill
                                   children: [
-                                    Expanded(
-                                      flex: 2,
-                                      child: Center(
-                                        child: Text(
-                                          service.name,
-                                          textAlign: TextAlign.center,
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Appcolor.textColor,
-                                          ),
+                                    service.image.isNotEmpty
+                                        ? Image.network(
+                                      service.image,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) =>
+                                          Container(color: Colors.grey[300]),
+                                    )
+                                        : Container(color: Colors.grey[300]),
+
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.transparent,
+                                            Appcolor.withOpacity(Appcolor.mehrun, 0.8),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 10),
-                                    Expanded(
-                                      flex: 3,
-                                      child: Image.network(
-                                        service.image,
-                                        fit: BoxFit.cover,
-                                        cacheWidth: 120,
-                                        cacheHeight: 120,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-                                              return CircleShimmer(size: 40);
-                                            },
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                const Icon(
-                                                  Icons.broken_image,
-                                                  color: Colors.red,
-                                                  size: 24,
-                                                ),
+
+                                    Positioned(
+                                      left: 12,
+                                      right: 12,
+                                      bottom: 12,
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            service.name,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Starting From AED ${service.price}',
+                                            style: const TextStyle(color: Colors.white, fontSize: 11),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -342,7 +351,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                             );
                           },
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),

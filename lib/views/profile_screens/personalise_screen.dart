@@ -37,6 +37,9 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
     _emailController.text = localStorageService.getString(
       AppConstants.prefEmail,
     )!;
+    print("Loaded prefMobile = ${localStorageService.getString(AppConstants.prefMobile)}");
+    print("Loaded prefEmail = ${localStorageService.getString(AppConstants.prefEmail)}");
+
   }
 
   @override
@@ -74,18 +77,18 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "",
+                "Something went wrong",
                 style: const TextStyle(color: Colors.red, fontSize: 16),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async{
                   final parts = _fullNameController.text.split(" ");
                   final firstName = parts.isNotEmpty ? parts[0] : "";
                   final lastName = parts.length > 1 ? parts[1] : "";
 
-                  provider.updateProfile(
+                  await provider.updateProfile(
                     firstName,
                     lastName,
                     _emailController.text,
@@ -99,29 +102,10 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
         );
       }
 
-      if (state is Success) {
-        // ✅ Navigate on success
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (widget.isVerified) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ProfileScreen(),
-              ),
-            );
-          } else {
-            Navigator.pushReplacementNamed(
-              context,
-              AppConstants.navigateToOnBoardingScreen,
-            );
-          }
-        });
-      }
-
-      // ✅ Default UI (Idle or Success before navigating)
       return _buildMainForm(context, provider);
     },
     ),
+
 
     );
   }
@@ -180,17 +164,34 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
           width: double.infinity,
           height: 48,
           child: ElevatedButton(
-            onPressed: () {
+            onPressed: () async{
               final parts = _fullNameController.text.split(" ");
               final firstName = parts.isNotEmpty ? parts[0] : "";
               final lastName = parts.length > 1 ? parts[1] : "";
 
-              provider.updateProfile(
+             await provider.updateProfile(
                 firstName,
                 lastName,
                 _emailController.text,
                 context,
               );
+
+              // ✅ Navigate based on where screen was opened from
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (widget.isVerified) {
+                  // First time → go onboarding
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppConstants.navigateToOnBoardingScreen,
+                  );
+                } else {
+                  // From profile → go dashboard
+                  Navigator.pushReplacementNamed(
+                    context,
+                    AppConstants.navigateToDashboardScreen,
+                  );
+                }
+              });
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Appcolor.mehrun,
@@ -211,7 +212,7 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
 
         const SizedBox(height: 16),
 
-        if (widget.isVerified)
+        if (widget.isVerified) // ✅ show only on first time
           TextButton(
             onPressed: () {
               Navigator.pushReplacementNamed(

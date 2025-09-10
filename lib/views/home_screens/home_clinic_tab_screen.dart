@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 Text(
-                                  "${storage.getString(AppConstants.prefFirstName)!} ${storage.getString(AppConstants.prefLastName)!}",
+                                  "${storage.getString(AppConstants.prefFirstName)??"your"} ${storage.getString(AppConstants.prefLastName)??"name"}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Appcolor.mehrun,

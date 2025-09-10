@@ -56,6 +56,8 @@ class Doctor {
   final String title;
   final String specialization;
   final String image;
+  final int averageRating;
+  final int reviewCount;
 
   Doctor({
     required this.id,
@@ -63,6 +65,8 @@ class Doctor {
     required this.title,
     required this.specialization,
     required this.image,
+    required this.averageRating,
+    required this.reviewCount
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -72,6 +76,8 @@ class Doctor {
       title: json['title'] ?? '',
       specialization: json['specialization'] ?? '',
       image: json['image'] ?? '',
+      averageRating: json['averageRating'] ?? '',
+      reviewCount: json['reviewCount'] ?? '',
     );
   }
 }
