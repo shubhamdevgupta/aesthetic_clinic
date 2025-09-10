@@ -301,11 +301,14 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                   children: [
                                     service.image.isNotEmpty
                                         ? Image.network(
-                                      service.image,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) =>
-                                          Container(color: Colors.grey[300]),
-                                    )
+                                            service.image,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    Container(
+                                                      color: Colors.grey[300],
+                                                    ),
+                                          )
                                         : Container(color: Colors.grey[300]),
 
                                     Container(
@@ -315,7 +318,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                           end: Alignment.bottomCenter,
                                           colors: [
                                             Colors.transparent,
-                                            Appcolor.withOpacity(Appcolor.mehrun, 0.8),
+                                            Appcolor.withOpacity(
+                                              Appcolor.mehrun,
+                                              0.8,
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -326,7 +332,8 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                       right: 12,
                                       bottom: 12,
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             service.name,
@@ -340,7 +347,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                           ),
                                           Text(
                                             'Starting From AED ${service.price}',
-                                            style: const TextStyle(color: Colors.white, fontSize: 11),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 11,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -351,7 +361,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                             );
                           },
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -486,13 +496,13 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   }
 
   static Widget _topChoiceItem(
-      String serviceId,
-      String title,
-      String description,
-      String imageUrl,
-      String price,
-      BuildContext context,
-      ) {
+    String serviceId,
+    String title,
+    String description,
+    String imageUrl,
+    String price,
+    BuildContext context,
+  ) {
     return InkWell(
       onTap: () {
         showModalBottomSheet(
@@ -520,8 +530,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               Image.network(
                 imageUrl,
                 width: double.infinity,
-                height: 200, // fixed height for consistency
-                fit: BoxFit.cover, // ✅ ensures image fills area nicely
+                height: 200,
+                // fixed height for consistency
+                fit: BoxFit.cover,
+                // ✅ ensures image fills area nicely
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const ShimmerPlaceholder(
@@ -551,7 +563,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                         title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style:  TextStyle(
+                        style: TextStyle(
                           color: Appcolor.mehrun,
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
@@ -559,7 +571,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                       ),
                       Text(
                         "Starting From $price",
-                        style:  TextStyle(
+                        style: TextStyle(
                           color: Appcolor.textColor,
                           fontSize: 12,
                         ),
@@ -576,7 +588,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   }
 }
 
-class ServiceItem extends StatelessWidget {
+class ServiceItem extends StatefulWidget {
   final String imageUrl;
   final String label;
   final String serviceID;
@@ -589,59 +601,108 @@ class ServiceItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ServiceDetailScreen(serviceId: serviceID),
-          ),
-        );
-      },
-      child: Container(
-        width: 90,
-        margin: const EdgeInsets.only(right: 16),
-        child: Column(
-          children: [
-            Expanded(
-              flex: 3,
-              child: Center(
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Appcolor.textColor,
-                  ),
-                ),
-              ),
-            ),
-            // Image first (takes 70%)
-            const SizedBox(height: 6),
-            Expanded(
-              flex: 7,
-              child: ClipOval(
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain, // ensures full image shown
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return CircleShimmer(size: 48);
-                  },
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.broken_image,
-                    color: Colors.red,
-                    size: 32,
-                  ),
-                ),
-              ),
-            ),
+  State<ServiceItem> createState() => _ServiceItemState();
+}
 
-          ],
+class _ServiceItemState extends State<ServiceItem> {
+  double _scale = 1.0;
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _scale = 0.95);
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _scale = 1.0);
+  }
+
+  void _onTapCancel() {
+    setState(() => _scale = 1.0);
+  }
+
+  void _navigateToDetails() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 400),
+        pageBuilder: (_, __, ___) =>
+            ServiceDetailScreen(serviceId: widget.serviceID),
+        transitionsBuilder: (_, animation, __, child) {
+          final offsetAnimation = Tween<Offset>(
+            begin: const Offset(0.0, 1.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.ease,
+          ));
+          return SlideTransition(
+            position: offsetAnimation,
+            child: FadeTransition(opacity: animation, child: child),
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      scale: _scale,
+      duration: const Duration(milliseconds: 120),
+      curve: Curves.easeOut,
+      child: Hero(
+        tag: "service ${widget.serviceID}",
+        child: Material(
+          color: Colors.transparent, // needed for ripple
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: _navigateToDetails,
+            onTapDown: _onTapDown,
+            onTapUp: _onTapUp,
+            onTapCancel: _onTapCancel,
+            splashColor: Appcolor.mehrun.withOpacity(0.1), // custom ripple
+            highlightColor: Colors.transparent,
+            child: Container(
+              width: 90,
+              margin: const EdgeInsets.only(right: 16),
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Center(
+                      child: Text(
+                        widget.label,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Appcolor.textColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Expanded(
+                    flex: 7,
+                    child: ClipOval(
+                      child: Image.network(
+                        widget.imageUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return CircleShimmer(size: 48);
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.broken_image,
+                            color: Colors.red, size: 32),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
