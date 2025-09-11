@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart';
 import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
+import 'package:aesthetic_clinic/views/booking_screens/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -261,12 +262,12 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                         _buildCalendar(availableDates, provider),
 
                         // Available Slots Section
-                        const Text(
+                         Text(
                           'Available Slots',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: Appcolor.mehrun,
                           ),
                         ),
 
@@ -435,9 +436,15 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                               onPressed: provider.selectedSlot != null
                                   ? () async{
                                       if (provider.selectedSlot == null) return;
-                                      String formattedDate = DateFormat('yyyy-MM-dd').format(provider.selectedDate);
-                                     await provider.bookAppointment(storage.getString(AppConstants.prefUserId)!, widget.serviceId, appointmentSlot[provider.selectedDoctorIndex].doctorId, provider.selectedSlot!.id, formattedDate, "description", "purpose", "prescription",context);
-                                    }
+                                     // String formattedDate = DateFormat('yyyy-MM-dd').format(provider.selectedDate);
+                                     //await provider.bookAppointment(storage.getString(AppConstants.prefUserId)!, widget.serviceId, appointmentSlot[provider.selectedDoctorIndex].doctorId, provider.selectedSlot!.id, formattedDate, "description", "purpose", "prescription",context);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CartScreen(
+                                          ),
+                                        ),
+                                      );                                    }
                                   : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Appcolor.mehrun,
@@ -449,31 +456,13 @@ class _BookingSlotScreenState extends State<BookingSlotScreen> {
                                   vertical: 16,
                                 ),
                               ),
-                              child: Consumer<ServiceProvider>(
-                                builder: (context, provider, _) {
-                                  if (provider.appointmentSlotsState
-                                      is Success<AppointmentSlots>) {
-                                    final data =
-                                        (provider.appointmentSlotsState
-                                                as Success<AppointmentSlots>)
-                                            .response
-                                            .data;
-                                    final int? idx =
-                                        provider.selectedDoctorIndex <
-                                            data.length
-                                        ? provider.selectedDoctorIndex
-                                        : 0;
-                                    return Text(
-                                      _formatPrice(_derivePrice(data[idx!])),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    );
-                                  }
-                                  return const Text('');
-                                },
+                              child: Text(
+                                "Checkout",
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),

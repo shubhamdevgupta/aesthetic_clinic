@@ -1,10 +1,3 @@
-import 'dart:convert';
-
-import 'package:aesthetic_clinic/models/appointment/appointment_response.dart';
-import 'package:aesthetic_clinic/models/appointment/appointment_slots.dart';
-import 'package:aesthetic_clinic/models/appointment/booking_response.dart';
-import 'package:aesthetic_clinic/models/doctor/get_review.dart';
-import 'package:aesthetic_clinic/models/doctor/submit_doctor_review.dart';
 import 'package:aesthetic_clinic/models/service/all_services.dart';
 import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
 import 'package:aesthetic_clinic/models/service/sub_service.dart';
@@ -54,64 +47,6 @@ class ServiceRepository {
       );
 
       return ServiceDetailResponse.fromJson(response);
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      rethrow;
-    }
-  }
-
-  Future<AppointmentResponse> bookAppointment(
-    String clientId,
-    String serviceId,
-    String doctorId,
-    String slotId,
-    String date,
-    String description,
-    String purpose,
-    String prescription,
-  ) async {
-    try {
-      final response = await _apiService.post(
-        '/appointments/',
-        body: jsonEncode({
-          'clientId': clientId,
-          'serviceId': serviceId,
-          'doctorId': doctorId,
-          'slotId': slotId,
-          'date': date,
-          'description': description,
-          'purpose': purpose,
-          'prescription': prescription,
-        }),
-      withAuth: true);
-      return AppointmentResponse.fromJson(response);
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      rethrow;
-    }
-  }
-
-
-  Future<BookingResponse> getBookingList() async {
-    try {
-      final response = await _apiService.get(
-        '/appointments/list',
-        withAuth: true,
-      );
-      return BookingResponse.fromJson(response);
-    } catch (e) {
-      GlobalExceptionHandler.handleException(e as Exception);
-      rethrow;
-    }
-  }
-
-  Future<AppointmentSlots> getAppointmentSlots(String serviceId) async {
-    try {
-      final response = await _apiService.get(
-        '/appointment-slots?service=$serviceId',
-        withAuth: true,
-      );
-      return AppointmentSlots.fromJson(response);
     } catch (e) {
       GlobalExceptionHandler.handleException(e as Exception);
       rethrow;

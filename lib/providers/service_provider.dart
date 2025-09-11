@@ -7,6 +7,7 @@ import 'package:aesthetic_clinic/models/appointment/appointment_response.dart'
     hide Service;
 import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
 import 'package:aesthetic_clinic/models/service/sub_service.dart';
+import 'package:aesthetic_clinic/repository/BookingRepository.dart';
 import 'package:aesthetic_clinic/repository/ServiceRepository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import 'authentication_provider.dart';
 
 class ServiceProvider extends ChangeNotifier {
   final ServiceRepository serviceRepository = ServiceRepository();
+  final BookingRepository bookingRepository = BookingRepository();
 
   UiState<GetAllService> serviceState = Idle();
   UiState<ServiceResponse> subServiceState = Idle();
@@ -122,7 +124,7 @@ class ServiceProvider extends ChangeNotifier {
     bookingState = Loading();
     notifyListeners();
     try {
-      final response = await serviceRepository.getBookingList();
+      final response = await bookingRepository.getBookingList();
       if (response.status && response.statuscode == 200) {
         bookingState = Success(response);
       } else {
@@ -148,7 +150,7 @@ class ServiceProvider extends ChangeNotifier {
     appointmentSlotsState = Loading();
     notifyListeners();
     try {
-      final response = await serviceRepository.getAppointmentSlots(serviceId);
+      final response = await bookingRepository.getAppointmentSlots(serviceId);
       if (response.status && response.statuscode == 200) {
         appointmentSlotsState = Success(response);
       } else {
@@ -182,7 +184,7 @@ class ServiceProvider extends ChangeNotifier {
     bookAppointmentState = Loading();
     notifyListeners();
     try {
-      final response = await serviceRepository.bookAppointment(
+      final response = await bookingRepository.bookAppointment(
         clientId,
         serviceId,
         doctorId,
