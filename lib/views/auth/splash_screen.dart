@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [Image.asset('assets/icons/ic_logo.png', width: 220)],
+              children: [Image.asset('assets/icons/ic_logo_new.png', width: 220)],
             ),
           ),
         ],

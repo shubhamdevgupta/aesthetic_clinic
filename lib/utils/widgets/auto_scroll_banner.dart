@@ -1,5 +1,6 @@
 import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 
 class AutoScrollingBanner extends StatefulWidget {
   final List<dynamic> items; // String URLs or objects with fields
@@ -22,13 +23,24 @@ class AutoScrollingBanner extends StatefulWidget {
 class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
   final PageController _pageController = PageController();
   int currentPage = 0;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+
     if (widget.items.isNotEmpty) {
       Future.delayed(widget.autoScrollDelay, autoScroll);
     }
+
+    // Fake shimmer loading for 2s
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   void autoScroll() {
@@ -62,7 +74,9 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
           );
     }
 
-    return Column(
+    return _isLoading
+        ? _buildShimmerLoader()
+        : Column(
       children: [
         SizedBox(
           height: widget.height,
@@ -122,16 +136,17 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                             ),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Center(
-                            child: Icon(Icons.broken_image,
-                                size: 48, color: Colors.grey),
-                          ),
-                        ),
+                        errorBuilder: (context, error, stackTrace) =>
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.broken_image,
+                                    size: 48, color: Colors.grey),
+                              ),
+                            ),
                       ),
                     ),
 
@@ -256,6 +271,44 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
           ),
         ],
       ],
+    );
+  }
+
+  /// 🔥 Shimmer Loader while waiting for banners
+  Widget _buildShimmerLoader() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Column(
+        children: [
+          // Fake banner card shimmer
+          Container(
+            height: widget.height,
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Fake indicator shimmer
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              3,
+                  (index) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                height: 6,
+                width: index == 0 ? 20 : 6,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
