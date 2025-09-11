@@ -294,68 +294,93 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                   ),
                                 ],
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Stack(
-                                  fit: StackFit.expand, // 👈 make stack fill
-                                  children: [
-                                    service.image.isNotEmpty
-                                        ? Image.network(
-                                            service.image,
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    Container(
-                                                      color: Colors.grey[300],
-                                                    ),
-                                          )
-                                        : Container(color: Colors.grey[300]),
+                              child: InkWell(
+                                onTap: (){
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      transitionDuration: const Duration(milliseconds: 400),
+                                      pageBuilder: (_, __, ___) =>
+                                          ServiceDetailScreen(serviceId: service.id),
+                                      transitionsBuilder: (_, animation, __, child) {
+                                        final offsetAnimation = Tween<Offset>(
+                                          begin: const Offset(0.0, 1.0),
+                                          end: Offset.zero,
+                                        ).animate(CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.ease,
+                                        ));
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: FadeTransition(opacity: animation, child: child),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Stack(
+                                    fit: StackFit.expand, // 👈 make stack fill
+                                    children: [
+                                      service.image.isNotEmpty
+                                          ? Image.network(
+                                              service.image,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) =>
+                                                      Container(
+                                                        color: Colors.grey[300],
+                                                      ),
+                                            )
+                                          : Container(color: Colors.grey[300]),
 
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            Appcolor.withOpacity(
-                                              Appcolor.mehrun,
-                                              0.8,
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.transparent,
+                                              Appcolor.withOpacity(
+                                                Appcolor.mehrun,
+                                                0.8,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      Positioned(
+                                        left: 12,
+                                        right: 12,
+                                        bottom: 12,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              service.name,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Starting From AED ${service.price}',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 11,
+                                              ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                    ),
-
-                                    Positioned(
-                                      left: 12,
-                                      right: 12,
-                                      bottom: 12,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            service.name,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          Text(
-                                            'Starting From AED ${service.price}',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 11,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
