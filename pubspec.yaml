@@ -32,6 +32,7 @@ dependencies:
   pin_code_fields: ^8.0.1
   carousel_slider: ^5.1.1
   shimmer: ^3.0.0
+  flutter_svg: ^2.0.9
 
 
   # ✅ Required for localization

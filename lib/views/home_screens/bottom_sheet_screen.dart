@@ -76,23 +76,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 },
                 items: [
                   BottomNavigationBarItem(
-                    icon: Image.asset('assets/icons/ic_home.png', width: 48,height: 48,),
-                    activeIcon: Image.asset('assets/icons/ic_home_highlight.png', width: 48,height: 48,),
+                    icon: Icon(Icons.home,size: 28,),
+                    activeIcon: Icon(Icons.home,color: Appcolor.mehrun,),
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
-                    icon: Image.asset('assets/icons/ic_service.png', width: 48,height: 48,),
-                    activeIcon: Image.asset('assets/icons/ic_service_highlight.png', width: 48,height: 48,),
+                    icon: Icon(Icons.design_services),
+                    activeIcon: Icon(Icons.design_services,color: Appcolor.mehrun,),
                     label: 'Services',
                   ),
                   BottomNavigationBarItem(
-                    icon: Image.asset('assets/icons/ic_booking.png', width: 48,height: 48,),
-                    activeIcon: Image.asset('assets/icons/ic_booking_highlight.png', width: 48,height: 48,),
+                    icon: Icon(Icons.edit_calendar),
+                    activeIcon: Icon(Icons.edit_calendar,color: Appcolor.mehrun,),
                     label: 'Bookings',
                   ),
                   BottomNavigationBarItem(
-                    icon: Image.asset('assets/icons/ic_profile.png', width: 48,height: 48,),
-                    activeIcon: Image.asset('assets/icons/ic_profile_highlight.png', width: 48,height: 48,),
+                    icon: Icon(Icons.person),
+                    activeIcon: Icon(Icons.person,color: Appcolor.mehrun,),
                     label: 'Profile',
                   ),
                 ],
