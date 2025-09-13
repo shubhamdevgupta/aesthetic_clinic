@@ -9,7 +9,8 @@ import '../../utils/Appcolor.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
   @override
-  _LanguageSelectionScreenState createState() => _LanguageSelectionScreenState();
+  _LanguageSelectionScreenState createState() =>
+      _LanguageSelectionScreenState();
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
@@ -25,7 +26,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         title: Center(
           child: Text(
             localization.language,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
       ),
@@ -36,16 +37,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             title: 'English',
             isSelected: selectedLanguage == 'en',
             onTap: () => localeProvider.setLocale(const Locale('en')),
-
           ),
           LanguageTile(
             flagAsset: 'assets/icons/en.png',
             title: 'हिंदी',
             isSelected: selectedLanguage == 'hi',
             onTap: () => localeProvider.setLocale(const Locale('hi')),
-
           ),
-
           // Arabic Option
           LanguageTile(
             flagAsset: 'assets/icons/ar.png',
@@ -53,35 +51,33 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             isSelected: selectedLanguage == 'ar',
             onTap: () => localeProvider.setLocale(const Locale('ar')),
           ),
-
-          Spacer(),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16,),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SendOtpScreen()),
-                  );                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Appcolor.mehrun,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  localization.select,
-                  style: TextStyle(fontSize: 18,color: Colors.white),
-                ),
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        // 👆 ensures consistent padding but also respects device safe area
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const SendOtpScreen()),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Appcolor.mehrun,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
+            child: Text(
+              localization.select,
+              style: const TextStyle(fontSize: 18, color: Colors.white),
+            ),
           ),
-          SizedBox(height: 30,)
-        ],
+        ),
       ),
     );
   }
@@ -117,13 +113,9 @@ class LanguageTile extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Divider(
-            color: Colors.grey.shade300,
-            thickness: 1,
-          ),
+          child: Divider(color: Colors.grey.shade300, thickness: 1),
         ),
       ],
     );
   }
 }
-

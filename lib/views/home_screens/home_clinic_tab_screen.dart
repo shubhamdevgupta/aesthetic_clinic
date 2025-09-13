@@ -8,7 +8,6 @@ import 'package:aesthetic_clinic/utils/widgets/CartIconButton.dart';
 import 'package:aesthetic_clinic/views/home_screens/clinic_based_screen.dart';
 import 'package:aesthetic_clinic/views/home_screens/home_based_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/LocalStorageService.dart';
@@ -24,18 +23,13 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> {
   final LocalStorageService storage = LocalStorageService();
-  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      setState(() {}); // rebuild on tab change
-    });
+
   }
 
   @override
@@ -72,9 +66,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      "${storage.getString(
-                          AppConstants.prefFirstName)} ${storage.getString(
-                          AppConstants.prefLastName)}",
+                      "${storage.getString(AppConstants.prefFirstName)} ${storage.getString(AppConstants.prefLastName)}",
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -130,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen>
               _buildDrawerItem(
                 icon: Icons.logout,
                 title: 'Logout',
-                onTap: () {
+                onTap: (){
                   AppDialogs.showLogoutDialog(context);
                 },
                 isLogout: true,
@@ -142,8 +134,7 @@ class _HomeScreenState extends State<HomeScreen>
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
           print("object--- ${storage.getString(AppConstants.prefUserId)}");
-          print(
-              "object--- ${storage.getString(AppConstants.prefRefreshToken)}");
+          print("object--- ${storage.getString(AppConstants.prefRefreshToken)}");
           return DefaultTabController(
             length: 2,
             initialIndex: 0,
@@ -171,10 +162,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   style: const TextStyle(fontSize: 14),
                                 ),
                                 Text(
-                                  "${storage.getString(
-                                      AppConstants.prefFirstName) ??
-                                      "your"} ${storage.getString(
-                                      AppConstants.prefLastName) ?? "name"}",
+                                  "${storage.getString(AppConstants.prefFirstName)??"your"} ${storage.getString(AppConstants.prefLastName)??"name"}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Appcolor.mehrun,
@@ -239,8 +227,7 @@ class _HomeScreenState extends State<HomeScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(11),
-                      // Slightly smaller to fit inside border
+                      borderRadius: BorderRadius.circular(11), // Slightly smaller to fit inside border
                       child: TabBar(
                         padding: EdgeInsets.zero,
                         labelPadding: EdgeInsets.zero,
@@ -254,55 +241,44 @@ class _HomeScreenState extends State<HomeScreen>
                         unselectedLabelColor: Colors.grey[600],
                         dividerColor: Colors.transparent,
                         splashFactory: NoSplash.splashFactory,
-                        overlayColor: MaterialStateProperty.all(Colors
-                            .transparent),
+                        overlayColor: MaterialStateProperty.all(Colors.transparent),
                         tabs: [
                           Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                              SvgPicture.asset(
-                              'assets/icons/ic_tab_clinic.svg',
-                              width: 24,
-                              height: 24,
-                              color: _tabController.index == 0
-                                  ? Colors.white
-                                  : Colors.grey[600],
-                            ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Clinic Based',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: _tabController.index == 0
-                                        ? Colors.white
-                                        : Colors.grey[600],
+                            child: Container(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ImageIcon(
+                                    AssetImage('assets/icons/ic_tab_clinic.png'),
+                                    size: 20,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Clinic Based',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Tab(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.home_outlined,
-                                  color: _tabController.index == 1
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'Home Based',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: _tabController.index == 1
-                                        ? Colors.white
-                                        : Colors.grey[600],
+                            child: Container(
+                              width: double.infinity,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  ImageIcon(
+                                    AssetImage('assets/icons/ic_tab_home.png'),
+                                    size: 20,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'Home Based',
+                                    style: TextStyle(fontSize: 13),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -311,9 +287,8 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
 
                   // TabBarView (Expanded to fill space)
-                  Expanded(
+                  const Expanded(
                     child: TabBarView(
-                      controller: _tabController,
                       children: [ClinicBasedScreen(), HomeBasedScreen()],
                     ),
                   ),
@@ -354,9 +329,7 @@ class _HomeScreenState extends State<HomeScreen>
 }
 
 String _getGreeting() {
-  final hour = DateTime
-      .now()
-      .hour;
+  final hour = DateTime.now().hour;
   if (hour < 12) return 'Good Morning';
   if (hour < 17) return 'Good Afternoon';
   return 'Good Evening';

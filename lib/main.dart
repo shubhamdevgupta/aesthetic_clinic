@@ -6,8 +6,10 @@ import 'package:aesthetic_clinic/providers/service_provider.dart';
 import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/utils/AppRoutes.dart';
+import 'package:aesthetic_clinic/utils/appcolor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'l10n/app_localizations.dart';
@@ -54,7 +56,8 @@ class MyApp extends StatelessWidget {
       navigatorKey: navigatorKey,
       title: 'Aesthetic Clinic',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        textTheme: GoogleFonts.poppinsTextTheme(),
+        colorScheme: ColorScheme.fromSeed(seedColor: Appcolor.mehrun),
         useMaterial3: true,
       ),
       initialRoute: AppConstants.navigateToSplashScreen,

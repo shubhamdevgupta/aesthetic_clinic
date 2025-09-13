@@ -9,6 +9,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../models/banner_list.dart';
 import '../../models/doctor/doctor_response.dart';
 import '../../services/ui_state.dart';
+import '../../utils/ShimerPlaceholder.dart';
 import '../../utils/widgets/auto_scroll_banner.dart';
 import '../service_screens/service_details.dart';
 import '../service_screens/service_popup.dart';
@@ -147,31 +148,180 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 ),
               ),
 
-              // ✅ Personalized
               SliverToBoxAdapter(
-                child: _section(
-                  "Our Personalise Services for You",
-                  SizedBox(
-                    height: 180,
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: personalizeServices.length,
-                      itemBuilder: (context, index) {
-                        final service = personalizeServices[index];
-                        return _topChoiceItem(
-                          service.id,
-                          service.name,
-                          service.description,
-                          service.personalisedServiceImages,
-                          service.price,
-                          context,
-                        );
-                      },
-                    ),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Our Personalise Services for You",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Appcolor.mehrun,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 180,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: personalizeServices.length,
+                          itemBuilder: (context, index) {
+                            final personalize = personalizeServices[index];
+                            return _topChoiceItem(
+                              personalize.id,
+                              personalize.name,
+                              personalize.description,
+                              personalize.personalisedServiceImages,
+                              personalize.price,
+                              context,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
+              // ✅ Personalized
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Our Top Choices for You",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Appcolor.mehrun,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        height: 180,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: personalizeServices.length,
+                          itemBuilder: (context, index) {
+                            final service = personalizeServices[index];
+                            return Container(
+                              width: 160, // 👈 FIX: set width
+                              margin: const EdgeInsets.only(right: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.06),
+                                    spreadRadius: 1,
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: InkWell(
+                                onTap: (){
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      transitionDuration: const Duration(milliseconds: 400),
+                                      pageBuilder: (_, __, ___) =>
+                                          ServiceDetailScreen(serviceId: service.id),
+                                      transitionsBuilder: (_, animation, __, child) {
+                                        final offsetAnimation = Tween<Offset>(
+                                          begin: const Offset(0.0, 1.0),
+                                          end: Offset.zero,
+                                        ).animate(CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.ease,
+                                        ));
+                                        return SlideTransition(
+                                          position: offsetAnimation,
+                                          child: FadeTransition(opacity: animation, child: child),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Stack(
+                                    fit: StackFit.expand, // 👈 make stack fill
+                                    children: [
+                                      service.image.isNotEmpty
+                                          ? Image.network(
+                                        service.image,
+                                        fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                            Container(
+                                              color: Colors.grey[300],
+                                            ),
+                                      )
+                                          : Container(color: Colors.grey[300]),
+
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.transparent,
+                                              Appcolor.withOpacity(
+                                                Appcolor.mehrun,
+                                                0.8,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+
+                                      Positioned(
+                                        left: 12,
+                                        right: 12,
+                                        bottom: 12,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              service.name,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Starting From AED ${service.price}',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
 
               // ✅ Doctors
               SliverToBoxAdapter(
@@ -310,19 +460,58 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
-              Container(color: Colors.grey[300]), // fallback
+              // Background image
+              Image.network(
+                imageUrl,
+                width: double.infinity,
+                height: 200,
+                // fixed height for consistency
+                fit: BoxFit.cover,
+                // ✅ ensures image fills area nicely
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const ShimmerPlaceholder(
+                    width: 160,
+                    height: 200,
+                    borderRadius: 16,
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 200,
+                  color: const Color(0xFFFFEBEE),
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.broken_image, color: Colors.red),
+                ),
+              ),
+
+              // Positioned text
               Positioned(
                 left: 8,
                 right: 8,
                 bottom: 0,
-                child: Text(
-                  title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      color: Appcolor.mehrun,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Appcolor.mehrun,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      Text(
+                        "Starting From $price",
+                        style: TextStyle(
+                          color: Appcolor.textColor,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],

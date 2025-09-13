@@ -26,6 +26,14 @@ class HomeProvider extends ChangeNotifier {
   double _selectedRating = 0.0;
 
   double get selectedRating => _selectedRating;
+  int _selectedTabIndex = 0;
+
+  int get selectedTabIndex => _selectedTabIndex;
+
+  void setSelectedTab(int index) {
+    _selectedTabIndex = index;
+    notifyListeners();
+  }
 
   Future<void> getDashboardData(BuildContext context) async {
     dashboardState = Loading();
