@@ -3,7 +3,7 @@ import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:aesthetic_clinic/views/profile_screens/personalise_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/app_localizations.dart';
@@ -18,18 +18,92 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+  final int otpLength = 6;
+  late List<TextEditingController> _controllers;
+  late List<FocusNode> _focusNodes;
   String otpValue = '';
 
   @override
   void initState() {
     super.initState();
+
+    _controllers = List.generate(otpLength, (_) => TextEditingController());
+    _focusNodes = List.generate(otpLength, (_) => FocusNode());
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<AuthenticationProvider>(
         context,
         listen: false,
       );
       provider.startTimer();
+      _focusNodes[0].requestFocus();
     });
+
+  }
+
+  void _onOtpChanged() {
+    setState(() {
+      otpValue = _controllers.map((c) => c.text).join();
+    });
+
+    if (otpValue.length == otpLength) {
+      final provider = Provider.of<AuthenticationProvider>(
+        context,
+        listen: false,
+      );
+
+      final phoneNumber = provider.formatPhoneNumber(
+        provider.selectedCountry.phoneCode,
+        provider.phoneController.text,
+      );
+
+      provider.verifyOtp(phoneNumber, otpValue);
+    }
+  }
+
+
+  Widget _buildOtpField(int index) {
+    return SizedBox(
+      width: 45,
+      child: TextField(
+        controller: _controllers[index],
+        focusNode: _focusNodes[index],
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        maxLength: 1,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          counterText: "",
+          border: OutlineInputBorder(),
+        ),
+        onChanged: (value) {
+          if (value.isNotEmpty) {
+            if (index + 1 < otpLength) {
+              FocusScope.of(context).requestFocus(_focusNodes[index + 1]);
+            } else {
+              FocusScope.of(context).unfocus();
+            }
+          } else {
+            if (index > 0) {
+              FocusScope.of(context).requestFocus(_focusNodes[index - 1]);
+            }
+          }
+          _onOtpChanged();
+        },
+        onTap: () async {
+          final data = await Clipboard.getData("text/plain");
+          if (data != null && data.text != null) {
+            final pasted = data.text!.trim();
+            if (pasted.length == otpLength) {
+              for (int i = 0; i < otpLength; i++) {
+                _controllers[i].text = pasted[i];
+              }
+              _onOtpChanged(); // auto verify
+            }
+          }
+        },
+      ),
+    );
   }
 
   void _onResend() {
@@ -55,7 +129,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         builder: (context, provider, child) {
           final state = provider.verifyOtpState;
 
-          // Navigate only once on success
           if (state is Success<VerifyOtpResponseModel>) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
@@ -71,7 +144,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             children: [
               Column(
                 children: [
-                  // Scrollable content
                   Expanded(
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.all(24),
@@ -104,25 +176,12 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           ),
                           const SizedBox(height: 24),
 
-                          // OTP input
-                          PinCodeTextField(
-                            appContext: context,
-                            length: 6,
-                            keyboardType: TextInputType.number,
-                            onChanged: (value) {
-                              otpValue = value;
-                              if (provider.errorMsg.isNotEmpty) {
-                                provider.clearError();
-                              }
-                            },
-                            pinTheme: PinTheme(
-                              activeColor: Appcolor.mehrun,
-                              inactiveColor: Colors.grey.shade700,
-                              selectedColor: Appcolor.mehrun,
-                              shape: PinCodeFieldShape.box,
-                              borderRadius: BorderRadius.circular(8),
-                              fieldHeight: 50,
-                              fieldWidth: 40,
+                          // ✅ Custom OTP input (6 fields)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: List.generate(
+                              otpLength,
+                                  (index) => _buildOtpField(index),
                             ),
                           ),
 
@@ -131,7 +190,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           Text(
                             provider.canResend
                                 ? localization.resendNow
-                                : "${localization.resendInTime} ${provider.start.toString().padLeft(2, '0')}",
+                                : "${localization.resendInTime} : ${provider.start.toString().padLeft(2, '0')}",
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
 
@@ -184,7 +243,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     ),
                   ),
 
-                  // Fixed bottom section
+                  // Bottom section
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -214,15 +273,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () async {
+                              onPressed: otpValue.length == otpLength
+                                  ? () async {
                                 final phoneNumber =
                                 provider.formatPhoneNumber(
                                   provider.selectedCountry.phoneCode,
                                   provider.phoneController.text,
                                 );
-                                await provider.verifyOtp(
-                                    phoneNumber, otpValue);
-                              },
+                                await provider.verifyOtp(phoneNumber, otpValue);
+                              }:null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Appcolor.mehrun,
                                 padding:
@@ -247,7 +306,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ],
               ),
 
-              // Loading overlay
               if (state is Loading)
                 Container(
                   color: Colors.black26,

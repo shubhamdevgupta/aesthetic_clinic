@@ -39,6 +39,7 @@ class AuthenticationProvider extends ChangeNotifier {
       } else {
           start--;
       }
+      notifyListeners();
     });
   }
   Country _selectedCountry = Country(
