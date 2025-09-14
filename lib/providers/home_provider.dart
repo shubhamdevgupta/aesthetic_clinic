@@ -14,7 +14,6 @@ import '../utils/CustomException.dart';
 class HomeProvider extends ChangeNotifier {
   final HomeRepository homeRepository = HomeRepository();
 
-  TextEditingController reviewController = TextEditingController();
 
   UiState<AppConfigurationResponse> dashboardState = Idle();
   UiState<DoctorResponse> doctorState = Idle();

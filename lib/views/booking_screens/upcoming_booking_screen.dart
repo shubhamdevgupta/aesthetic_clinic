@@ -4,6 +4,7 @@ import 'package:aesthetic_clinic/services/ui_state.dart';
 import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'booking_tab_screen.dart';
 
@@ -25,12 +26,14 @@ class _UpcomingBookingScreenState extends State<UpcomingBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Consumer<ServiceProvider>(
       builder: (context, provider, _) {
         final state = provider.bookingState;
 
-        if (state is Loading || state is Idle) {
-          return const Center(child: CircularProgressIndicator());
+        if (state is Loading) {
+          return _ShimmerBookingList(width: width, height: height);
         }
 
         if (state is Error) {
@@ -276,4 +279,37 @@ class _BookingCard extends StatelessWidget {
       ),
     );
   }
+
 }
+class _ShimmerBookingList extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const _ShimmerBookingList({required this.width, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding:
+      EdgeInsets.symmetric(horizontal: width * 0.04, vertical: height * 0.015),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(bottom: height * 0.015),
+            padding: EdgeInsets.all(width * 0.04),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            height: height * 0.18,
+          ),
+        );
+      },
+    );
+  }
+}
+

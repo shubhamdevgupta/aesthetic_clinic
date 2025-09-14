@@ -12,7 +12,7 @@ class DoctorProfileScreen extends StatefulWidget {
   final String doctorId;
 
   const DoctorProfileScreen({Key? key, required this.doctorId})
-      : super(key: key);
+    : super(key: key);
 
   @override
   State<DoctorProfileScreen> createState() => _DoctorProfileScreenState();
@@ -23,16 +23,26 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-          () => Provider.of<HomeProvider>(context, listen: false).getDoctorById(widget.doctorId,context),
+          () =>
+          Provider.of<HomeProvider>(
+            context,
+            listen: false,
+          ).getDoctorById(widget.doctorId, context),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery
+        .of(context)
+        .size; // ✅ responsiveness
+    final width = size.width;
+    final height = size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text('Doctor Profile'),
+        title: const Text('Doctor Profile'),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -43,25 +53,27 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
           final doctorState = provider.doctorDetailState;
-          if ( doctorState is Loading || doctorState is Idle) {
-            return const Center(child: CircularProgressIndicator());
+
+          if (doctorState is Loading || doctorState is Idle) {
+            // ✅ Show shimmer instead of loader
+            return _buildShimmer(width, height);
           }
 
           if (doctorState is Error) {
-            return Center(child: Text(""));
+            return const Center(child: Text("Something went wrong"));
           }
-          final doctor = (doctorState as Success<DoctorDetailModel>).response.data;
 
-        //  final doctor = provider.doctorDetailResponse!.data;
+          final doctor =
+              (doctorState as Success<DoctorDetailModel>).response.data;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(width * 0.05), // responsive padding
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Doctor Header Section
+                // ✅ Doctor Header Section
                 Container(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: EdgeInsets.all(width * 0.05),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(12),
@@ -70,36 +82,38 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                     children: [
                       // Doctor Image
                       SizedBox(
-                        width: 84,
-                        height: 84,
+                        width: width * 0.22,
+                        height: width * 0.22,
                         child: ClipOval(
-                          child: Image.network(
-                            '${doctor!.image}',
+                          child:
+                          (doctor!.image != null &&
+                              doctor.image!.isNotEmpty &&
+                              doctor.image!.startsWith('http'))
+                              ? Image.network(
+                            doctor.image!,
                             fit: BoxFit.cover,
-                            cacheWidth: 120,
-                            cacheHeight: 120,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const ShimmerPlaceholder(
-                                width: 64,
-                                height: 64,
+                            cacheWidth: 200,
+                            cacheHeight: 200,
+                            loadingBuilder:
+                                (context, child, loadingProgress) {
+                              if (loadingProgress == null)
+                                return child;
+                              return ShimmerPlaceholder(
+                                width: width * 0.18,
+                                height: width * 0.18,
                                 isCircle: true,
                               );
                             },
-                            errorBuilder: (context, error, stackTrace) =>
-                            const CircleAvatar(
-                              backgroundColor: Colors.grey,
-                              child: Icon(
-                                Icons.broken_image,
-                                color: Appcolor.mehrun,
-                                size: 24,
-                              ),
-                            ),
-                          ),
+                            errorBuilder: (context, error, stackTrace) {
+                              return _buildInitialsAvatar(doctor.name);
+                            },
+                          )
+                              : _buildInitialsAvatar(doctor.name),
                         ),
                       ),
 
-                      const SizedBox(width: 16),
+                      SizedBox(width: width * 0.04),
+
                       // Doctor Info
                       Expanded(
                         child: Column(
@@ -108,39 +122,38 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             Text(
                               "${doctor.title} ${doctor.name}",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: width * 0.045,
                                 fontWeight: FontWeight.bold,
                                 color: Appcolor.mehrun,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: height * 0.004),
                             Text(
                               '${doctor.specialization}',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: width * 0.038,
                                 color: Appcolor.textColor,
                                 height: 1.3,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: height * 0.004),
                             Row(
                               children: [
                                 Text(
                                   'Experience: ',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: width * 0.035,
                                     color: Colors.grey.shade600,
                                   ),
                                 ),
                                 Text(
                                   '${doctor.experience}+ years',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: width * 0.038,
                                     fontWeight: FontWeight.w600,
                                     color: Appcolor.mehrun,
                                   ),
                                 ),
-                                const Spacer(),
                               ],
                             ),
                           ],
@@ -150,87 +163,48 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: height * 0.02),
 
                 // About Section
                 Text(
-                  '${doctor.bio}',
+                  doctor.bio??"",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: width * 0.038,
                     color: Colors.grey.shade700,
                     height: 1.5,
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: height * 0.02),
 
-                // Specialized In Section
-                const Text(
+                _buildSectionTitle(
                   'Specialized In:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Appcolor.mehrun,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${doctor.specialization}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                    height: 1.5,
-                  ),
+                  doctor.specialization ?? '',
+                  width,
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: height * 0.02),
 
-                // Certification Section
-                const Text(
+                _buildSectionTitle(
                   'Certification:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Appcolor.mehrun,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
                   'Board-certified in Dermatology and Venereology.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                    height: 1.5,
-                  ),
+                  width,
                 ),
 
-                const SizedBox(height: 20),
+                SizedBox(height: height * 0.02),
 
-                // Explore My Expertise Section
-                const Text(
+                _buildSectionTitle(
                   'Explore My Expertise:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Appcolor.mehrun,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
                   'From diagnosing and treating complex skin conditions to delivering tailored aesthetic procedures, my focus is on achieving results that are both medically sound and visually refined. I specialize in laser therapies for skin rejuvenation, botulinum toxin, fillers, PRP, mesotherapy, and minor dermatologic surgeries.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                    height: 1.5,
-                  ),
+                  width,
                 ),
 
-                const SizedBox(height: 30),
+                SizedBox(height: height * 0.03),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 16,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: width * 0.05,
+                    vertical: height * 0.015,
                   ),
                   child: Row(
                     children: [
@@ -240,13 +214,16 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DoctorReviewScreen(doctorData :doctor)
+                                builder: (context) =>
+                                    DoctorReviewScreen(doctorData: doctor),
                               ),
                             );
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Appcolor.mehrun),
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: EdgeInsets.symmetric(
+                              vertical: height * 0.018,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -260,15 +237,17 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: width * 0.03),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // Handle check availability
+                            // TODO: check availability
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Appcolor.mehrun,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: EdgeInsets.symmetric(
+                              vertical: height * 0.018,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -284,11 +263,122 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                       ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  // ✅ Section Builder
+  Widget _buildSectionTitle(String title, String description, double width) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: width * 0.042,
+            fontWeight: FontWeight.bold,
+            color: Appcolor.mehrun,
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          description,
+          style: TextStyle(
+            fontSize: width * 0.038,
+            color: Colors.grey.shade700,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ✅ Helper widget for initials avatar
+  Widget _buildInitialsAvatar(String? name) {
+    final initials = (name != null && name
+        .trim()
+        .isNotEmpty)
+        ? name
+        .trim()
+        .split(' ')
+        .map((e) => e.isNotEmpty ? e[0] : '')
+        .take(2)
+        .join()
+        .toUpperCase()
+        : '?';
+
+    return CircleAvatar(
+      backgroundColor: Colors.grey.shade300,
+      child: Text(
+        initials,
+        style: const TextStyle(
+          color: Appcolor.mehrun,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
+  // ✅ Shimmer UI (for loading)
+  Widget _buildShimmer(double width, double height) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(width * 0.05),
+      child: Column(
+        children: [
+          // Doctor header shimmer
+          Row(
+            children: [
+              ShimmerPlaceholder(
+                width: width * 0.22,
+                height: width * 0.22,
+                isCircle: true,
+              ),
+              SizedBox(width: width * 0.04),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ShimmerPlaceholder(width: width * 0.4, height: 18),
+                    SizedBox(height: height * 0.01),
+                    ShimmerPlaceholder(width: width * 0.3, height: 14),
+                    SizedBox(height: height * 0.01),
+                    ShimmerPlaceholder(width: width * 0.5, height: 14),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          SizedBox(height: height * 0.03),
+
+          // About shimmer
+          ShimmerPlaceholder(width: double.infinity, height: 14),
+          SizedBox(height: height * 0.01),
+          ShimmerPlaceholder(width: double.infinity, height: 14),
+          SizedBox(height: height * 0.01),
+          ShimmerPlaceholder(width: width * 0.8, height: 14),
+
+          SizedBox(height: height * 0.03),
+
+          // Button shimmer
+          Row(
+            children: [
+              Expanded(
+                child: ShimmerPlaceholder(width: double.infinity, height: 40),
+              ),
+              SizedBox(width: width * 0.03),
+              Expanded(
+                child: ShimmerPlaceholder(width: double.infinity, height: 40),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

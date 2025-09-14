@@ -5,6 +5,7 @@ import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:aesthetic_clinic/utils/toast_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart'; // ⭐ Added shimmer package
 
 import '../../providers/home_provider.dart';
 import '../../services/ui_state.dart';
@@ -19,24 +20,32 @@ class DoctorReviewScreen extends StatefulWidget {
 }
 
 class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
+  TextEditingController reviewController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     Future.microtask(
-      () => Provider.of<HomeProvider>(
+          () => Provider.of<HomeProvider>(
         context,
         listen: false,
-      ).getDoctorReview(widget.doctorData.id ?? "",context),
+      ).getDoctorReview(widget.doctorData.id ?? "", context),
     );
   }
+  @override
+  void dispose() {
+    super.dispose();
+    reviewController.clear();
+  }
+
 
   /// ⭐ Reusable star builder (supports half stars)
   Widget buildStarRating(
-    double rating, {
-    bool isInteractive = false,
-    double size = 20,
-    Function(double)? onChanged,
-  }) {
+      double rating, {
+        bool isInteractive = false,
+        double size = 20,
+        Function(double)? onChanged,
+      }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: List.generate(5, (index) {
@@ -59,6 +68,27 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
     );
   }
 
+  /// ⭐ Shimmer loader widget
+  Widget shimmerLoader() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: ListView.builder(
+        itemCount: 6,
+        itemBuilder: (context, index) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Container(
+            height: 80,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,13 +107,12 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
           final doctoReviewState = provider.doctorReviewState;
           final submitReviewState = provider.submitReviewState;
 
-          // 🔹 Show loader for Idle & Loading (for either state)
+          // 🔹 Show shimmer for Idle & Loading
           if (doctoReviewState is Idle ||
               doctoReviewState is Loading ||
               submitReviewState is Loading) {
-            return const Center(child: CircularProgressIndicator());
+            return shimmerLoader();
           }
-
 
           // 🔹 Success: safe cast now
           if (doctoReviewState is Success<DoctorReview>) {
@@ -103,11 +132,30 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                     ),
                     child: Row(
                       children: [
+                        // ⭐ Doctor image with fallback initials
                         CircleAvatar(
                           radius: 40,
-                          backgroundImage: NetworkImage(
-                            widget.doctorData.image ?? "",
-                          ),
+                          backgroundColor: Appcolor.mehrun,
+                          backgroundImage: (widget.doctorData.image != null &&
+                              widget.doctorData.image!.isNotEmpty)
+                              ? NetworkImage(widget.doctorData.image!)
+                              : null,
+                          child: (widget.doctorData.image == null ||
+                              widget.doctorData.image!.isEmpty)
+                              ? Text(
+                            widget.doctorData.name
+                                ?.split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase() ??
+                                "",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          )
+                              : null,
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -183,20 +231,25 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
 
                   const SizedBox(height: 16),
 
+                  // ⭐ Stylish TextField
                   TextField(
-                    controller: provider.reviewController,
+                    controller: reviewController,
                     keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                      labelText: "Write your review",
-                      floatingLabelBehavior: FloatingLabelBehavior.auto,
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 12,
+                    decoration: InputDecoration(
+                      hintText: "Write your review...",
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 16,
                       ),
-                      border: InputBorder.none,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
+
                   const SizedBox(height: 20),
 
                   // ✅ Submit Review Button
@@ -204,23 +257,26 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
+                        if(reviewController.text.isEmpty){
+                          ToastHelper.showToastMessage("Please enter your Review");
+
+                        }else{
                         await provider.submitReview(
                           provider.selectedRating.toString(),
-                          provider.reviewController.text,
-                          widget.doctorData.id ?? "",context
+                          reviewController.text,
+                          widget.doctorData.id ?? "",
+                          context,
                         );
 
-                        // Handle submit success message safely
-                        if (provider.submitReviewState
-                            is Success<ReviewResponse>) {
+                        if (provider.submitReviewState is Success<ReviewResponse>) {
                           final response =
-                              (provider.submitReviewState
-                                      as Success<ReviewResponse>)
+                              (provider.submitReviewState as Success<ReviewResponse>)
                                   .response;
                           ToastHelper.showToastMessage(response.message);
                           provider.setSelectedRating(0);
-                          provider.reviewController.clear();
-                        }
+                          reviewController.clear();
+                          provider.getDoctorReview(widget.doctorData.id??"", context);
+                        }}
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Appcolor.mehrun,
@@ -246,30 +302,29 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                   doctor.isEmpty
                       ? const Center(child: Text("No reviews yet"))
                       : ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: doctor.length,
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 20),
-                          itemBuilder: (context, index) {
-                            final review = doctor[index];
-                            return ReviewCard(
-                              name:
-                                  "${review.reviewer.firstName} ${review.reviewer.lastName}",
-                              date: review.date,
-                              rating: review.rating,
-                              comment: review.review,
-                              avatarColor: Appcolor.mehrun,
-                            );
-                          },
-                        ),
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: doctor.length,
+                    separatorBuilder: (context, index) =>
+                    const SizedBox(height: 20),
+                    itemBuilder: (context, index) {
+                      final review = doctor[index];
+                      return ReviewCard(
+                        name:
+                        "${review.reviewer.firstName} ${review.reviewer.lastName}",
+                        date: review.date,
+                        rating: review.rating,
+                        comment: review.review,
+                        avatarColor: Appcolor.mehrun,
+                      );
+                    },
+                  ),
                 ],
               ),
             );
           }
 
-          // Fallback in case of unexpected state
-          return const Center(child: CircularProgressIndicator());
+          return shimmerLoader(); // fallback
         },
       ),
     );
@@ -307,7 +362,7 @@ class ReviewCard extends StatelessWidget {
           icon = Icons.star_border;
         }
 
-        return Icon(icon, color: Colors.red, size: 16);
+        return Icon(icon, color: Appcolor.mehrun, size: 16);
       }),
     );
   }

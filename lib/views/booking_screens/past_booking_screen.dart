@@ -4,6 +4,7 @@ import 'package:aesthetic_clinic/services/ui_state.dart';
 import 'package:aesthetic_clinic/utils/Appcolor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import 'booking_tab_screen.dart';
 
@@ -19,18 +20,21 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ServiceProvider>(context, listen: false).getBookingList(context);
+      Provider.of<ServiceProvider>(context, listen: false)
+          .getBookingList(context);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Consumer<ServiceProvider>(
       builder: (context, provider, _) {
         final state = provider.bookingState;
 
         if (state is Loading) {
-          return const Center(child: CircularProgressIndicator());
+          return _ShimmerBookingList(width: width, height: height);
         }
 
         if (state is Error) {
@@ -38,7 +42,8 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 56, color: Colors.grey.shade400),
+                Icon(Icons.error_outline,
+                    size: width * 0.15, color: Colors.grey.shade400),
                 const SizedBox(height: 12),
                 Text("", style: TextStyle(color: Colors.grey.shade600)),
                 const SizedBox(height: 12),
@@ -62,7 +67,8 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
         }
 
         return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(
+              horizontal: width * 0.04, vertical: height * 0.015),
           itemCount: past.length,
           itemBuilder: (context, index) {
             final b = past[index];
@@ -71,11 +77,10 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
               title: b.service.name,
               minutes: b.doctorSlot.duration,
               subtitle: b.purpose,
-              dateLine: '${_formatBookingDate(b.date)} ${b.doctorSlot.startTime} with ${b.doctor.title} ${b.doctor.name}',
+              dateLine:
+              '${_formatBookingDate(b.date)} ${b.doctorSlot.startTime} with ${b.doctor.title} ${b.doctor.name}',
               bookingId: b.id,
-              onPrimaryAction: () {
-
-              },
+              onPrimaryAction: () {},
               onSecondaryAction: () {},
             );
           },
@@ -94,7 +99,7 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
     return b.status != 1;
   }
 
-   List<String> _monthShort = [
+  List<String> _monthShort = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
@@ -103,6 +108,38 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
     if (d == null) return iso;
     final month = _monthShort[d.month - 1];
     return '$month ${d.day}';
+  }
+}
+
+class _ShimmerBookingList extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const _ShimmerBookingList({required this.width, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding:
+      EdgeInsets.symmetric(horizontal: width * 0.04, vertical: height * 0.015),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(bottom: height * 0.015),
+            padding: EdgeInsets.all(width * 0.04),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            height: height * 0.18,
+          ),
+        );
+      },
+    );
   }
 }
 
@@ -121,13 +158,16 @@ class _EmptyBookingsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double imageSize = MediaQuery.of(context).size.width * 0.55;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    final double imageSize = width * 0.55;
+
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.04),
         child: Column(
           children: [
-            SizedBox(height: MediaQuery.of(context).size.height * 0.12),
+            SizedBox(height: height * 0.12),
             Center(
               child: Image.asset(
                 'assets/icons/ic_skin_booking.png',
@@ -136,9 +176,9 @@ class _EmptyBookingsView extends StatelessWidget {
                 fit: BoxFit.contain,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: height * 0.02),
             Text(title, textAlign: TextAlign.center, style: kEmptyTitleStyle),
-            const SizedBox(height: 24),
+            SizedBox(height: height * 0.03),
             if (showPrimaryAction)
               SizedBox(
                 width: double.infinity,
@@ -146,7 +186,7 @@ class _EmptyBookingsView extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     backgroundColor: kPrimaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: height * 0.018),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -191,16 +231,19 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: height * 0.015),
+      padding: EdgeInsets.all(width * 0.04),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.7),
+            color: Colors.black.withOpacity(0.07),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -212,28 +255,33 @@ class _BookingCard extends StatelessWidget {
         children: [
           Text(
             '$minutes Mins',
-            style: TextStyle(color: Colors.grey[600], fontSize: 12),
+            style: TextStyle(color: Colors.grey[600], fontSize: width * 0.03),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: height * 0.008),
           Text(
             title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            style:
+            TextStyle(fontSize: width * 0.045, fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: height * 0.006),
           Text(
             subtitle,
-            style: const TextStyle(fontSize: 12, color: kCardSubtitle, height: 1.4),
+            style: TextStyle(
+              fontSize: width * 0.032,
+              color: kCardSubtitle,
+              height: 1.4,
+            ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: height * 0.012),
           Text(
             dateLine,
-            style: const TextStyle(
-              fontSize: 13,
+            style: TextStyle(
+              fontSize: width * 0.034,
               fontWeight: FontWeight.w700,
               color: kPrimaryColor,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: height * 0.02),
           Row(
             children: [
               Expanded(
@@ -241,32 +289,38 @@ class _BookingCard extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     elevation: 0,
                     backgroundColor: kPrimaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: EdgeInsets.symmetric(vertical: height * 0.016),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   onPressed: onPrimaryAction,
-                  child: Text(isUpcoming ? 'Reschedule' : 'Submit Review',style: TextStyle(color: Appcolor.white),),
+                  child: Text(
+                    isUpcoming ? 'Reschedule' : 'Submit Review',
+                    style: TextStyle(color: Appcolor.white),
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: width * 0.03),
               Expanded(
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.grey[300]!),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: EdgeInsets.symmetric(vertical: height * 0.016),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    foregroundColor: isUpcoming ? Colors.black : kPrimaryColor,
+                    foregroundColor:
+                    isUpcoming ? Colors.black : kPrimaryColor,
                   ),
                   onPressed: onSecondaryAction,
                   icon: Icon(
                     isUpcoming ? Icons.cancel_outlined : Icons.refresh,
-                    size: 18,
+                    size: width * 0.045,
                   ),
-                  label: Text(isUpcoming ? 'Cancel Booking' : 'Book Again'),
+                  label: Text(
+                      isUpcoming ? 'Cancel Booking' : 'Book Again',
+                      style: TextStyle(fontSize: width * 0.032)),
                 ),
               ),
             ],

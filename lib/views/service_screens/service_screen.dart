@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/views/service_screens/service_details.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../models/service/all_services.dart';
 import '../../models/service/sub_service.dart';
@@ -39,8 +40,36 @@ class _ServicesScreenState extends State<ServiceScreen> {
             final state = provider.serviceState;
 
             if (state is Loading) {
-              return const Center(child: CircularProgressIndicator());
+              // Instead of CircularProgressIndicator
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Container(
+                      height: 20,
+                      width: 160,
+                      color: Colors.transparent,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          height: 20,
+                          width: 160,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ShimmerWidgets.mainCategories(),
+                    const SizedBox(height: 18),
+                    ShimmerWidgets.subServicesGrid(),
+                  ],
+                ),
+              );
             }
+
 
             if (state is Error) {
               return Center(
@@ -86,27 +115,33 @@ class _ServicesScreenState extends State<ServiceScreen> {
                 });
               }
 
-              return SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Our Main Categories',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Appcolor.mehrun,
+              return RefreshIndicator(
+                onRefresh: ()async{
+                  await  provider.getMainServices(context);
+                },
+                child: SingleChildScrollView(
+                  physics:const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Our Main Categories',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Appcolor.mehrun,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildMainCategoriesGrid(services),
-                      const SizedBox(height: 24),
-                      _buildSubServicesSection(provider),
-                      const SizedBox(height: 100),
-                    ],
+                        const SizedBox(height: 16),
+                        _buildMainCategoriesGrid(services),
+                        const SizedBox(height: 24),
+                        _buildSubServicesSection(provider),
+                        const SizedBox(height: 100),
+                      ],
+                    ),
                   ),
                 ),
               );
@@ -237,10 +272,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
   Widget _buildSubServicesSection(ServiceProvider provider) {
     final state = provider.subServiceState;
     if (state is Loading) {
-      return SizedBox(
-        height: 240,
-        child: const Center(child: CircularProgressIndicator()),
-      );
+      return ShimmerWidgets.subServicesGrid();
     }
     if (state is Error) {
       return Column(
@@ -391,3 +423,77 @@ class _SubServiceCard extends StatelessWidget {
     );
   }
 }
+
+class ShimmerWidgets {
+  // 🔹 Shimmer for main categories (horizontal list)
+  static Widget mainCategories() {
+    return SizedBox(
+      height: 120,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            width: 90,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Shimmer.fromColors(
+              baseColor: Colors.grey.shade300,
+              highlightColor: Colors.grey.shade100,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: Colors.grey,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: 60,
+                    height: 10,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  // 🔹 Shimmer for sub-services grid
+  static Widget subServicesGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.85,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+      ),
+      itemCount: 4,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+

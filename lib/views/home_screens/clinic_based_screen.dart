@@ -207,9 +207,9 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
                           scrollDirection: Axis.horizontal,
-                          itemCount: personalizeServices.length,
+                          itemCount: topChoices.length,
                           itemBuilder: (context, index) {
-                            final service = personalizeServices[index];
+                            final service = topChoices[index];
                             return Container(
                               width: 160, // 👈 FIX: set width
                               margin: const EdgeInsets.only(right: 12),

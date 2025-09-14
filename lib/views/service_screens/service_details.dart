@@ -2,8 +2,10 @@ import 'package:aesthetic_clinic/models/service/service_detail_response.dart';
 import 'package:aesthetic_clinic/services/ui_state.dart';
 import 'package:aesthetic_clinic/utils/widgets/auto_scroll_banner.dart';
 import 'package:aesthetic_clinic/views/booking_screens/booking_slot_screen.dart';
+import 'package:aesthetic_clinic/views/doctor/doctor_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../providers/service_provider.dart';
 import '../../utils/Appcolor.dart';
@@ -29,7 +31,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
         context,
         listen: false,
       );
-      serviceProvider.getServiceDetial(widget.serviceId,context);
+      serviceProvider.getServiceDetial(widget.serviceId, context);
     });
   }
 
@@ -65,6 +67,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -87,7 +90,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           final serviceDetialState = serviceProvider.serviceDetialState;
 
           if (serviceDetialState is Loading) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildShimmerLoader(screenWidth);
           }
 
           // Show error message if service detail is null
@@ -109,7 +112,10 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () {
-                      serviceProvider.getServiceDetial(widget.serviceId,context);
+                      serviceProvider.getServiceDetial(
+                        widget.serviceId,
+                        context,
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pink,
@@ -124,7 +130,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             );
           }
 
-          if(serviceDetialState is Success<ServiceDetailResponse>){
+          if (serviceDetialState is Success<ServiceDetailResponse>) {
             final serviceData = (serviceDetialState).response.data;
             // Prepare images list based on available images from API
             final List<String> serviceImages = [];
@@ -137,33 +143,31 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   Padding(
                     padding: EdgeInsetsGeometry.all(8),
                     child: // In your ClinicBasedScreen build method, replace the current banner section with:
-
                     Padding(
                       padding: const EdgeInsets.fromLTRB(8, 12, 8, 0),
-                      child: AutoScrollingBanner(
-                        items: [serviceData.image],
-                      ),
+                      child: AutoScrollingBanner(items: [serviceData.image]),
                     ),
                   ),
 
                   const SizedBox(height: 8),
 
                   // Main Service Card
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: ServiceCard(
                       name: serviceData.name,
                       price: serviceData.price,
                       description:
-                      serviceData?.description ?? 'No description available',
+                          serviceData?.description ??
+                          'No description available',
                       isOnSale: serviceData?.isRecommended ?? false,
                       isTopService: serviceData?.isTopService ?? false,
                       onBook: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => BookingSlotScreen(serviceId: serviceData.id,)
+                            builder: (context) =>
+                                BookingSlotScreen(serviceId: serviceData.id),
                           ),
                         );
                       },
@@ -188,145 +192,17 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           ),
                           const SizedBox(height: 16),
                           SizedBox(
-                            height: 160, // set height to fit horizontal items
+                            height: 190, // set height to fit horizontal items
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
                               itemCount: serviceData.doctors.length,
                               separatorBuilder: (context, index) =>
-                              const SizedBox(width: 12),
+                                  const SizedBox(width: 12),
                               itemBuilder: (context, index) {
                                 final doctor = serviceData.doctors[index];
-                                return Container(
-                                  width: 140,
-                                  // fixed width for each horizontal card
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Colors.grey.shade200,
-                                    ),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      /*SizedBox(
-                                      height: 190, // set height to fit horizontal items
-                                      child: ListView.separated(
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: provider.doctorResponse!.data.length,
-                                        separatorBuilder: (context, index) =>
-                                        const SizedBox(width: 12),
-                                        itemBuilder: (context, index) {
-                                          final doctor = provider.doctorResponse!.data[index];
-                                          return InkWell(
-                                            onTap: (){
-                                              Navigator.push(context, MaterialPageRoute(builder: (contex)=>DoctorProfileScreen(doctorId: doctor.id,)));
-                                            },
-                                            child: Container(
-                                              width: 140, // fixed width for each horizontal card
-                                              padding: const EdgeInsets.all(12),
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey.shade200,
-                                                borderRadius: BorderRadius.circular(12),
-                                                border: Border.all(color: Colors.grey.shade200),
-                                              ),
-                                              child: Column(
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-
-                                                  SizedBox(
-                                                    width: 84,
-                                                    height: 84,
-                                                    child: ClipOval(
-                                                      child: Image.network(
-                                                        '${doctor.image}',
-                                                        fit: BoxFit.cover,
-                                                        cacheWidth: 120,
-                                                        cacheHeight: 120,
-                                                        loadingBuilder: (context, child, loadingProgress) {
-                                                          if (loadingProgress == null) return child;
-                                                          return const ShimmerPlaceholder(
-                                                            width: 64,
-                                                            height: 64,
-                                                            isCircle: true,
-                                                          );
-                                                        },
-                                                        errorBuilder: (context, error, stackTrace) =>
-                                                        const CircleAvatar(
-                                                          backgroundColor: Colors.grey,
-                                                          child: Icon(
-                                                            Icons.broken_image,
-                                                            color: Appcolor.mehrun,
-                                                            size: 24,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 6),
-                                                  Text(
-                                                    '${doctor.title} ${doctor.name}',
-                                                    textAlign: TextAlign.center,
-                                                    maxLines: 2,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Appcolor.mehrun,
-                                                      overflow: TextOverflow.clip,
-                                                    ),
-                                                  ),
-                                                  if (doctor.experience != null) ...[
-                                                    const SizedBox(height: 6),
-                                                    Text(
-                                                      '${doctor.experience}+ yrs',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Appcolor.textColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-*/
-                                      CircleAvatar(
-                                        radius: 30,
-                                        backgroundColor: Colors.red.shade100,
-                                        child: Icon(
-                                          Icons.person,
-                                          color: Appcolor.mehrun,
-                                          size: 30,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        '${doctor.title} ${doctor.name}',
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Appcolor.mehrun,
-                                          overflow: TextOverflow.clip,
-                                        ),
-                                      ),
-                                      if (doctor.experience != null) ...[
-                                        const SizedBox(height: 6),
-                                        Text(
-                                          '${doctor.experience}+ yrs',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Appcolor.textColor,
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
+                                return DoctorCard(
+                                  name: doctor.name,
+                                  experience: doctor.experience,
                                 );
                               },
                             ),
@@ -335,73 +211,6 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       ),
                     ),
                   ],
-
-                  // webzila
-                  /*// About Section
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        serviceData?.name ?? 'Our Services',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                          height: 1.3,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        serviceData?.description ??
-                            'We provide high-quality medical and aesthetic services with expert care and advanced technology.',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
-                          height: 1.5,
-                        ),
-                      ),
-
-                      // Extra details if available
-                      if (serviceData?.extraDetail != null) ...[
-                        const SizedBox(height: 16),
-                        Text(
-                          'Additional Information',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          serviceData!.extraDetail!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
-
-                      // Service highlights
-                      const SizedBox(height: 16),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          if (serviceData?.isTopService == true)
-                            _buildServiceBadge('Top Service', Colors.blue),
-                          if (serviceData?.isRecommended == true)
-                            _buildServiceBadge('Recommended', Colors.green),
-                          if (serviceData?.personalisedService == true)
-                            _buildServiceBadge('Personalized', Colors.purple),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),*/
                   SizedBox(height: 18),
 
                   // Static Treatment Guide Section (since not in API)
@@ -441,7 +250,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       itemCount: treatmentCategories.length,
                       separatorBuilder: (context, index) =>
-                      const SizedBox(width: 12),
+                          const SizedBox(width: 12),
                       itemBuilder: (context, index) {
                         return Container(
                           width: 120,
@@ -486,12 +295,12 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.5,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                          ),
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 1.5,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
                           itemCount: otherServices.length,
                           itemBuilder: (context, index) {
                             final service = otherServices[index];
@@ -532,12 +341,93 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               ),
             );
           }
-          return const Center(child: CircularProgressIndicator());
-
+          return const SizedBox.shrink();
         },
       ),
     );
   }
+}
+
+Widget _shimmerBox({double? height, double? width, double radius = 6}) {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: Container(
+      height: height,
+      width: width,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+      ),
+    ),
+  );
+}
+Widget _buildShimmerLoader(double screenWidth) {
+  return SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Banner shimmer
+          Shimmer.fromColors(
+            baseColor: Colors.grey[300]!,
+            highlightColor: Colors.grey[100]!,
+            child: Container(
+              height: screenWidth * 0.5,
+              width: double.infinity,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Service card shimmer
+          _shimmerBox(height: 120, width: double.infinity),
+          const SizedBox(height: 20),
+
+          // Why choose section shimmer
+          _shimmerBox(height: 20, width: 180),
+          const SizedBox(height: 12),
+          _shimmerBox(height: 14, width: double.infinity),
+          const SizedBox(height: 8),
+          _shimmerBox(height: 14, width: screenWidth * 0.7),
+
+          const SizedBox(height: 20),
+
+          // Treatment categories shimmer
+          SizedBox(
+            height: 80,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: 3,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                return _shimmerBox(height: 60, width: 100, radius: 8);
+              },
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Other services shimmer
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.5,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: 4,
+            itemBuilder: (_, __) {
+              return _shimmerBox(height: 80, width: double.infinity, radius: 12);
+            },
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class ServiceCard extends StatelessWidget {
