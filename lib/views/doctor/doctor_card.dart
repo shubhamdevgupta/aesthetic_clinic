@@ -53,14 +53,11 @@ class _DoctorCardState extends State<DoctorCard> {
   @override
   void initState() {
     super.initState();
-    // Simulate network delay of 2-3 seconds
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override

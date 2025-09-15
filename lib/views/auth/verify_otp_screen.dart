@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/ui_state.dart';
 import '../../utils/Appcolor.dart';
+import '../../utils/LoaderUtils.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen({super.key});
@@ -38,7 +39,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       provider.startTimer();
       _focusNodes[0].requestFocus();
     });
-
   }
 
   void _onOtpChanged() {
@@ -60,7 +60,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       provider.verifyOtp(phoneNumber, otpValue);
     }
   }
-
 
   Widget _buildOtpField(int index) {
     return SizedBox(
@@ -121,10 +120,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     AppLocalizations localization = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(localization.verifyMsg),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(localization.verifyMsg), centerTitle: true),
       body: Consumer<AuthenticationProvider>(
         builder: (context, provider, child) {
           final state = provider.verifyOtpState;
@@ -181,7 +177,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: List.generate(
                               otpLength,
-                                  (index) => _buildOtpField(index),
+                              (index) => _buildOtpField(index),
                             ),
                           ),
 
@@ -275,17 +271,22 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                             child: ElevatedButton(
                               onPressed: otpValue.length == otpLength
                                   ? () async {
-                                final phoneNumber =
-                                provider.formatPhoneNumber(
-                                  provider.selectedCountry.phoneCode,
-                                  provider.phoneController.text,
-                                );
-                                await provider.verifyOtp(phoneNumber, otpValue);
-                              }:null,
+                                      final phoneNumber = provider
+                                          .formatPhoneNumber(
+                                            provider.selectedCountry.phoneCode,
+                                            provider.phoneController.text,
+                                          );
+                                      await provider.verifyOtp(
+                                        phoneNumber,
+                                        otpValue,
+                                      );
+                                    }
+                                  : null,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Appcolor.mehrun,
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -306,13 +307,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ],
               ),
 
-              if (state is Loading)
-                Container(
-                  color: Colors.black26,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
+              LoaderUtils.conditionalLoader(isLoading: state is Loading),
             ],
           );
         },

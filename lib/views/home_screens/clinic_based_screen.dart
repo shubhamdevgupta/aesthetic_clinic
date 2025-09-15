@@ -67,11 +67,11 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
             .expand((item) => item.appConfigs.banner ?? [])
             .map(
               (banner) => {
-            "imageUrl": banner.configData?.imageUrl ?? "",
-            "title": banner.configData?.title ?? "",
-            "subtitle": banner.configData?.subtitle ?? "",
-          },
-        )
+                "imageUrl": banner.configData?.imageUrl ?? "",
+                "title": banner.configData?.title ?? "",
+                "subtitle": banner.configData?.subtitle ?? "",
+              },
+            )
             .toList();
 
         final topServices = dashboardResponse.data
@@ -92,9 +92,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
 
         return RefreshIndicator(
           onRefresh: () async {
-            await provider.getDashboardData(context);
-            await provider.getDoctorData(context);
+            await provider.getDashboardData(context, forceRefresh: true);
+            await provider.getDoctorData(context, forceRefresh: true);
           },
+          color: Appcolor.mehrun,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
@@ -128,7 +129,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   ),
                 ),
               ),
-
+              SliverToBoxAdapter(
+                child: SizedBox(
+                    child: Divider(thickness: 6, color: Color(0xFFD5D5D5))),
+              ),
               // ✅ Products
               SliverToBoxAdapter(
                 child: _section(
@@ -149,8 +153,13 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
               ),
 
               SliverToBoxAdapter(
+                child: SizedBox(
+                    child: Divider(thickness: 6, color: Color(0xFFD5D5D5))),
+              ),
+
+              SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -186,10 +195,16 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   ),
                 ),
               ),
+
+              SliverToBoxAdapter(
+                child: SizedBox(
+                    child: Divider(thickness: 6, color: Color(0xFFD5D5D5))),
+              ),
+
               // ✅ Personalized
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 18, 8, 0),
+                  padding: const EdgeInsets.fromLTRB(8, 10, 8, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -225,26 +240,37 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                 ],
                               ),
                               child: InkWell(
-                                onTap: (){
+                                onTap: () {
                                   Navigator.push(
                                     context,
                                     PageRouteBuilder(
-                                      transitionDuration: const Duration(milliseconds: 400),
+                                      transitionDuration: const Duration(
+                                        milliseconds: 400,
+                                      ),
                                       pageBuilder: (_, __, ___) =>
-                                          ServiceDetailScreen(serviceId: service.id),
-                                      transitionsBuilder: (_, animation, __, child) {
-                                        final offsetAnimation = Tween<Offset>(
-                                          begin: const Offset(0.0, 1.0),
-                                          end: Offset.zero,
-                                        ).animate(CurvedAnimation(
-                                          parent: animation,
-                                          curve: Curves.ease,
-                                        ));
-                                        return SlideTransition(
-                                          position: offsetAnimation,
-                                          child: FadeTransition(opacity: animation, child: child),
-                                        );
-                                      },
+                                          ServiceDetailScreen(
+                                            serviceId: service.id,
+                                          ),
+                                      transitionsBuilder:
+                                          (_, animation, __, child) {
+                                            final offsetAnimation =
+                                                Tween<Offset>(
+                                                  begin: const Offset(0.0, 1.0),
+                                                  end: Offset.zero,
+                                                ).animate(
+                                                  CurvedAnimation(
+                                                    parent: animation,
+                                                    curve: Curves.ease,
+                                                  ),
+                                                );
+                                            return SlideTransition(
+                                              position: offsetAnimation,
+                                              child: FadeTransition(
+                                                opacity: animation,
+                                                child: child,
+                                              ),
+                                            );
+                                          },
                                     ),
                                   );
                                 },
@@ -255,14 +281,17 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                     children: [
                                       service.image.isNotEmpty
                                           ? Image.network(
-                                        service.image,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                            Container(
-                                              color: Colors.grey[300],
-                                            ),
-                                      )
+                                              service.image,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => Container(
+                                                    color: Colors.grey[300],
+                                                  ),
+                                            )
                                           : Container(color: Colors.grey[300]),
 
                                       Container(
@@ -287,7 +316,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                         bottom: 12,
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               service.name,
@@ -322,7 +351,10 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 ),
               ),
 
-
+              SliverToBoxAdapter(
+                child: SizedBox(
+                    child: Divider(thickness: 6, color: Color(0xFFD5D5D5))),
+              ),
               // ✅ Doctors
               SliverToBoxAdapter(
                 child: _section(
@@ -372,12 +404,14 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Appcolor.mehrun,
-              )),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Appcolor.mehrun,
+            ),
+          ),
           const SizedBox(height: 12),
           child,
         ],
@@ -430,13 +464,13 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   }
 
   static Widget _topChoiceItem(
-      String serviceId,
-      String title,
-      String description,
-      String imageUrl,
-      String price,
-      BuildContext context,
-      ) {
+    String serviceId,
+    String title,
+    String description,
+    String imageUrl,
+    String price,
+    BuildContext context,
+  ) {
     return InkWell(
       onTap: () {
         showModalBottomSheet(
@@ -525,6 +559,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
 // 🔹 Service shimmer placeholder
 class ServiceItemShimmer extends StatelessWidget {
   const ServiceItemShimmer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -544,6 +579,7 @@ class ServiceItemShimmer extends StatelessWidget {
 // 🔹 Product shimmer placeholder
 class ProductCardShimmer extends StatelessWidget {
   const ProductCardShimmer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -557,7 +593,9 @@ class ProductCardShimmer extends StatelessWidget {
 // 🔹 Circle shimmer loader
 class CircleShimmer extends StatelessWidget {
   final double size;
+
   const CircleShimmer({super.key, this.size = 48});
+
   @override
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
@@ -574,6 +612,7 @@ class CircleShimmer extends StatelessWidget {
     );
   }
 }
+
 class ProductCard extends StatelessWidget {
   final String name;
   final String imageUrl;
@@ -594,11 +633,8 @@ class ProductCard extends StatelessWidget {
               child: Image.network(
                 imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.broken_image,
-                  color: Colors.red,
-                  size: 32,
-                ),
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.broken_image, color: Colors.red, size: 32),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const ShimmerBox(width: 100, height: 100, radius: 12);
@@ -614,10 +650,7 @@ class ProductCard extends StatelessWidget {
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF707070),
-              ),
+              style: const TextStyle(fontSize: 12, color: Color(0xFF707070)),
             ),
           ),
         ],
@@ -625,7 +658,6 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-
 
 class ServiceItem extends StatefulWidget {
   final String imageUrl;
@@ -670,10 +702,7 @@ class _ServiceItemState extends State<ServiceItem> {
           final offsetAnimation = Tween<Offset>(
             begin: const Offset(0.0, 1.0),
             end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.ease,
-          ));
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.ease));
           return SlideTransition(
             position: offsetAnimation,
             child: FadeTransition(opacity: animation, child: child),
@@ -713,19 +742,19 @@ class _ServiceItemState extends State<ServiceItem> {
                     child: Center(
                       child: _textLoaded
                           ? Text(
-                        widget.label,
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Appcolor.textColor,
-                        ),
-                      )
+                              widget.label,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Appcolor.textColor,
+                              ),
+                            )
                           : const ShimmerBox(width: 60, height: 12, radius: 6),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
 
                   // ✅ Image with shimmer loader
                   Expanded(
@@ -739,19 +768,24 @@ class _ServiceItemState extends State<ServiceItem> {
                             // Mark text as loaded only when image completes
                             if (!_textLoaded) {
                               Future.delayed(
-                                  const Duration(milliseconds: 300), () {
-                                if (mounted) {
-                                  setState(() => _textLoaded = true);
-                                }
-                              });
+                                const Duration(milliseconds: 300),
+                                () {
+                                  if (mounted) {
+                                    setState(() => _textLoaded = true);
+                                  }
+                                },
+                              );
                             }
                             return child;
                           }
                           return const CircleShimmer(size: 48);
                         },
                         errorBuilder: (context, error, stackTrace) =>
-                        const Icon(Icons.broken_image,
-                            color: Colors.red, size: 32),
+                            const Icon(
+                              Icons.broken_image,
+                              color: Colors.red,
+                              size: 32,
+                            ),
                       ),
                     ),
                   ),
@@ -765,12 +799,12 @@ class _ServiceItemState extends State<ServiceItem> {
   }
 }
 
-
 /// 🔹 Rectangular shimmer loader
 class ShimmerBox extends StatelessWidget {
   final double width;
   final double height;
   final double radius;
+
   const ShimmerBox({
     super.key,
     required this.width,
@@ -794,5 +828,3 @@ class ShimmerBox extends StatelessWidget {
     );
   }
 }
-
-

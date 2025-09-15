@@ -40,7 +40,10 @@ class ServiceProvider extends ChangeNotifier {
   Slot? _selectedSlot;
   Slot? get selectedSlot => _selectedSlot;
 
-  Future<void> getMainServices(BuildContext context) async {
+  Future<void> getMainServices(BuildContext context,{bool forceRefresh = false}) async {
+  if (!forceRefresh && serviceState is Success<GetAllService>) {
+  return;
+  }
     serviceState = Loading();
     notifyListeners();
     try {
@@ -118,7 +121,11 @@ class ServiceProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getBookingList(BuildContext context) async {
+  Future<void> getBookingList(BuildContext context,{bool forceRefresh=false}) async {
+
+    if(!forceRefresh && bookingState is Success<BookingResponse>){
+      return;
+    }
     bookingState = Loading();
     notifyListeners();
     try {

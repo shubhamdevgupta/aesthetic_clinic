@@ -32,7 +32,7 @@ class _UpcomingBookingScreenState extends State<UpcomingBookingScreen> {
       builder: (context, provider, _) {
         final state = provider.bookingState;
 
-        if (state is Loading) {
+        if (state is Loading || state is Idle) {
           return _ShimmerBookingList(width: width, height: height);
         }
 
@@ -64,23 +64,28 @@ class _UpcomingBookingScreenState extends State<UpcomingBookingScreen> {
           );
         }
 
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          itemCount: upcoming.length,
-          itemBuilder: (context, index) {
-            final b = upcoming[index];
-            return _BookingCard(
-              isUpcoming: true,
-              title: b.service.name,
-              minutes: b.doctorSlot.duration,
-              subtitle:b.purpose,
-              dateLine:
-                  _formatBookingDate(b.date) + ' with ${b.doctor.title} ${b.doctor.name}',
-              bookingId: b.id,
-              onPrimaryAction: () {},
-              onSecondaryAction: () {},
-            );
+        return RefreshIndicator(
+          onRefresh: ()async{
+           await provider.getBookingList(context,forceRefresh: true);
           },
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            itemCount: upcoming.length,
+            itemBuilder: (context, index) {
+              final b = upcoming[index];
+              return _BookingCard(
+                isUpcoming: true,
+                title: b.service.name,
+                minutes: b.doctorSlot.duration,
+                subtitle:b.purpose,
+                dateLine:
+                    _formatBookingDate(b.date) + ' with ${b.doctor.title} ${b.doctor.name}',
+                bookingId: b.id,
+                onPrimaryAction: () {},
+                onSecondaryAction: () {},
+              );
+            },
+          ),
         );
       },
     );

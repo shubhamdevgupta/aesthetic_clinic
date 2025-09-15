@@ -34,7 +34,10 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getDashboardData(BuildContext context) async {
+  Future<void> getDashboardData(BuildContext context,{bool forceRefresh = false}) async {
+    if (!forceRefresh && dashboardState is Success<AppConfigurationResponse>) {
+      return;
+    }
     dashboardState = Loading();
     notifyListeners();
 
@@ -45,9 +48,7 @@ class HomeProvider extends ChangeNotifier {
       } else {
         dashboardState = Error("Unexpected response");
       }
-    } on NetworkException {
-      dashboardState = NoInternet();
-    } on AuthenticationException {
+    }  on AuthenticationException {
       if (!context.mounted) return;  // exit early if widget is gone
       final authProvider = Provider.of<AuthenticationProvider>(
         context,
@@ -61,7 +62,10 @@ class HomeProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> getDoctorData(BuildContext context) async {
+  Future<void> getDoctorData(BuildContext context,{bool forceRefresh = false}) async {
+    if (!forceRefresh && doctorState is Success<DoctorResponse>) {
+      return;
+    }
     doctorState = Loading();
     notifyListeners();
 
@@ -72,9 +76,7 @@ class HomeProvider extends ChangeNotifier {
       } else {
         doctorState = Error("Unexpected response format");
       }
-    } on NetworkException {
-      doctorState = NoInternet();
-    } on AuthenticationException {
+    }  on AuthenticationException {
       if (!context.mounted) return;  // exit early if widget is gone
       final authProvider = Provider.of<AuthenticationProvider>(
         context,

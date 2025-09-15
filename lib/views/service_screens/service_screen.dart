@@ -117,7 +117,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
 
               return RefreshIndicator(
                 onRefresh: ()async{
-                  await  provider.getMainServices(context);
+                  await  provider.getMainServices(context,forceRefresh: true);
                 },
                 child: SingleChildScrollView(
                   physics:const AlwaysScrollableScrollPhysics(),

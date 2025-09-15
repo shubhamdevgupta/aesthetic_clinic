@@ -54,8 +54,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
         ],
       ),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-        // 👆 ensures consistent padding but also respects device safe area
+        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 56),
         child: SizedBox(
           width: double.infinity,
           child: ElevatedButton(

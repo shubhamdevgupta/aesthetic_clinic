@@ -1,6 +1,7 @@
 import 'package:aesthetic_clinic/models/send_otp_response.dart';
 import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/services/ui_state.dart';
+import 'package:aesthetic_clinic/utils/LoaderUtils.dart';
 import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
@@ -60,9 +61,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
         builder: (context, provider, child) {
           final state = provider.sendOtpState;
 
-          if (state is Loading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+          LoaderUtils.conditionalLoader(isLoading: state is Loading);
 
           if (state is Success<SendOtpResponseModel>) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -177,7 +176,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
         },
       ),
       bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        minimum: const EdgeInsets.fromLTRB(24, 0, 24, 56),
         child: Consumer<AuthenticationProvider>(
           builder: (context, provider, _) {
             return Column(

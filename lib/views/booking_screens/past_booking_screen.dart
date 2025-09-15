@@ -66,24 +66,29 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
           );
         }
 
-        return ListView.builder(
-          padding: EdgeInsets.symmetric(
-              horizontal: width * 0.04, vertical: height * 0.015),
-          itemCount: past.length,
-          itemBuilder: (context, index) {
-            final b = past[index];
-            return _BookingCard(
-              isUpcoming: false,
-              title: b.service.name,
-              minutes: b.doctorSlot.duration,
-              subtitle: b.purpose,
-              dateLine:
-              '${_formatBookingDate(b.date)} ${b.doctorSlot.startTime} with ${b.doctor.title} ${b.doctor.name}',
-              bookingId: b.id,
-              onPrimaryAction: () {},
-              onSecondaryAction: () {},
-            );
+        return RefreshIndicator(
+          onRefresh: ()async{
+           await provider.getBookingList(context,forceRefresh: true);
           },
+          child: ListView.builder(
+            padding: EdgeInsets.symmetric(
+                horizontal: width * 0.04, vertical: height * 0.015),
+            itemCount: past.length,
+            itemBuilder: (context, index) {
+              final b = past[index];
+              return _BookingCard(
+                isUpcoming: false,
+                title: b.service.name,
+                minutes: b.doctorSlot.duration,
+                subtitle: b.purpose,
+                dateLine:
+                '${_formatBookingDate(b.date)} ${b.doctorSlot.startTime} with ${b.doctor.title} ${b.doctor.name}',
+                bookingId: b.id,
+                onPrimaryAction: () {},
+                onSecondaryAction: () {},
+              );
+            },
+          ),
         );
       },
     );
