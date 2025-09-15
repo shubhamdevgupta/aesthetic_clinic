@@ -27,114 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final LocalStorageService storage = LocalStorageService();
 
   @override
-  void initState() {
-    super.initState();
-
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: Drawer(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Appcolor.mehrun,
-                Appcolor.mehrun.withOpacity(0.8),
-              ],
-            ),
-          ),
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              DrawerHeader(
-                decoration: const BoxDecoration(color: Colors.transparent),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white.withOpacity(0.2),
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "${storage.getString(AppConstants.prefFirstName)} ${storage.getString(AppConstants.prefLastName)}",
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Welcome back!',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              _buildDrawerItem(
-                icon: Icons.home,
-                title: 'Home',
-                onTap: () => Navigator.pop(context),
-              ),
-              _buildDrawerItem(
-                icon: Icons.person,
-                title: 'Profile',
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                  );
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.calendar_month,
-                title: 'Bookings',
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const BookingScreen()),
-                  );
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.credit_card,
-                title: 'Service',
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => ServiceScreen()),
-                  );
-                },
-              ),
-              Divider(color: Colors.white.withOpacity(0.3), height: 32),
-              _buildDrawerItem(
-                icon: Icons.logout,
-                title: 'Logout',
-                onTap: (){
-                  AppDialogs.showLogoutDialog(context);
-                },
-                isLogout: true,
-              ),
-            ],
-          ),
-        ),
-      ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
-          print("object--- ${storage.getString(AppConstants.prefUserId)}");
-          print("object--- ${storage.getString(AppConstants.prefRefreshToken)}");
           return DefaultTabController(
             length: 2,
             initialIndex: 0,
@@ -151,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Image.asset(
-                              'assets/icons/amara_logo.png',
+                              'assets/icons/ic_logo_new.png',
                               height: 40,
                             ),
                             Column(
@@ -159,14 +55,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 Text(
                                   _getGreeting(),
-                                  style: const TextStyle(fontSize: 14),
+                                  style: const TextStyle(fontSize: 13),
                                 ),
                                 Text(
                                   "${storage.getString(AppConstants.prefFirstName)??"your"} ${storage.getString(AppConstants.prefLastName)??"name"}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Appcolor.mehrun,
-                                    fontSize: 16,
+                                    fontSize: 17,
                                   ),
                                 ),
                               ],
@@ -187,11 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    IconButton(
-                                      onPressed: () =>
-                                          Scaffold.of(context).openDrawer(),
-                                      icon: const Icon(Icons.menu),
-                                    ),
                                     const SizedBox(width: 10),
                                     const Expanded(
                                       child: TextField(
@@ -330,7 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
 String _getGreeting() {
   final hour = DateTime.now().hour;
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  return 'Good Evening';
+
+  if (hour < 12) {
+    return ' ☀️ Good Morning'; // Sun emoji
+  } else if (hour < 17) {
+    return ' 🌤️ Good Afternoon'; // Afternoon / partly sunny
+  } else {
+    return ' 🌙  Goon Evening'; // Moon emoji
+  }
 }

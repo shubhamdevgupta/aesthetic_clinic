@@ -45,7 +45,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Center(
                   child: Text(
                     "Amara Welcome you to the personalised...",
-                    style: TextStyle(fontSize: 14, color: Appcolor.textColor),
+                    style: TextStyle(fontSize: 14, color: Appcolor.grey),
                   ),
                 ),
                 Padding(
@@ -87,10 +87,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
-
-/*//todo make it true for one time see onboarding screen
-storage.saveBool(AppConstants.prefSeenOnboarding, false);
-Navigator.pushReplacement(
-context,
-MaterialPageRoute(builder: (_) => const SendOtpScreen()),
-);*/

@@ -7,7 +7,6 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
 import 'app_localizations_en.dart';
-import 'app_localizations_hi.dart';
 
 // ignore_for_file: type=lint
 
@@ -210,7 +209,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar': return AppLocalizationsAr();
     case 'en': return AppLocalizationsEn();
-    case 'hi': return AppLocalizationsHi();
   }
 
   throw FlutterError(

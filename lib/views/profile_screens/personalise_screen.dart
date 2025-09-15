@@ -155,11 +155,10 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
       children: [
         Text(
           'Complete your profile for better experience',
-          style: TextStyle(color: Colors.grey[600], fontSize: 14),
+          style: TextStyle(color: Colors.grey[600], fontSize: 12),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 24),
-
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           height: 48,
@@ -169,12 +168,16 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               final firstName = parts.isNotEmpty ? parts[0] : "";
               final lastName = parts.length > 1 ? parts[1] : "";
 
-             await provider.updateProfile(
-                firstName,
-                lastName,
-                _emailController.text,
-                context,
-              );
+              if(parts.isEmpty || _emailController.text.isEmpty){
+                ToastHelper.showErrorSnackBar(context, "please fill all the field");
+              }else{
+                await provider.updateProfile(
+                  firstName,
+                  lastName,
+                  _emailController.text,
+                  context,
+                );
+              }
 
               // ✅ Navigate based on where screen was opened from
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -210,27 +213,28 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
           ),
         ),
 
-        const SizedBox(height: 16),
-
-        if (widget.isVerified) // ✅ show only on first time
-          TextButton(
-            onPressed: () {
-              Navigator.pushReplacementNamed(
-                context,
-                AppConstants.navigateToOnBoardingScreen,
-              );
-            },
-            child: Text(
-              'Do It Later',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                decoration: TextDecoration.underline,
+        if (widget.isVerified)
+          Padding(
+            padding: const EdgeInsets.only(top: 4), // reduce space here
+            child: TextButton(
+              onPressed: () {
+                Navigator.pushReplacementNamed(
+                  context,
+                  AppConstants.navigateToOnBoardingScreen,
+                );
+              },
+              child: Text(
+                'Do It Later',
+                style: TextStyle(
+                  color: Colors.grey[500],
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  decoration: TextDecoration.underline,
+                ),
               ),
             ),
           ),
-        const SizedBox(height: 20),
+
       ],
     );
   }

@@ -38,12 +38,6 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             isSelected: selectedLanguage == 'en',
             onTap: () => localeProvider.setLocale(const Locale('en')),
           ),
-          LanguageTile(
-            flagAsset: 'assets/icons/en.png',
-            title: 'हिंदी',
-            isSelected: selectedLanguage == 'hi',
-            onTap: () => localeProvider.setLocale(const Locale('hi')),
-          ),
           // Arabic Option
           LanguageTile(
             flagAsset: 'assets/icons/ar.png',

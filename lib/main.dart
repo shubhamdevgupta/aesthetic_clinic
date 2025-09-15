@@ -44,7 +44,6 @@ class MyApp extends StatelessWidget {
       locale: provider.locale,
       supportedLocales: const [
         Locale('en'),
-        Locale('hi'),
         Locale('ar'),
       ],
       localizationsDelegates: const [
@@ -57,7 +56,7 @@ class MyApp extends StatelessWidget {
       title: 'Aesthetic Clinic',
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(),
-        colorScheme: ColorScheme.fromSeed(seedColor: Appcolor.mehrun),
+        colorScheme: ColorScheme.fromSeed(seedColor: Appcolor.white),
         useMaterial3: true,
       ),
       initialRoute: AppConstants.navigateToSplashScreen,
