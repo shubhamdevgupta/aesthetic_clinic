@@ -60,7 +60,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Appcolor.mehrun),
         useMaterial3: true,
       ),
-      initialRoute: AppConstants.navigateToSplashScreen,
+      initialRoute: AppConstants.navigateToProfileLogoutScreen,
       routes: AppRoutes.getRoutes(),
     );
   }

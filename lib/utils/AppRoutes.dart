@@ -2,6 +2,7 @@ import 'package:aesthetic_clinic/views/auth/verify_otp_screen.dart';
 import 'package:aesthetic_clinic/views/home_screens/bottom_sheet_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/language_screen.dart';
 import 'package:aesthetic_clinic/views/onboarding/onboarding_screen.dart';
+import 'package:aesthetic_clinic/views/profile_screens/profile_logout_screen.dart';
 import 'package:flutter/cupertino.dart';
 import '../views/auth/send_otp_screen.dart';
 import '../views/auth/splash_screen.dart';
@@ -16,7 +17,8 @@ class AppRoutes {
       AppConstants.navigateToOnBoardingScreen:(context)=> const OnboardingScreen(),
       AppConstants.navigateToVerifyOtpScreen:(context)=> const OtpVerificationScreen(),
       AppConstants.navigateToSelectLanguageScreen:(context)=>  LanguageSelectionScreen(),
-      AppConstants.navigateToDashboardScreen:(context)=>  DashboardScreen()
+      AppConstants.navigateToDashboardScreen:(context)=>  DashboardScreen(),
+      AppConstants.navigateToProfileLogoutScreen:(context)=>  ProfileLogoutScreen()
     };
   }
 }
