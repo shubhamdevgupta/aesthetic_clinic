@@ -32,6 +32,7 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
       ),
       body: Column(
         children: [
+          SizedBox(height: 34,),
           LanguageTile(
             flagAsset: 'assets/icons/en.png',
             title: 'English',
@@ -104,6 +105,7 @@ class LanguageTile extends StatelessWidget {
               : Icon(Icons.radio_button_off),
           onTap: onTap,
         ),
+        SizedBox(height: 8,),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Divider(color: Colors.grey.shade300, thickness: 1),

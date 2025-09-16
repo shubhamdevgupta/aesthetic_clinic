@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
       title: 'Aesthetic Clinic',
       theme: ThemeData(
         textTheme: GoogleFonts.poppinsTextTheme(),
-        colorScheme: ColorScheme.fromSeed(seedColor: Appcolor.white),
+        colorScheme: ColorScheme.fromSeed(seedColor: Appcolor.mehrun),
         useMaterial3: true,
       ),
       initialRoute: AppConstants.navigateToSplashScreen,

@@ -159,7 +159,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
 
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
+                  padding: const EdgeInsets.fromLTRB(8, 12, 8, 14),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

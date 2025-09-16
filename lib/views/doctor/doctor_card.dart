@@ -62,77 +62,87 @@ class _DoctorCardState extends State<DoctorCard> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // 🔑 Responsive sizes
+    final cardWidth = screenWidth * 0.4; // ~40% of screen width
+    final avatarRadius = screenWidth * 0.1; // avatar scales with screen
+    final nameHeight = screenWidth * 0.09; // fixed box for name/title
+
     final hasValidImage = widget.imageUrl != null &&
         widget.imageUrl!.isNotEmpty &&
         Uri.tryParse(widget.imageUrl!) != null;
 
     return Container(
-      width: 150,
-      padding: const EdgeInsets.all(12),
+      width: cardWidth,
+      padding: EdgeInsets.all(screenWidth * 0.03),
       decoration: BoxDecoration(
         color: Colors.grey.shade200,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade300),
       ),
       child: _isLoading
-          ? _buildShimmerLoader()
+          ? _buildShimmerLoader(avatarRadius)
           : Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
-            radius: 40,
+            radius: avatarRadius,
             backgroundColor: Appcolor.mehrun.withOpacity(0.1),
-            backgroundImage: hasValidImage ? NetworkImage(widget.imageUrl!) : null,
+            backgroundImage:
+            hasValidImage ? NetworkImage(widget.imageUrl!) : null,
             child: !hasValidImage
                 ? Text(
               _getInitials(widget.name),
-              style: const TextStyle(
-                fontSize: 20,
+              style: TextStyle(
+                fontSize: screenWidth * 0.05,
                 fontWeight: FontWeight.bold,
                 color: Appcolor.mehrun,
               ),
             )
                 : null,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: screenWidth * 0.02),
+
+          // 🔒 Fixed height for name/title
           SizedBox(
-            width: double.infinity,
+            height: nameHeight,
             child: Text(
               '${widget.title ?? ""} ${widget.name}',
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: screenWidth * 0.035,
                 fontWeight: FontWeight.bold,
                 color: Appcolor.mehrun,
               ),
             ),
           ),
-          const SizedBox(height: 6),
           if (widget.experience != null)
             Text(
               '${widget.experience}+ yrs',
-              style: const TextStyle(
-                fontSize: 13,
+              style: TextStyle(
+                fontSize: screenWidth * 0.032,
                 color: Appcolor.textColor,
               ),
             ),
-          const SizedBox(height: 6),
+          SizedBox(height: screenWidth * 0.015),
+
           if (widget.rating != null) _buildRatingStars(widget.rating!),
         ],
       ),
     );
   }
 
-  Widget _buildShimmerLoader() {
+  Widget _buildShimmerLoader(double avatarRadius) {
     return Shimmer.fromColors(
       baseColor: Colors.grey.shade300,
       highlightColor: Colors.grey.shade100,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircleAvatar(radius: 40, backgroundColor: Colors.white),
+          CircleAvatar(radius: avatarRadius, backgroundColor: Colors.white),
           const SizedBox(height: 8),
           Container(height: 14, width: 100, color: Colors.white),
           const SizedBox(height: 6),
@@ -140,12 +150,15 @@ class _DoctorCardState extends State<DoctorCard> {
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(5, (_) => Container(
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              height: 14,
-              width: 14,
-              color: Colors.white,
-            )),
+            children: List.generate(
+              5,
+                  (_) => Container(
+                margin: const EdgeInsets.symmetric(horizontal: 2),
+                height: 14,
+                width: 14,
+                color: Colors.white,
+              ),
+            ),
           ),
         ],
       ),

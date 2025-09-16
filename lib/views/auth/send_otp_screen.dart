@@ -136,6 +136,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                           child: TextField(
                             controller: provider.phoneController,
                             keyboardType: TextInputType.phone,
+                            cursorColor: Appcolor.mehrun, // 👈 sets the blinking cursor color
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
@@ -144,9 +145,12 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                 provider.clearError();
                               }
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: "Phone Number",
+                              labelStyle: TextStyle(color: Appcolor.mehrun),
                               isDense: true,
+                              hintText: "Enter phone number", // 👈 make sure you use `hintText`
+                              hintStyle: TextStyle(color: Appcolor.mehrun), // 👈 hint text color
                               contentPadding: EdgeInsets.symmetric(
                                 vertical: 12,
                                 horizontal: 12,
@@ -154,7 +158,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                               border: InputBorder.none,
                             ),
                           ),
-                        ),
+                        )
                       ],
                     ),
                   ),
