@@ -255,6 +255,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                           child: const Text(
                             'Check Availability',
                             style: TextStyle(
+                              fontSize: 14,
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),

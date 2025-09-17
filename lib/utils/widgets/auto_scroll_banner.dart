@@ -113,13 +113,13 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
 
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 4),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    // Banner Image
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.network(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12), // ✅ apply to whole stack
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // Banner Image
+                      Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
                         cacheWidth: 800,
@@ -127,121 +127,114 @@ class _AutoScrollingBannerState extends State<AutoScrollingBanner> {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
+                            color: Colors.grey.shade300,
+                            child: const Center(child: CircularProgressIndicator()),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) =>
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Center(
-                                child: Icon(Icons.broken_image,
-                                    size: 48, color: Colors.grey),
-                              ),
-                            ),
-                      ),
-                    ),
-
-                    // Gradient only if text exists
-                    if (hasText)
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          height: 100,
-                          decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(12),
-                              bottomRight: Radius.circular(12),
-                            ),
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.7),
-                              ],
-                            ),
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey.shade300,
+                          child: const Center(
+                            child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
                           ),
                         ),
                       ),
 
-                    // Title & Subtitle
-                    if (hasText)
+                      // 🔹 Overlay Gradient
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Appcolor.withOpacity(Appcolor.mehrun, 0.9),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // 🔹 Text Gradient (optional, if text exists)
+                      if (hasText)
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height: 100,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.7),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      // 🔹 Title & Subtitle
+                      if (hasText)
+                        Positioned(
+                          bottom: 16,
+                          left: 16,
+                          right: 140,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (title.isNotEmpty)
+                                Text(
+                                  title,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              if (subtitle.isNotEmpty) ...[
+                                const SizedBox(height: 4),
+                                Text(
+                                  subtitle,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+
+                      // 🔹 Book Now Button
                       Positioned(
                         bottom: 16,
-                        left: 16,
-                        right: 140,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (title.isNotEmpty)
-                              Text(
-                                title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            if (subtitle.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                subtitle,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-
-                    // Book Now Button
-                    Positioned(
-                      bottom: 16,
-                      right: 16,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          print("Book Now clicked on banner index: $index");
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Appcolor.mehrun,
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                        right: 16,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            print("Book Now clicked on banner index: $index");
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Appcolor.mehrun,
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: const Text(
-                          "Book Now",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
+                          child: const Text(
+                            "Book Now",
+                            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

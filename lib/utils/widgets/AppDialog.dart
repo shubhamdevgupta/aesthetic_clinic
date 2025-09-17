@@ -55,7 +55,7 @@ class AppDialogs {
 
       Navigator.pushReplacementNamed(
         context,
-        AppConstants.navigateToSplashScreen,
+        AppConstants.navigateToSendOtpScreen,
       );
     }
   }

@@ -95,7 +95,6 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
             await provider.getDashboardData(context, forceRefresh: true);
             await provider.getDoctorData(context, forceRefresh: true);
           },
-          color: Appcolor.mehrun,
           child: CustomScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
@@ -313,7 +312,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                       Positioned(
                                         left: 12,
                                         right: 12,
-                                        bottom: 12,
+                                        bottom: 8,
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -332,7 +331,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                                               'Starting From AED ${service.price}',
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 11,
+                                                fontSize: 10,
                                               ),
                                             ),
                                           ],
@@ -534,14 +533,14 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                         style: TextStyle(
                           color: Appcolor.mehrun,
                           fontWeight: FontWeight.bold,
-                          fontSize: 15,
+                          fontSize: 14,
                         ),
                       ),
                       Text(
                         "Starting From $price",
                         style: TextStyle(
                           color: Appcolor.textColor,
-                          fontSize: 12,
+                          fontSize: 10,
                         ),
                       ),
                     ],

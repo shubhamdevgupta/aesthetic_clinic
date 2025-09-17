@@ -1,20 +1,14 @@
-import 'dart:async';
-
-import 'package:aesthetic_clinic/providers/authentication_provider.dart';
 import 'package:aesthetic_clinic/providers/home_provider.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
-import 'package:aesthetic_clinic/utils/widgets/AppDialog.dart';
 import 'package:aesthetic_clinic/utils/widgets/CartIconButton.dart';
 import 'package:aesthetic_clinic/views/home_screens/clinic_based_screen.dart';
 import 'package:aesthetic_clinic/views/home_screens/home_based_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/LocalStorageService.dart';
 import '../../utils/Appcolor.dart';
-import '../booking_screens/booking_tab_screen.dart';
-import '../profile_screens/profile_screen.dart';
-import '../service_screens/service_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
           return DefaultTabController(
@@ -47,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Image.asset(
-                              'assets/icons/ic_logo_new.png',
+                              'assets/icons/ic_dashboard.png',
                               height: 40,
                             ),
                             Column(
@@ -58,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: const TextStyle(fontSize: 13),
                                 ),
                                 Text(
-                                  "${storage.getString(AppConstants.prefFirstName)??"your"} ${storage.getString(AppConstants.prefLastName)??"name"}",
+                                  "${storage.getString(AppConstants.prefFirstName) ?? "your"} ${storage.getString(AppConstants.prefLastName) ?? "name"}",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Appcolor.mehrun,
@@ -97,9 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              width: 8,
-                            ),
+                            SizedBox(width: 8),
                             CartIconButton(itemCount: 0, onPressed: () {}),
                           ],
                         ),
@@ -118,7 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(11), // Slightly smaller to fit inside border
+                      borderRadius: BorderRadius.circular(11),
+                      // Slightly smaller to fit inside border
                       child: TabBar(
                         padding: EdgeInsets.zero,
                         labelPadding: EdgeInsets.zero,
@@ -132,7 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         unselectedLabelColor: Colors.grey[600],
                         dividerColor: Colors.transparent,
                         splashFactory: NoSplash.splashFactory,
-                        overlayColor: MaterialStateProperty.all(Colors.transparent),
+                        overlayColor: MaterialStateProperty.all(
+                          Colors.transparent,
+                        ),
                         tabs: [
                           Tab(
                             child: Container(
@@ -140,10 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ImageIcon(
-                                    AssetImage('assets/icons/ic_tab_clinic.png'),
-                                    size: 20,
-                                  ),
+                                  Icon(Iconsax.hospital),
                                   const SizedBox(width: 6),
                                   const Text(
                                     'Clinic Based',
@@ -159,10 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ImageIcon(
-                                    AssetImage('assets/icons/ic_tab_home.png'),
-                                    size: 20,
-                                  ),
+                                  Icon(Iconsax.house),
                                   const SizedBox(width: 6),
                                   const Text(
                                     'Home Based',

@@ -61,8 +61,6 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
         builder: (context, provider, child) {
           final state = provider.sendOtpState;
 
-          LoaderUtils.conditionalLoader(isLoading: state is Loading);
-
           if (state is Success<SendOtpResponseModel>) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.pushReplacement(
@@ -74,108 +72,118 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
             });
           }
 
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Divider
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Divider(color: Colors.grey.shade400, thickness: 1),
-                  ),
-                  const SizedBox(height: 30),
-
-                  // Phone field with country selector
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(6),
+          return Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Divider
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Divider(color: Colors.grey.shade400, thickness: 1),
                     ),
-                    child: Row(
-                      children: [
-                        // 🌍 Country Picker Section
-                        IntrinsicWidth(
-                          child: InkWell(
-                            onTap: _isNavigating
-                                ? null
-                                : () => _navigateToCountryPicker(
-                                    context,
-                                    provider,
-                                  ),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 10,
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    provider.selectedCountry.flagEmoji,
-                                    style: const TextStyle(fontSize: 24),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Icon(
-                                    Icons.arrow_drop_down,
-                                    size: 28,
-                                    color: _isNavigating ? Colors.grey : null,
-                                  ),
-                                ],
+                    const SizedBox(height: 30),
+
+                    // Phone field with country selector
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        children: [
+                          // 🌍 Country Picker Section
+                          IntrinsicWidth(
+                            child: InkWell(
+                              onTap: _isNavigating
+                                  ? null
+                                  : () => _navigateToCountryPicker(
+                                      context,
+                                      provider,
+                                    ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 10,
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      provider.selectedCountry.flagEmoji,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Icon(
+                                      Icons.arrow_drop_down,
+                                      size: 28,
+                                      color: _isNavigating ? Colors.grey : null,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
 
-                        // Divider
-                        Container(height: 48, width: 1, color: Colors.grey),
+                          // Divider
+                          Container(height: 48, width: 1, color: Colors.grey),
 
-                        // 📱 Phone Number Field
-                        Expanded(
-                          child: TextField(
-                            controller: provider.phoneController,
-                            keyboardType: TextInputType.phone,
-                            cursorColor: Appcolor.mehrun, // 👈 sets the blinking cursor color
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onChanged: (value) {
-                              if (provider.errorMsg.isNotEmpty) {
-                                provider.clearError();
-                              }
-                            },
-                            decoration: InputDecoration(
-                              labelText: "Phone Number",
-                              labelStyle: TextStyle(color: Appcolor.mehrun),
-                              isDense: true,
-                              hintText: "Enter phone number", // 👈 make sure you use `hintText`
-                              hintStyle: TextStyle(color: Appcolor.mehrun), // 👈 hint text color
-                              contentPadding: EdgeInsets.symmetric(
-                                vertical: 12,
-                                horizontal: 12,
+                          // 📱 Phone Number Field
+                          Expanded(
+                            child: TextField(
+                              controller: provider.phoneController,
+                              keyboardType: TextInputType.phone,
+                              cursorColor: Appcolor.mehrun,
+                              // 👈 sets the blinking cursor color
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              onChanged: (value) {
+                                if (provider.errorMsg.isNotEmpty) {
+                                  provider.clearError();
+                                }
+                              },
+                              decoration: InputDecoration(
+                                labelText: "Phone Number",
+                                labelStyle: TextStyle(color: Appcolor.mehrun),
+                                isDense: true,
+                                hintText: "Enter phone number",
+                                // 👈 make sure you use `hintText`
+                                hintStyle: TextStyle(color: Appcolor.mehrun),
+                                // 👈 hint text color
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 12,
+                                ),
+                                border: InputBorder.none,
                               ),
-                              border: InputBorder.none,
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Error message if any
-                  if (state is Error)
-                    Center(
-                      child: Text(
-                        provider.errorMsg,
-                        style: const TextStyle(color: Colors.red, fontSize: 12),
+                        ],
                       ),
                     ),
-                ],
+
+                    const SizedBox(height: 30),
+
+                    // Error message if any
+                    if (state is Error)
+                      Center(
+                        child: Text(
+                          provider.errorMsg,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
+              LoaderUtils.conditionalLoader(isLoading: state is Loading),
+
+            ],
           );
         },
       ),

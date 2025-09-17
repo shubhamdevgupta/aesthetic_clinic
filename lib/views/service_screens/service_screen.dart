@@ -20,10 +20,10 @@ class _ServicesScreenState extends State<ServiceScreen> {
   int _selectedCategoryIndex = 0;
   String? _selectedCategoryId;
   bool _requestedInitialSub = false;
+
   @override
   void initState() {
     super.initState();
-    // Trigger main services fetch after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<ServiceProvider>(context, listen: false);
       provider.getMainServices(context);
@@ -32,6 +32,10 @@ class _ServicesScreenState extends State<ServiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final height = size.height;
+    final width = size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -40,54 +44,52 @@ class _ServicesScreenState extends State<ServiceScreen> {
             final state = provider.serviceState;
 
             if (state is Loading) {
-              // Instead of CircularProgressIndicator
               return Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(width * 0.04),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 20),
+                    SizedBox(height: height * 0.02),
                     Container(
-                      height: 20,
-                      width: 160,
+                      height: height * 0.025,
+                      width: width * 0.4,
                       color: Colors.transparent,
                       child: Shimmer.fromColors(
                         baseColor: Colors.grey.shade300,
                         highlightColor: Colors.grey.shade100,
                         child: Container(
-                          height: 20,
-                          width: 160,
+                          height: height * 0.025,
+                          width: width * 0.4,
                           color: Colors.grey,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    ShimmerWidgets.mainCategories(),
-                    const SizedBox(height: 18),
-                    ShimmerWidgets.subServicesGrid(),
+                    SizedBox(height: height * 0.02),
+                    ShimmerWidgets.mainCategories(height, width),
+                    SizedBox(height: height * 0.025),
+                    ShimmerWidgets.subServicesGrid(height, width),
                   ],
                 ),
               );
             }
-
 
             if (state is Error) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.grey.shade400,
-                    ),
-                    const SizedBox(height: 12),
+                    Icon(Icons.error_outline,
+                        size: height * 0.08, color: Colors.grey.shade400),
+                    SizedBox(height: height * 0.015),
                     Text(
-                      "",
+                      "Something went wrong",
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey.shade600),
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: width * 0.04,
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: height * 0.02),
                     ElevatedButton(
                       onPressed: () => provider.getMainServices(context),
                       style: ElevatedButton.styleFrom(
@@ -111,35 +113,36 @@ class _ServicesScreenState extends State<ServiceScreen> {
                 _selectedCategoryId = services.first.id;
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Provider.of<ServiceProvider>(context, listen: false)
-                      .getSubService(_selectedCategoryId!,context);
+                      .getSubService(_selectedCategoryId!, context);
                 });
               }
 
               return RefreshIndicator(
-                onRefresh: ()async{
-                  await  provider.getMainServices(context,forceRefresh: true);
+                onRefresh: () async {
+                  await provider.getMainServices(context, forceRefresh: true);
                 },
                 child: SingleChildScrollView(
-                  physics:const AlwaysScrollableScrollPhysics(),
+                  physics: const AlwaysScrollableScrollPhysics(),
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(width * 0.04),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 20),
-                        const Text(
+                        SizedBox(height: height * 0.025),
+                        Text(
                           'Our Main Categories',
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: width * 0.05,
                             fontWeight: FontWeight.bold,
                             color: Appcolor.mehrun,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        _buildMainCategoriesGrid(services),
-                        const SizedBox(height: 24),
-                        _buildSubServicesSection(provider),
-                        const SizedBox(height: 100),
+                        SizedBox(height: height * 0.02),
+                        _buildMainCategoriesGrid(
+                            services, width, height),
+                        SizedBox(height: height * 0.03),
+                        _buildSubServicesSection(provider, width, height),
+                        SizedBox(height: height * 0.1),
                       ],
                     ),
                   ),
@@ -154,7 +157,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
     );
   }
 
-  Widget _buildMainCategoriesGrid(List<Service> categories) {
+  Widget _buildMainCategoriesGrid(List<Service> categories, double width, double height) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       decoration: BoxDecoration(
@@ -162,7 +165,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        height: 120,
+        height: height * 0.15, // ✅ Responsive height instead of fixed 160
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: categories.length,
@@ -173,19 +176,19 @@ class _ServicesScreenState extends State<ServiceScreen> {
                 left: 8,
                 right: index < categories.length - 1 ? 8 : 8,
               ),
-              width: 90,
               child: _buildCategoryCard(
                 service.name,
                 service.topServiceImage ?? service.image,
-                () {
+                    () {
                   setState(() {
                     _selectedCategoryIndex = index;
                     _selectedCategoryId = service.id;
                   });
                   Provider.of<ServiceProvider>(context, listen: false)
-                      .getSubService(service.id,context);
+                      .getSubService(service.id, context);
                 },
                 isSelected: _selectedCategoryIndex == index,
+                width: width,
               ),
             );
           },
@@ -195,11 +198,11 @@ class _ServicesScreenState extends State<ServiceScreen> {
   }
 
   Widget _buildCategoryCard(String title, String imageUrl, VoidCallback onTap,
-      {bool isSelected = false}) {
+      {bool isSelected = false, required double width}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 90,
+        width: width * 0.3,
         decoration: BoxDecoration(
           color: isSelected ? Appcolor.mehrun.withOpacity(0.08) : Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -219,81 +222,74 @@ class _ServicesScreenState extends State<ServiceScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color:
-                    isSelected ? Appcolor.mehrun.withOpacity(0.1) : Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: imageUrl.isNotEmpty
-                    ? Image.network(
-                        imageUrl,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[200],
-                            child: Icon(
-                              Icons.image,
-                              color: Colors.grey[400],
-                              size: 25,
-                            ),
-                          );
-                        },
-                      )
-                    : Icon(Icons.image, color: Colors.grey[400], size: 25),
-              ),
-            ),
-            const SizedBox(height: 8),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(horizontal: width * 0.01),
               child: Text(
                 title,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: Colors.black87,
+                style: TextStyle(
+                  fontSize: width * 0.03,
+                  color: Appcolor.textColor,
                   height: 1.2,
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            SizedBox(height: width * 0.02),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: imageUrl.isNotEmpty
+                  ? Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                height: width * 0.18,
+                width: width * 0.18,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[200],
+                    child: Icon(
+                      Icons.image,
+                      color: Colors.grey[400],
+                      size: width * 0.08,
+                    ),
+                  );
+                },
+              )
+                  : Icon(Icons.image,
+                  color: Colors.grey[400], size: width * 0.08),
+            ),
           ],
         ),
       ),
     );
   }
-  Widget _buildSubServicesSection(ServiceProvider provider) {
+
+  Widget _buildSubServicesSection(
+      ServiceProvider provider, double width, double height) {
     final state = provider.subServiceState;
     if (state is Loading) {
-      return ShimmerWidgets.subServicesGrid();
+      return ShimmerWidgets.subServicesGrid(height, width);
     }
     if (state is Error) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const SizedBox(height: 12),
-          Icon(Icons.error_outline, size: 48, color: Colors.grey.shade400),
-          const SizedBox(height: 8),
+          SizedBox(height: height * 0.015),
+          Icon(Icons.error_outline, size: height * 0.06, color: Colors.grey.shade400),
+          SizedBox(height: height * 0.01),
           Text(
-            "",
+            "Failed to load sub services",
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade600),
+            style: TextStyle(color: Colors.grey.shade600, fontSize: width * 0.035),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: height * 0.015),
           ElevatedButton(
             onPressed: _selectedCategoryId == null
                 ? null
-                : () => provider.getSubService(_selectedCategoryId!,context),
+                : () => provider.getSubService(_selectedCategoryId!, context),
             style: ElevatedButton.styleFrom(backgroundColor: Appcolor.mehrun),
-            child:
-                const Text('Retry', style: TextStyle(color: Colors.white)),
+            child: const Text('Retry', style: TextStyle(color: Colors.white)),
           ),
         ],
       );
@@ -303,11 +299,11 @@ class _ServicesScreenState extends State<ServiceScreen> {
       if (items.isEmpty) {
         return Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 32),
+            padding: EdgeInsets.symmetric(vertical: height * 0.04),
             child: Text(
               'No sub services found',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: width * 0.035,
                 color: Colors.grey.shade600,
               ),
             ),
@@ -317,16 +313,16 @@ class _ServicesScreenState extends State<ServiceScreen> {
       return GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.85,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          childAspectRatio: width / (height * 0.6),
+          crossAxisSpacing: width * 0.03,
+          mainAxisSpacing: width * 0.03,
         ),
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-          return _SubServiceCard(item: item);
+          return _SubServiceCard(item: item, width: width);
         },
       );
     }
@@ -336,7 +332,9 @@ class _ServicesScreenState extends State<ServiceScreen> {
 
 class _SubServiceCard extends StatelessWidget {
   final ServiceItem item;
-  const _SubServiceCard({Key? key, required this.item}) : super(key: key);
+  final double width;
+  const _SubServiceCard({Key? key, required this.item, required this.width})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -353,13 +351,11 @@ class _SubServiceCard extends StatelessWidget {
         ],
       ),
       child: InkWell(
-        onTap: (){
+        onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ServiceDetailScreen(
-                serviceId: item.id,
-              ),
+              builder: (context) => ServiceDetailScreen(serviceId: item.id),
             ),
           );
         },
@@ -370,11 +366,11 @@ class _SubServiceCard extends StatelessWidget {
               Positioned.fill(
                 child: item.image.isNotEmpty
                     ? Image.network(
-                        item.image,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Container(color: Colors.grey[300]),
-                      )
+                  item.image,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      Container(color: Colors.grey[300]),
+                )
                     : Container(color: Colors.grey[300]),
               ),
               Positioned.fill(
@@ -392,9 +388,9 @@ class _SubServiceCard extends StatelessWidget {
                 ),
               ),
               Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
+                left: width * 0.03,
+                right: width * 0.03,
+                bottom: width * 0.03,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -402,16 +398,19 @@ class _SubServiceCard extends StatelessWidget {
                       item.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: width * 0.035,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: width * 0.01),
                     Text(
                       'Starting From AED ${item.price}',
-                      style: const TextStyle(color: Colors.white, fontSize: 11),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: width * 0.03,
+                      ),
                     ),
                   ],
                 ),
@@ -425,17 +424,16 @@ class _SubServiceCard extends StatelessWidget {
 }
 
 class ShimmerWidgets {
-  // 🔹 Shimmer for main categories (horizontal list)
-  static Widget mainCategories() {
+  static Widget mainCategories(double height, double width) {
     return SizedBox(
-      height: 120,
+      height: height * 0.15,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: 6,
         itemBuilder: (context, index) {
           return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            width: 90,
+            margin: EdgeInsets.symmetric(horizontal: width * 0.02),
+            width: width * 0.22,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
@@ -447,17 +445,17 @@ class ShimmerWidgets {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: 50,
-                    height: 50,
+                    width: width * 0.12,
+                    height: width * 0.12,
                     decoration: BoxDecoration(
                       color: Colors.grey,
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: height * 0.01),
                   Container(
-                    width: 60,
-                    height: 10,
+                    width: width * 0.15,
+                    height: height * 0.012,
                     color: Colors.grey,
                   ),
                 ],
@@ -469,16 +467,15 @@ class ShimmerWidgets {
     );
   }
 
-  // 🔹 Shimmer for sub-services grid
-  static Widget subServicesGrid() {
+  static Widget subServicesGrid(double height, double width) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.85,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
+        childAspectRatio: width / (height * 0.6),
+        crossAxisSpacing: width * 0.03,
+        mainAxisSpacing: width * 0.03,
       ),
       itemCount: 4,
       itemBuilder: (context, index) {
@@ -496,4 +493,3 @@ class ShimmerWidgets {
     );
   }
 }
-

@@ -2,6 +2,7 @@ import 'package:aesthetic_clinic/views/profile_screens/profile_screen.dart';
 import 'package:aesthetic_clinic/views/service_screens/service_details.dart';
 import 'package:aesthetic_clinic/views/service_screens/service_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../utils/Appcolor.dart';
 import '../booking_screens/booking_tab_screen.dart';
