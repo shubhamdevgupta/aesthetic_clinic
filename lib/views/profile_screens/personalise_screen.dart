@@ -163,38 +163,42 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
           width: double.infinity,
           height: 48,
           child: ElevatedButton(
-            onPressed: () async{
-              final parts = _fullNameController.text.split(" ");
+            onPressed: () async {
+              final parts = _fullNameController.text.trim().split(" ");
               final firstName = parts.isNotEmpty ? parts[0] : "";
-              final lastName = parts.length > 1 ? parts[1] : "";
+              final lastName = parts.length > 1 ? parts.sublist(1).join(" ") : "";
+              final email = _emailController.text.trim();
 
-              if(parts.isEmpty || _emailController.text.isEmpty){
-                ToastHelper.showErrorSnackBar(context, "please fill all the field");
-              }else{
-                await provider.updateProfile(
-                  firstName,
-                  lastName,
-                  _emailController.text,
-                  context,
-                );
+              // ✅ Validation checks
+              if (firstName.isEmpty || lastName.isEmpty || email.isEmpty) {
+                ToastHelper.showErrorSnackBar(context, "Please fill all the fields");
+                return;
               }
 
-              // ✅ Navigate based on where screen was opened from
-              WidgetsBinding.instance.addPostFrameCallback((_) {
+              final emailRegex = RegExp(r'^[\w\.-]+@[\w\.-]+\.\w+$');
+              if (!emailRegex.hasMatch(email)) {
+                ToastHelper.showErrorSnackBar(context, "Please enter a valid email address");
+                return;
+              }
+
+              // ✅ Trigger updateProfile
+              await provider.updateProfile(firstName, lastName, email, context);
+
+              // ✅ Navigate ONLY if API success
+              final state = provider.updateProfileState;
+              if (state is Success) {
                 if (widget.isVerified) {
-                  // First time → go onboarding
                   Navigator.pushReplacementNamed(
                     context,
                     AppConstants.navigateToOnBoardingScreen,
                   );
                 } else {
-                  // From profile → go dashboard
                   Navigator.pushReplacementNamed(
                     context,
                     AppConstants.navigateToDashboardScreen,
                   );
                 }
-              });
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Appcolor.mehrun,
@@ -213,9 +217,10 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
           ),
         ),
 
+        // ✅ Do It Later → skip API, direct to onboarding
         if (widget.isVerified)
           Padding(
-            padding: const EdgeInsets.only(top: 4), // reduce space here
+            padding: const EdgeInsets.only(top: 4),
             child: TextButton(
               onPressed: () {
                 Navigator.pushReplacementNamed(
@@ -234,7 +239,6 @@ class _PersonalizeScreenState extends State<PersonalizeScreen> {
               ),
             ),
           ),
-
       ],
     );
   }

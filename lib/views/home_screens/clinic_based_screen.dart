@@ -463,13 +463,13 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
   }
 
   static Widget _topChoiceItem(
-    String serviceId,
-    String title,
-    String description,
-    String imageUrl,
-    String price,
-    BuildContext context,
-  ) {
+      String serviceId,
+      String title,
+      String description,
+      String imageUrl,
+      String price,
+      BuildContext context,
+      ) {
     return InkWell(
       onTap: () {
         showModalBottomSheet(
@@ -498,9 +498,7 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 imageUrl,
                 width: double.infinity,
                 height: 200,
-                // fixed height for consistency
                 fit: BoxFit.cover,
-                // ✅ ensures image fills area nicely
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const ShimmerPlaceholder(
@@ -517,33 +515,47 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                 ),
               ),
 
-              // Positioned text
-              Positioned(
-                left: 8,
-                right: 8,
-                bottom: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    children: [
-                      Text(
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Appcolor.mehrun,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
+              // Gradient overlay at bottom
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.6),
+                        ],
                       ),
-                      Text(
-                        "Starting From $price",
-                        style: TextStyle(
-                          color: Appcolor.textColor,
-                          fontSize: 10,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height:2,),
+                        Text(
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:  TextStyle(
+                            color: Appcolor.mehrun,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                         ),
-                      ),
-                    ],
+                        Text(
+                          "Starting From $price",
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

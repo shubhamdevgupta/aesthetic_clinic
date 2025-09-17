@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
-
 import '../../utils/Appcolor.dart';
 
-class GetHelpScreen extends StatelessWidget {
+class GetHelpScreen extends StatefulWidget {
   const GetHelpScreen({super.key});
+
+  @override
+  State<GetHelpScreen> createState() => _GetHelpScreenState();
+}
+
+class _GetHelpScreenState extends State<GetHelpScreen> {
+  int? expandedIndex;
+
+  final List<Map<String, String>> faqs = [
+    {
+      'q': 'Do you have a parking?',
+      'a': 'Yes, we provide parking facilities for our clients at the clinic.'
+    },
+    {
+      'q': 'Can I pay with a card?',
+      'a': 'Yes, we accept all major credit and debit cards for your convenience.'
+    },
+    {
+      'q': 'Can I reschedule?',
+      'a': 'Absolutely, you can reschedule your appointment with prior notice.'
+    },
+    {
+      'q': 'Can I change doctor?',
+      'a': 'Yes, you may choose or switch your doctor based on availability.'
+    },
+    {
+      'q': 'How to do corporate bookings?',
+      'a': 'For corporate bookings, please contact our clinic support team directly.'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +72,7 @@ class GetHelpScreen extends StatelessWidget {
                 Expanded(
                   child: _HelpActionCard(
                     icon: Image.asset(
-                      'assets/icons/ic_whatsapp.png',
+                      'assets/icons/ic_whatsapp_help.png',
                       width: 28,
                       height: 28,
                     ),
@@ -55,10 +84,10 @@ class GetHelpScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: _HelpActionCard(
-                    icon: const Icon(
-                      Icons.phone_outlined,
-                      size: 28,
-                      color: Appcolor.mehrun,
+                    icon: Image.asset(
+                      'assets/icons/ic_phone_help.png',
+                      width: 28,
+                      height: 28,
                     ),
                     titleTop: 'Connect on',
                     titleBottom: 'Call',
@@ -68,23 +97,75 @@ class GetHelpScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            const Text(
+             Text(
               'FAQs',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Appcolor.mehrun,
               ),
             ),
             const SizedBox(height: 8),
-            _buildFaqItem(context, 'Do you have a parking?'),
-            _buildFaqItem(context, 'Can I pay with a card?'),
-            _buildFaqItem(context, 'Can I reschedule?'),
-            _buildFaqItem(context, 'Can I change doctor?'),
-            _buildFaqItem(context, 'How to do corporate bookings?'),
+
+            // FAQ list
+            Column(
+              children: List.generate(faqs.length, (index) {
+                final faq = faqs[index];
+                final isExpanded = expandedIndex == index;
+
+                return Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey[200]!),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        title: Text(
+                          faq['q']!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        trailing: Icon(
+                          isExpanded
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                          size: 20,
+                          color: Colors.grey,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            expandedIndex = isExpanded ? null : index;
+                          });
+                        },
+                      ),
+                      if (isExpanded)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          child: Text(
+                            faq['a']!,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.black54,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+
             const SizedBox(height: 24),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildFooterLink('Privacy Policy', () {}),
                 _buildFooterLink('Terms & Conditions', () {}),
@@ -107,33 +188,6 @@ class GetHelpScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFaqItem(BuildContext context, String question) {
-    return Container(
-      margin: const EdgeInsets.only(top: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: ListTile(
-        title: Text(
-          question,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.black,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        trailing: const Icon(
-          Icons.arrow_forward_ios,
-          size: 16,
-          color: Colors.grey,
-        ),
-        onTap: () {},
-      ),
-    );
-  }
-
   Widget _buildFooterLink(String text, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -142,7 +196,6 @@ class GetHelpScreen extends StatelessWidget {
         style: const TextStyle(
           color: Appcolor.mehrun,
           fontSize: 14,
-          decoration: TextDecoration.underline,
         ),
       ),
     );
@@ -183,16 +236,7 @@ class _HelpActionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color:  Appcolor.mehrun.withOpacity(0.08),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: icon,
-            ),
+            icon,
             const SizedBox(height: 10),
             Text(
               titleTop,
@@ -216,5 +260,3 @@ class _HelpActionCard extends StatelessWidget {
     );
   }
 }
-
-

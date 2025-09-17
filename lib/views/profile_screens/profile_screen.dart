@@ -9,13 +9,11 @@ import '../../services/LocalStorageService.dart';
 import '../../utils/Appcolor.dart';
 import 'get_help_screen.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
-
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -64,14 +62,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.grey[200],
-                  child: const Icon(
-                    Icons.person,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
+                  child: const Icon(Icons.person, size: 40, color: Colors.grey),
                 ),
                 const SizedBox(width: 16),
-                 Text(
+                Text(
                   "${storage.getString(AppConstants.prefFirstName)!} ${storage.getString(AppConstants.prefLastName)!}",
                   style: TextStyle(
                     fontSize: 18,
@@ -91,9 +85,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>  PersonalizeScreen(isVerified: false,),
+                    builder: (_) => PersonalizeScreen(isVerified: false),
                   ),
-                );},
+                );
+              },
             ),
             _buildMenuItem(
               icon: Icons.account_balance_wallet_outlined,
@@ -122,9 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const GetHelpScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const GetHelpScreen()),
                 );
               },
             ),
@@ -134,9 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const SettingsScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
                 );
               },
             ),
@@ -144,22 +135,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: Icons.logout,
               title: 'Logout',
               onTap: () {
-               AppDialogs.showLogoutDialog(context);
+                AppDialogs.showLogoutDialog(context);
               },
             ),
 
             const SizedBox(height: 32),
 
-            // Footer Links
-            _buildFooterLink('FAQs', () {
-              // Navigate to FAQs
-            }),
-            _buildFooterLink('Privacy Policy', () {
-              // Navigate to privacy policy
-            }),
-            _buildFooterLink('Terms & Conditions', () {
-              // Navigate to terms & conditions
-            }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Footer Links
+                _buildFooterLink('FAQs', () {
+                  // Navigate to FAQs
+                }),
+                _buildFooterLink('Privacy Policy', () {
+                  // Navigate to privacy policy
+                }),
+                _buildFooterLink('Terms & Conditions', () {
+                  // Navigate to terms & conditions
+                }),
+              ],
+            ),
 
             const SizedBox(height: 16),
 
@@ -167,10 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Center(
               child: Text(
                 'App Version 1.0.0',
-                style: TextStyle(
-                  color: Colors.grey[600],
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
             ),
 
@@ -198,11 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: ListTile(
         leading: Stack(
           children: [
-            Icon(
-              icon,
-              color:  Appcolor.mehrun,
-              size: 24,
-            ),
+            Icon(icon, color: Appcolor.mehrun, size: 24),
             if (hasBadge)
               Positioned(
                 right: 0,
@@ -256,11 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onTap: onTap,
         child: Text(
           text,
-          style: TextStyle(
-            color:  Appcolor.mehrun,
-            fontSize: 14,
-            decoration: TextDecoration.underline,
-          ),
+          style: TextStyle(color: Appcolor.mehrun, fontSize: 14),
         ),
       ),
     );

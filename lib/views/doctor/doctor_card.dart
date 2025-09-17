@@ -106,7 +106,7 @@ class _DoctorCardState extends State<DoctorCard> {
 
           // 🔒 Fixed height for name/title
           SizedBox(
-            height: nameHeight,
+            width: double.infinity, // ensures text wraps properly
             child: Text(
               '${widget.title ?? ""} ${widget.name}',
               textAlign: TextAlign.center,
@@ -119,7 +119,8 @@ class _DoctorCardState extends State<DoctorCard> {
               ),
             ),
           ),
-          if (widget.experience != null)
+          if (widget.experience != null) ...[
+            const SizedBox(height: 4), // small spacing
             Text(
               '${widget.experience}+ yrs',
               style: TextStyle(
@@ -127,9 +128,11 @@ class _DoctorCardState extends State<DoctorCard> {
                 color: Appcolor.textColor,
               ),
             ),
-          SizedBox(height: screenWidth * 0.015),
-
-          if (widget.rating != null) _buildRatingStars(widget.rating!),
+          ],
+          if (widget.rating != null) ...[
+            const SizedBox(height: 6),
+            _buildRatingStars(widget.rating!),
+          ],
         ],
       ),
     );

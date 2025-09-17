@@ -201,69 +201,68 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
 
                 SizedBox(height: height * 0.03),
 
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: width * 0.05,
-                    vertical: height * 0.015,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    DoctorReviewScreen(doctorData: doctor),
-                              ),
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Appcolor.mehrun),
-                            padding: EdgeInsets.symmetric(
-                              vertical: height * 0.018,
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  DoctorReviewScreen(doctorData: doctor),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Appcolor.mehrun),
+                          padding: EdgeInsets.symmetric(
+                            vertical: height * 0.018,
                           ),
-                          child: const Text(
-                            'Check Reviews',
-                            style: TextStyle(
-                              color: Appcolor.mehrun,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Check Reviews',
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13, // ✅ slightly smaller for small screens
+                            color: Appcolor.mehrun,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      SizedBox(width: width * 0.03),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // TODO: check availability
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Appcolor.mehrun,
-                            padding: EdgeInsets.symmetric(
-                              vertical: height * 0.018,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                    ),
+                    SizedBox(width: width * 0.03),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // TODO: check availability
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Appcolor.mehrun,
+                          padding: EdgeInsets.symmetric(
+                            vertical: height * 0.018,
                           ),
-                          child: const Text(
-                            'Check Availability',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'Check Availability',
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13, // ✅ reduced size
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ),
