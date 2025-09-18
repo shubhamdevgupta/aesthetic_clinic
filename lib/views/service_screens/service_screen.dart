@@ -165,7 +165,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        height: height * 0.15, // ✅ Responsive height instead of fixed 160
+        height: height * 0.2,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: categories.length,
@@ -220,48 +220,37 @@ class _ServicesScreenState extends State<ServiceScreen> {
           ),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: width * 0.01),
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: width * 0.03,
-                  color: Appcolor.textColor,
-                  height: 1.2,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: width * 0.01, vertical: 4),
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: width * 0.03,
+                color: Appcolor.textColor,
+                height: 1.2,
               ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            SizedBox(height: width * 0.02),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: imageUrl.isNotEmpty
-                  ? Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                height: width * 0.18,
-                width: width * 0.18,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[200],
-                    child: Icon(
-                      Icons.image,
-                      color: Colors.grey[400],
-                      size: width * 0.08,
-                    ),
-                  );
-                },
-              )
-                  : Icon(Icons.image,
-                  color: Colors.grey[400], size: width * 0.08),
-            ),
-          ],
-        ),
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: imageUrl.isNotEmpty
+                ? Image.network(
+              imageUrl,
+              fit: BoxFit.contain, // 👈 better than cover
+              height: width * 0.18,
+              width: width * 0.18,
+            )
+                : Icon(Icons.image, color: Colors.grey[400], size: width * 0.08),
+          ),
+        ],
       ),
+
+    ),
     );
   }
 

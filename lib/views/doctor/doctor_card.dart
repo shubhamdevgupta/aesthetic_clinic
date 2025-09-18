@@ -86,11 +86,11 @@ class _DoctorCardState extends State<DoctorCard> {
           : Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Avatar
           CircleAvatar(
             radius: avatarRadius,
             backgroundColor: Appcolor.mehrun.withOpacity(0.1),
-            backgroundImage:
-            hasValidImage ? NetworkImage(widget.imageUrl!) : null,
+            backgroundImage: hasValidImage ? NetworkImage(widget.imageUrl!) : null,
             child: !hasValidImage
                 ? Text(
               _getInitials(widget.name),
@@ -104,23 +104,27 @@ class _DoctorCardState extends State<DoctorCard> {
           ),
           SizedBox(height: screenWidth * 0.02),
 
-          // 🔒 Fixed height for name/title
+          // 🔒 Fixed-height name section
           SizedBox(
-            width: double.infinity, // ensures text wraps properly
-            child: Text(
-              '${widget.title ?? ""} ${widget.name}',
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: screenWidth * 0.035,
-                fontWeight: FontWeight.bold,
-                color: Appcolor.mehrun,
+            height: screenWidth * 0.10, // reserve space for 2 lines
+            child: Center(
+              child: Text(
+                '${widget.title ?? ""} ${widget.name}',
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.035,
+                  fontWeight: FontWeight.bold,
+                  color: Appcolor.mehrun,
+                ),
               ),
             ),
           ),
+
+          // ✅ Experience stays aligned across all cards
           if (widget.experience != null) ...[
-            const SizedBox(height: 4), // small spacing
+            const SizedBox(height: 4),
             Text(
               '${widget.experience}+ yrs',
               style: TextStyle(
@@ -129,12 +133,14 @@ class _DoctorCardState extends State<DoctorCard> {
               ),
             ),
           ],
+
+          // ✅ Rating also aligned
           if (widget.rating != null) ...[
             const SizedBox(height: 6),
             _buildRatingStars(widget.rating!),
           ],
         ],
-      ),
+      )
     );
   }
 

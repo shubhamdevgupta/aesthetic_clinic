@@ -5,6 +5,13 @@ import 'package:flutter/material.dart';
 import '../../utils/Appcolor.dart';
 import '../profile_screens/get_help_screen.dart';
 
+import 'package:aesthetic_clinic/views/booking_screens/past_booking_screen.dart';
+import 'package:aesthetic_clinic/views/booking_screens/upcoming_booking_screen.dart';
+import 'package:flutter/material.dart';
+
+import '../../utils/Appcolor.dart';
+import '../profile_screens/get_help_screen.dart';
+
 
 const Color kPrimaryColor = Appcolor.mehrun;
 const Color kUnselectedTabText = Color(0xFF9E9E9E);
@@ -78,6 +85,7 @@ class BookingScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Container(
                   height: kTabHeight,
+                  margin: const EdgeInsets.only(bottom: 6), // small gap between tabs and content
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -88,6 +96,13 @@ class BookingScreen extends StatelessWidget {
                     unselectedLabelColor: kUnselectedTabText,
                     labelStyle: const TextStyle(fontWeight: FontWeight.w700),
                     unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+
+                    // Remove all underlines and dividers
+                    indicatorColor: Colors.transparent,
+                    indicatorWeight: 0,
+                    dividerColor: Colors.transparent, // This removes the underline
+                    dividerHeight: 0, // This also helps remove any divider
+
                     indicator: BoxDecoration(
                       color: kPrimaryColor,
                       borderRadius: BorderRadius.circular(10),
