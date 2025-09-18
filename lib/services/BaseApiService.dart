@@ -371,7 +371,7 @@ class BaseApiService {
     while (retryCount <= maxRetries) {
       try {
         log('🔄 Refreshing token... (Attempt ${retryCount + 1}/${maxRetries + 1})');
-        log('🔸 Refresh Token: ${refreshToken.substring(0, 10)}...'); // Log only first 10 chars for security
+        log('🔸 Refresh Token: $refreshToken'); // Log only first 10 chars for security
 
         final response = await http.post(
           url,
@@ -379,6 +379,7 @@ class BaseApiService {
           body: jsonEncode({'refreshToken': refreshToken}),
         );
         log('🔸 Post Request to: $url');
+        log('🔸 Refresh Token Header: $refreshToken');
 
         log('📩 Refresh Response Status: ${response.statusCode}');
         log('📩 Refresh Response Body: ${response.body}');
