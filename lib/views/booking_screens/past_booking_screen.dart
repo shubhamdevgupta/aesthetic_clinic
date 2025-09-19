@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../doctor/doctor_review_screen.dart';
 import 'booking_tab_screen.dart';
 
 class PastBookingsScreen extends StatefulWidget {
@@ -84,8 +85,19 @@ class _PastBookingsScreenState extends State<PastBookingsScreen> {
                 dateLine:
                 '${_formatBookingDate(b.date)} ${b.doctorSlot.startTime} with ${b.doctor.title} ${b.doctor.name}',
                 bookingId: b.id,
-                onPrimaryAction: () {},
-                onSecondaryAction: () {},
+                onPrimaryAction: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DoctorReviewScreen(
+                        doctorId: b.doctorId, // just pass id
+                      ),
+                    ),
+                  );
+                },
+                onSecondaryAction: () {
+                  print("Book Again Clicked");
+                },
               );
             },
           ),

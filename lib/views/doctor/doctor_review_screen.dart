@@ -11,9 +11,11 @@ import '../../providers/home_provider.dart';
 import '../../services/ui_state.dart';
 
 class DoctorReviewScreen extends StatefulWidget {
-  final DoctorData doctorData;
+  final DoctorData? doctorData;
+  final String? doctorId;
 
-  DoctorReviewScreen({Key? key, required this.doctorData}) : super(key: key);
+  const DoctorReviewScreen({Key? key, this.doctorData, this.doctorId})
+    : super(key: key);
 
   @override
   State<DoctorReviewScreen> createState() => _DoctorReviewScreenState();
@@ -22,71 +24,33 @@ class DoctorReviewScreen extends StatefulWidget {
 class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
   TextEditingController reviewController = TextEditingController();
 
+  String? _doctorId;
+  DoctorData? _doctorData;
+
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-          () => Provider.of<HomeProvider>(
-        context,
-        listen: false,
-      ).getDoctorReview(widget.doctorData.id ?? "", context),
-    );
+
+    _doctorData = widget.doctorData;
+    _doctorId = widget.doctorData?.id ?? widget.doctorId;
+
+    if (_doctorId != null && _doctorId!.isNotEmpty) {
+      final provider = Provider.of<HomeProvider>(context, listen: false);
+
+      // ✅ Always fetch reviews
+      provider.getDoctorReview(_doctorId!, context);
+
+      // ✅ If doctorData is null, trigger doctor details API
+      if (_doctorData == null) {
+        provider.getDoctorById(_doctorId!, context);
+      }
+    }
   }
+
   @override
   void dispose() {
+    reviewController.dispose();
     super.dispose();
-    reviewController.clear();
-  }
-
-
-  /// ⭐ Reusable star builder (supports half stars)
-  Widget buildStarRating(
-      double rating, {
-        bool isInteractive = false,
-        double size = 20,
-        Function(double)? onChanged,
-      }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (index) {
-        double starValue = index + 1.0;
-
-        IconData icon;
-        if (rating >= starValue) {
-          icon = Icons.star; // full star
-        } else if (rating >= starValue - 0.5) {
-          icon = Icons.star_half; // half star
-        } else {
-          icon = Icons.star_border; // empty star
-        }
-
-        return GestureDetector(
-          onTap: isInteractive ? () => onChanged?.call(starValue) : null,
-          child: Icon(icon, color: Appcolor.mehrun, size: size),
-        );
-      }),
-    );
-  }
-
-  /// ⭐ Shimmer loader widget
-  Widget shimmerLoader() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: ListView.builder(
-        itemCount: 6,
-        itemBuilder: (context, index) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Container(
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -104,95 +68,31 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
       ),
       body: Consumer<HomeProvider>(
         builder: (context, provider, child) {
-          final doctoReviewState = provider.doctorReviewState;
+          final doctorDetailState = provider.doctorDetailState;
+          final doctorReviewState = provider.doctorReviewState;
           final submitReviewState = provider.submitReviewState;
 
-          // 🔹 Show shimmer for Idle & Loading
-          if (doctoReviewState is Idle ||
-              doctoReviewState is Loading ||
+          // ✅ Bind _doctorData from doctorDetailState (reactive)
+          if (_doctorData == null && doctorDetailState is Success<DoctorDetailModel>) {
+            _doctorData = doctorDetailState.response.data;
+          }
+
+          if (doctorReviewState is Loading ||
+              doctorDetailState is Loading ||
               submitReviewState is Loading) {
             return shimmerLoader();
           }
 
-          // 🔹 Success: safe cast now
-          if (doctoReviewState is Success<DoctorReview>) {
-            final doctor = doctoReviewState.response.data;
+          if (doctorReviewState is Success<DoctorReview>) {
+            final doctorReviews = doctorReviewState.response.data;
 
             return SingleChildScrollView(
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ✅ Doctor Header
-                  Container(
-                    padding: const EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        // ⭐ Doctor image with fallback initials
-                        CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Appcolor.mehrun,
-                          backgroundImage: (widget.doctorData.image != null &&
-                              widget.doctorData.image!.isNotEmpty)
-                              ? NetworkImage(widget.doctorData.image!)
-                              : null,
-                          child: (widget.doctorData.image == null ||
-                              widget.doctorData.image!.isEmpty)
-                              ? Text(
-                            widget.doctorData.name
-                                ?.split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .toUpperCase() ??
-                                "",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          )
-                              : null,
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${widget.doctorData.name}',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Appcolor.mehrun,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${widget.doctorData.specialization}',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey.shade600,
-                                  height: 1.3,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '${widget.doctorData.experience} + years',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // ✅ Always show doctor card (either from widget or API)
+                  if (_doctorData != null) buildDoctorCard(_doctorData!),
 
                   const SizedBox(height: 20),
 
@@ -200,15 +100,15 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                   Row(
                     children: [
                       buildStarRating(
-                        doctor.isNotEmpty
-                            ? double.tryParse(doctor.first.rating) ?? 0.0
+                        doctorReviews.isNotEmpty
+                            ? double.tryParse(doctorReviews.first.rating) ?? 0.0
                             : 0.0,
                         size: 24,
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        doctor.isNotEmpty
-                            ? "${doctor.first.rating} Ratings"
+                        doctorReviews.isNotEmpty
+                            ? "${doctorReviews.first.rating} Ratings"
                             : "No Ratings Yet",
                         style: const TextStyle(
                           fontSize: 16,
@@ -231,7 +131,7 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
 
                   const SizedBox(height: 16),
 
-                  // ⭐ Stylish TextField
+                  // ⭐ Review Input
                   TextField(
                     controller: reviewController,
                     keyboardType: TextInputType.text,
@@ -257,26 +157,31 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        if(reviewController.text.isEmpty){
-                          ToastHelper.showToastMessage("Please enter your Review");
+                        if (reviewController.text.isEmpty) {
+                          ToastHelper.showToastMessage(
+                            "Please enter your Review",
+                          );
+                        } else if (_doctorId != null) {
+                          await provider.submitReview(
+                            provider.selectedRating.toString(),
+                            reviewController.text,
+                            _doctorId!,
+                            context,
+                          );
 
-                        }else{
-                        await provider.submitReview(
-                          provider.selectedRating.toString(),
-                          reviewController.text,
-                          widget.doctorData.id ?? "",
-                          context,
-                        );
+                          if (provider.submitReviewState
+                          is Success<ReviewResponse>) {
+                            final response =
+                                (provider.submitReviewState as Success<ReviewResponse>)
+                                    .response;
+                            ToastHelper.showToastMessage(response.message);
+                            provider.setSelectedRating(0);
+                            reviewController.clear();
 
-                        if (provider.submitReviewState is Success<ReviewResponse>) {
-                          final response =
-                              (provider.submitReviewState as Success<ReviewResponse>)
-                                  .response;
-                          ToastHelper.showToastMessage(response.message);
-                          provider.setSelectedRating(0);
-                          reviewController.clear();
-                          provider.getDoctorReview(widget.doctorData.id??"", context);
-                        }}
+                            // ✅ Refresh reviews after submit
+                            provider.getDoctorReview(_doctorId!, context);
+                          }
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Appcolor.mehrun,
@@ -299,16 +204,16 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
                   const SizedBox(height: 30),
 
                   // ✅ Reviews List
-                  doctor.isEmpty
+                  doctorReviews.isEmpty
                       ? const Center(child: Text("No reviews yet"))
                       : ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: doctor.length,
+                    itemCount: doctorReviews.length,
                     separatorBuilder: (context, index) =>
                     const SizedBox(height: 20),
                     itemBuilder: (context, index) {
-                      final review = doctor[index];
+                      final review = doctorReviews[index];
                       return ReviewCard(
                         name:
                         "${review.reviewer.firstName} ${review.reviewer.lastName}",
@@ -324,11 +229,128 @@ class _DoctorReviewScreenState extends State<DoctorReviewScreen> {
             );
           }
 
-          return shimmerLoader(); // fallback
+          return shimmerLoader();
         },
       ),
     );
   }
+
+  // ✅ Extracted reusable doctor card widget
+  Widget buildDoctorCard(DoctorData doctor) {
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: Appcolor.mehrun,
+            backgroundImage: (doctor.image != null && doctor.image!.isNotEmpty)
+                ? NetworkImage(doctor.image!)
+                : null,
+            child: (doctor.image == null || doctor.image!.isEmpty)
+                ? Text(
+              doctor.name
+                  ?.split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase() ??
+                  "",
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            )
+                : null,
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  doctor.name ?? "",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Appcolor.mehrun,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  doctor.specialization ?? "",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "${doctor.experience ?? ""} + years",
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// ⭐ Reusable star builder
+Widget buildStarRating(
+  double rating, {
+  bool isInteractive = false,
+  double size = 20,
+  Function(double)? onChanged,
+}) {
+  return Row(
+    mainAxisSize: MainAxisSize.min,
+    children: List.generate(5, (index) {
+      double starValue = index + 1.0;
+
+      IconData icon;
+      if (rating >= starValue) {
+        icon = Icons.star;
+      } else if (rating >= starValue - 0.5) {
+        icon = Icons.star_half;
+      } else {
+        icon = Icons.star_border;
+      }
+
+      return GestureDetector(
+        onTap: isInteractive ? () => onChanged?.call(starValue) : null,
+        child: Icon(icon, color: Appcolor.mehrun, size: size),
+      );
+    }),
+  );
+}
+
+/// ⭐ Shimmer loader widget
+Widget shimmerLoader() {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey.shade300,
+    highlightColor: Colors.grey.shade100,
+    child: ListView.builder(
+      itemCount: 6,
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Container(
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class ReviewCard extends StatelessWidget {
@@ -424,5 +446,4 @@ class ReviewCard extends StatelessWidget {
       ],
     );
   }
-
 }
