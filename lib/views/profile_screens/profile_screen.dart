@@ -21,35 +21,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final fullname=                  "${storage.getString(AppConstants.prefFirstName)!} ${storage.getString(AppConstants.prefLastName)!}";
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
+        title:  Text(
           'Profile',
           style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+            color: Appcolor.mehrun,
+            fontWeight: FontWeight.bold
           ),
         ),
-        centerTitle: true,
-        actions: [
-          Container(
-            margin: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.person_add, color: Colors.black),
-              onPressed: () {
-                // Handle switch profile
-              },
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -60,9 +44,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Row(
               children: [
                 CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.grey[200],
-                  child: const Icon(Icons.person, size: 40, color: Colors.grey),
+                  radius: 40,
+                  backgroundColor: Appcolor.mehrun,
+                  child: (fullname.isNotEmpty)
+                      ? Text(
+                    fullname
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")
+                        .toUpperCase() ??"",
+
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  )
+                      : null,
                 ),
                 const SizedBox(width: 16),
                 Text(

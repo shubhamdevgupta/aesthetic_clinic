@@ -389,6 +389,8 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   ),
                 ),
               ),
+              SliverToBoxAdapter(child: SizedBox(height: 20,))
+
             ],
           ),
         );
