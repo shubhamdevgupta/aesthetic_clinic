@@ -151,7 +151,7 @@ class _SendOtpScreenState extends State<SendOtpScreen> {
                                 isDense: true,
                                 hintText: "Enter phone number",
                                 // 👈 make sure you use `hintText`
-                                hintStyle: TextStyle(color: Appcolor.mehrun),
+                                hintStyle: TextStyle(color: Appcolor.withOpacity(Appcolor.mehrun,0.5)),
                                 // 👈 hint text color
                                 contentPadding: EdgeInsets.symmetric(
                                   vertical: 12,

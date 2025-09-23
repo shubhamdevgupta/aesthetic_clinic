@@ -128,32 +128,27 @@ class _ClinicBasedScreenState extends State<ClinicBasedScreen> {
                   ),
                 ),
               ),
-              SliverToBoxAdapter(
-                child: SizedBox(
-                    child: Divider(thickness: 6, color: Color(0xFFD5D5D5))),
-              ),
+
               // ✅ Products
               SliverToBoxAdapter(
-                child: _section(
-                  "Get Our Trusted Products",
-                  SizedBox(
-                    height: 160,
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: recommendedProducts.length,
-                      itemBuilder: (context, index) {
-                        final product = recommendedProducts[index];
-                        return ProductCard(product.name, product.featuredImage);
-                      },
+                child: Container(
+                  decoration: BoxDecoration(color:  Color(0xFFD5D5D5)),
+                  child: _section(
+                    "Get Our Trusted Products",
+                    SizedBox(
+                      height: 160,
+                      child: ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: recommendedProducts.length,
+                        itemBuilder: (context, index) {
+                          final product = recommendedProducts[index];
+                          return ProductCard(product.name, product.featuredImage);
+                        },
+                      ),
                     ),
                   ),
                 ),
-              ),
-
-              SliverToBoxAdapter(
-                child: SizedBox(
-                    child: Divider(thickness: 6, color: Color(0xFFD5D5D5))),
               ),
 
               SliverToBoxAdapter(
