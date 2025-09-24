@@ -7,6 +7,7 @@ import 'package:aesthetic_clinic/services/LocalStorageService.dart';
 import 'package:aesthetic_clinic/utils/AppConstants.dart';
 import 'package:aesthetic_clinic/utils/AppRoutes.dart';
 import 'package:aesthetic_clinic/utils/appcolor.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,7 +30,10 @@ void main() async {
         ChangeNotifierProvider(create: (_) => HomeProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
-      child: const MyApp(),
+      child:  DevicePreview(
+        enabled: true,
+        builder: (context) => MyApp(),
+      ),
     ),
   );
 }

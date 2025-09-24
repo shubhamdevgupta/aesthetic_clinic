@@ -165,7 +165,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: SizedBox(
-        height: height * 0.2,
+        height: 120, // ✅ fixed height looks consistent on all screens
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: categories.length,
@@ -193,7 +193,7 @@ class _ServicesScreenState extends State<ServiceScreen> {
             );
           },
         ),
-      ),
+      )
     );
   }
 
